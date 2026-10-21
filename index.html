@@ -670,13 +670,18 @@ const NID_DEV={
   'base eufy':['Base eufy','Arrière Cuisine'], 'plaque de cuisson':['Plaque de cuisson','Buanderie'],
   'clim bureau':['Clim','Bureau'], 'clim salon':['Clim','Salon'],
   'clim ma chambre':['Clim','Ma Chambre'], 'clim chambre piscine':['Clim','Chambre Piscine'],
-  'lumière cuisine':['Lumière','Cuisine'], 'sonnette entrée':['Sonnette','Entrée'], 'rideau ma chambre':['Rideau','Ma Chambre'],
+  'lumière cuisine':['Lumière','Cuisine'], 'sonnette entrée':['Sonnette','Entrée'], 'rideau ma chambre':['Rideau','Ma Chambre'], 'rideaux ma chambre':['Rideau','Ma Chambre'],
   'lumière baie gauche':['Lumière Baie Gauche','Salon'], 'lumière baie droite':['Lumière Baie Droite','Salon'], 'lumière table':['Lumière Table','Salon'],
   'store paul':['Store de Paul','Extérieur'], 'store chambre piscine':['Store de la chambre piscine','Extérieur'],
+  'store chambre de maître':['Store de ma chambre','Extérieur'],
   'store baie droite 1':['Store droit 1','Extérieur'], 'store baie droite 2':['Store droit 2','Extérieur'],
-  'store baie gauche 1':['Store Gauche 3','Extérieur'], 'store baie gauche 2':['Store gauche 4','Extérieur'],
+  'store baie gauche 1':['Store gauche 3','Extérieur'], 'store baie gauche 2':['Store gauche 4','Extérieur'],
+  'rideau gauche':['Rideau gauche','Salon'], 'rideaux droit':['Rideau droit','Salon'], 'rideau paul':['Rideau','Chambre De Paul'],
   'terrasse':['Terrasse','Extérieur'], 'terrasse nord':['Terrasse Nord','Extérieur']
 };
+// Les stores restent dans « Extérieur », mais on les retrouve aussi dans leur pièce
+const NID_ALSO={'store chambre de maître':['Ma Chambre'],'store paul':['Chambre De Paul'],'store chambre piscine':['Chambre Piscine'],
+  'store baie droite 1':['Salon'],'store baie droite 2':['Salon'],'store baie gauche 1':['Salon'],'store baie gauche 2':['Salon']};
 const nidRoom=n=>NID_ROOM[nk(n)]||String(n||'').trim();
 const nidDev=n=>NID_DEV[nk(n)]||(nk(n).indexOf('echo dot')===0?['Echo Dot','Bureau']:null);
 const devName=d=>(nidDev(d.name)||[])[0]||String(d.name||'').trim();
@@ -827,10 +832,12 @@ async function setCap(id,cap,val){
   try{
     await req('/api/manager/devices/device/'+encodeURIComponent(id)+'/capability/'+encodeURIComponent(cap),{method:'PUT',body:{value:val}});
     setTimeout(refresh,1500);
+    return true;
   }catch(e){
     if(c) c.value=old; render();
     const s=e&&e.status;
     toast(s===401||s===403?'Ta clé n’a pas le droit de piloter cet appareil.':'Commande non passée : Homey ne répond pas.','bad');
+    return false;
   }
 }
 async function closeAll(btn){
@@ -984,6 +991,7 @@ function roomDevs(name){
   if(o&&o.dev) return Object.values(data.devices||{}).filter(d=>nk(d.name)===o.dev);
   const names=[name].concat(o&&o.also||[]).map(nk), out=[];
   for(const r of roomsView()) if(!r.off&&names.includes(nk(r.name))) out.push(...r.devs.filter(x=>!x.off).map(x=>x.dev));
+  for(const d of Object.values(data.devices||{})){ const a=NID_ALSO[nk(d.name)]; if(a&&a.some(z=>names.includes(nk(z)))&&!out.includes(d)) out.push(d); }
   return out;
 }
 // Affichage dans le sens du plan de masse : piscine en haut, garage en bas (iPad) ;
@@ -1005,13 +1013,13 @@ function planBox(o,tall){
 }
 // Baies vitrées côté piscine (avec leur store ou rideau quand il y en a un, noms Homey)
 const PLAN_BAYS=[
-  {x:1.5,w:3.5,dev:'rideau ma chambre'},
+  {x:1.5,w:3.5,dev:'store chambre de maître|rideaux ma chambre'},
   {x:8.9,w:3,dev:'store baie gauche 2'},{x:13.9,w:3,dev:'store baie gauche 1'},
   {x:18.55,w:3,dev:'store baie droite 2'},{x:22.4,w:3,dev:'store baie droite 1'},
   {x:26.5,w:2,dev:'store chambre piscine'},
   {x:32.2,w:2,dev:'store paul'}
 ].map(b=>Object.assign({y:15.65,h:0.9},b));
-const bayDev=k=>Object.values(data.devices||{}).find(d=>nk(d.name)===k);
+const bayDev=k=>{ for(const n of String(k).split('|')){ const d=Object.values(data.devices||{}).find(x=>nk(x.name)===n); if(d) return d; } return null; };
 function roomState(o){
   const devs=roomDevs(o.n), live=devs.filter(d=>d.available!==false);
   const lit=live.filter(d=>(d.class==='light'||/lumi[eè]re/i.test(d.name))&&d.capabilitiesObj&&d.capabilitiesObj.onoff&&d.capabilitiesObj.onoff.value).length;
@@ -1045,12 +1053,12 @@ function planHtml(mini){
     if(!d){ h+='<span class="bay fixe" aria-hidden="true" style="'+planBox(b,tall)+'"></span>'; continue; }
     const s=bayState(d), cl=s.closed===null?'':s.closed>.95?' shut':s.closed>.05?' half':' open';
     const fill=s.closed===null?'':'<i style="'+(tall?'width':'height')+':'+Math.round(s.closed*100)+'%"></i>';
-    const say=devName(d)+', '+stateText(d);
+    const say=devName(d)+', '+stateText(d)+(s.closed===null?'':s.closed>.5?'. Touche pour ouvrir':'. Touche pour fermer');
     h+=mini?'<span class="bay'+cl+(s.bad?' bad':'')+'" style="'+planBox(b,false)+'">'+fill+'</span>'
       :'<button class="bay'+cl+(s.bad?' bad':'')+(tall?' tv':'')+'" type="button" data-bay="'+esc(b.dev)+'" style="'+planBox(b,tall)+'" aria-label="'+esc(say)+'">'+fill+'</button>';
   }
   h+='</div>';
-  if(!mini) h+='<p class="plan-legend"><span><i></i>Lumière allumée</span><span><i class="dot"></i>Ne répond pas</span><span><i class="glass"></i>Baie vitrée</span><span>Touche une pièce ou une baie</span></p>';
+  if(!mini) h+='<p class="plan-legend"><span><i></i>Lumière allumée</span><span><i class="dot"></i>Ne répond pas</span><span><i class="glass"></i>Baie vitrée</span><span>Touche une baie : son store s’ouvre ou se ferme</span></p>';
   return h;
 }
 function miniPlan(){
@@ -1066,6 +1074,20 @@ function planSheetHtml(id){
   return '<div class="list">'+devs.map(devRow).join('')+'</div>';
 }
 function openRoom(name){ const o=PLAN.find(p=>p.n===name); planRoom=name; openSheet((o&&o.t)||name,planSheetHtml(name),{}); }
+// Une touche sur la baie : le store s'ouvre s'il est fermé, se ferme s'il est ouvert
+async function toggleBay(k){
+  const d=bayDev(k); if(!d) return;
+  if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
+  if(d.available===false){ toast(devName(d)+' ne répond pas.','bad'); return; }
+  const kind=ctrlKind(d), sc=d.capabilitiesObj&&d.capabilitiesObj.windowcoverings_set;
+  const v=sc&&typeof sc.value==='number'?sc.value:null;
+  if(v===null||(kind!=='cover'&&kind!=='coverset')){ openBay(k); return; }
+  const open=v<.5;
+  if(mode!=='demo') sc.value=open?1:0;
+  toast(devName(d)+(open?' s’ouvre':' se ferme'));
+  const ok=kind==='cover'?await setCap(d.id,'windowcoverings_state',open?'up':'down'):await setCap(d.id,'windowcoverings_set',open?1:0);
+  if(ok===false){ sc.value=v; render(); }
+}
 function openBay(k){ const d=bayDev(k); if(!d) return; planRoom='bay:'+k; openSheet(devName(d),planSheetHtml(planRoom),{}); }
 function renderRooms(){
   const all=roomsView();
@@ -1483,7 +1505,7 @@ $('#view').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b) return;
   if(b.dataset.flow){ runScene(b); return; }
   if(b.dataset.plan){ openRoom(b.dataset.plan); return; }
-  if(b.dataset.bay){ openBay(b.dataset.bay); return; }
+  if(b.dataset.bay){ toggleBay(b.dataset.bay); return; }
   if(b.dataset.rview){ store.set('roomsView',b.dataset.rview); render(); return; }
   if(b.dataset.room){ room=b.dataset.room; render(); return; }
   if(b.dataset.photo){ if(getPhoto(b.dataset.photo)) openPhoto(b.dataset.photo); else { photoZone=b.dataset.photo; $('#photo-input').click(); } return; }
