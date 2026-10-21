@@ -1,0 +1,1542 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Le Nid"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#f6f3ee" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#111317" media="(prefers-color-scheme: dark)"><link rel="apple-touch-icon" href="data:image/png;base64,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"><link rel="icon" href="data:image/png;base64,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"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}</style><title>Le Nid</title></head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap">
+<style>
+/* Télécommande de maison : une colonne sur iPhone, deux colonnes sur iPad. En-tête fixe, barre d'onglets en bas.
+   Couleurs de la maison : blanc enduit, velours vert, noyer, laiton ; le soir, velours noir et laiton. Une seule police, Jost ; titres en laiton. */
+:root{
+  --bg:#f6f3ee; --surface:#ffffff; --surface-2:#ede7dd; --line:#e4ddd1; --line-2:#cfc6b8;
+  --ink:#16181b; --ink-2:#5e5a54; --ink-3:#7f786e;
+  --brand:#2e4a36; --fill:#2e4a36; --on-fill:#f6f3ee; --accent:#a8874f; --knob:#ffffff;
+  --ok:#2e4a36; --ok-bg:#e3ebe3; --warn:#6b4510; --warn-bg:#f4ddb4; --bad:#96391a; --bad-bg:#f6dccd;
+  --scrim:rgba(22,24,27,.4); --shadow:0 1px 3px rgba(69,51,36,.08); --lift:0 8px 24px rgba(69,51,36,.18);
+  --r:6px; --r-lg:10px; --lit:#f4d19a; --pool:#62a4f8; --pool-ink:#0b2545; --glass:#dde3da;
+  --font:"Jost",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --serif:"Jost",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111317; --surface:#1b1d22; --surface-2:#24272e; --line:#2c3037; --line-2:#3e434d;
+  --ink:#f3eee6; --ink-2:#b5aea3; --ink-3:#8e877d;
+  --brand:#d2ae6d; --fill:#c9a463; --on-fill:#16181b; --accent:#d2ae6d; --knob:#f3eee6;
+  --ok:#9bc4a5; --ok-bg:#1f2c23; --warn:#f0b95a; --warn-bg:#362a14; --bad:#f08a5d; --bad-bg:#3a2016;
+  --scrim:rgba(0,0,0,.6); --shadow:0 1px 3px rgba(0,0,0,.4); --lift:0 8px 24px rgba(0,0,0,.5); color-scheme:dark;
+  --lit:#5c4321; --pool:#2f6fbf; --pool-ink:#ffffff; --glass:#2e3a33;
+}}
+:root[data-theme="dark"]{
+  --bg:#111317; --surface:#1b1d22; --surface-2:#24272e; --line:#2c3037; --line-2:#3e434d;
+  --ink:#f3eee6; --ink-2:#b5aea3; --ink-3:#8e877d;
+  --brand:#d2ae6d; --fill:#c9a463; --on-fill:#16181b; --accent:#d2ae6d; --knob:#f3eee6;
+  --ok:#9bc4a5; --ok-bg:#1f2c23; --warn:#f0b95a; --warn-bg:#362a14; --bad:#f08a5d; --bad-bg:#3a2016;
+  --scrim:rgba(0,0,0,.6); --shadow:0 1px 3px rgba(0,0,0,.4); --lift:0 8px 24px rgba(0,0,0,.5); color-scheme:dark;
+  --lit:#5c4321; --pool:#2f6fbf; --pool-ink:#ffffff; --glass:#2e3a33;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* En-tête */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.top-in{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;display:flex;align-items:center;gap:12px}
+.logo{width:38px;height:38px;border-radius:var(--r);background:var(--fill);color:var(--on-fill);display:grid;place-items:center;flex:none}
+.brand-txt{min-width:0}
+h1{font-family:var(--serif);font-size:24px;line-height:1.1;margin:0;color:var(--ink);font-weight:500;letter-spacing:0;text-wrap:balance}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2)}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ink-3)}
+.pill.ok::before{background:var(--ok)} .pill.bad::before{background:var(--bad)}
+.icon-btn{width:44px;height:44px;border:1px solid var(--line);background:var(--bg);border-radius:var(--r);color:var(--brand);display:grid;place-items:center;cursor:pointer;flex:none}
+.top .icon-btn{margin-left:auto}
+
+/* Contenu */
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px calc(110px + env(safe-area-inset-bottom,0px))}
+.sec{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin:24px 0 10px;font-weight:600}
+.muted{color:var(--ink-3);font-size:14px;margin:0}
+.lead{color:var(--ink-2);margin:2px 0 14px}
+.linkbtn{background:none;border:0;padding:0;color:var(--brand);font-weight:600;text-decoration:underline;cursor:pointer}
+.sec-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:24px 0 10px}
+.sec-row .sec{margin:0}
+.sec-row .linkbtn,.chips-row .linkbtn{flex:none;font-size:14px;min-height:40px;padding:0 4px;text-decoration:none}
+
+/* Bandeau d'état */
+.status{display:flex;gap:14px;align-items:flex-start;padding:16px;border-radius:var(--r-lg);background:var(--ok-bg)}
+.status.warn{background:var(--warn-bg)} .status.bad{background:var(--bad-bg)}
+.status-dot{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--ok);color:var(--bg);font-weight:700;font-size:20px}
+.status.warn .status-dot{background:var(--warn)} .status.bad .status-dot{background:var(--bad)}
+.status h2{font-family:var(--serif);font-weight:500;margin:2px 0 4px;font-size:21px;line-height:1.25;color:var(--ok);text-wrap:balance}
+.status.warn h2{color:var(--warn)} .status.bad h2{color:var(--bad)}
+.status p,.status li{margin:0;color:var(--ink-2);font-size:14px}
+.status ul{margin:0;padding-left:18px;display:grid;gap:2px}
+.status .sum{margin-top:6px;color:var(--ink-3);font-size:13px;font-variant-numeric:tabular-nums}
+.status-txt{min-width:0}
+
+/* Tout fermer */
+.allclose{margin-top:12px;width:100%;display:flex;align-items:center;gap:14px;min-height:66px;padding:10px 14px;border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg);text-align:left;cursor:pointer}
+.allclose .row-ic{background:var(--fill);color:var(--on-fill)}
+.allclose b{display:block;font-weight:600;font-size:16px}
+.allclose small{display:block;color:var(--ink-2);font-size:13px}
+.allclose.busy{opacity:.55;pointer-events:none}
+a.allclose{color:inherit;text-decoration:none}
+.cams{margin-top:22px}
+.cams .sec{margin-bottom:0}
+
+/* Scènes */
+.scenes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.scene{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:14px;min-height:108px;padding:14px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);text-align:left;cursor:pointer;transition:background .2s,border-color .2s,transform .1s;overflow-wrap:anywhere}
+.scene:active{transform:scale(.98)}
+.scene.now{border-color:var(--accent);border-width:2px;padding:13px}
+.scene-ic{width:42px;height:42px;border-radius:50%;background:var(--fill);color:var(--on-fill);display:grid;place-items:center}
+.scene-name{font-weight:600;font-size:16px;line-height:1.25}
+.scene-now{position:absolute;top:12px;right:10px;font-size:12px;font-weight:600;color:var(--brand);background:var(--surface-2);border-radius:999px;padding:3px 9px}
+.scene-ok{display:none;position:absolute;top:14px;right:12px;align-items:center;gap:4px;font-size:13px;font-weight:600}
+.scene-ok .i{width:16px;height:16px}
+.scene.busy{opacity:.55;pointer-events:none}
+.scene.done{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
+.scene.done .scene-ic{background:var(--on-fill);color:var(--fill)}
+.scene.done .scene-ok{display:inline-flex}
+.scene.done .scene-now{display:none}
+.ask{margin-top:12px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;border:1.5px dashed var(--line-2);border-radius:var(--r-lg);background:none;color:var(--brand);font-weight:600;cursor:pointer}
+
+/* Listes */
+.list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:var(--bg)}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:64px}
+.row+.row{border-top:1px solid var(--line)}
+.row-ic{flex:none;width:40px;height:40px;border-radius:var(--r);background:var(--surface-2);color:var(--brand);display:grid;place-items:center}
+.row-txt{flex:1;min-width:0;overflow-wrap:anywhere}
+.row-txt b{display:block;font-weight:600;line-height:1.3}
+.row-txt small{display:block;color:var(--ink-2);font-size:13px;margin-top:1px;font-variant-numeric:tabular-nums}
+.row.is-off{opacity:.6}
+
+/* Pièces */
+.chips-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.chips{flex:1;min-width:0;display:flex;gap:8px;overflow-x:auto;padding-block:2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;min-height:40px;padding:0 15px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink-2);font-size:14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--fill);border-color:var(--fill);color:var(--on-fill);font-weight:600}
+.rooms{display:grid;gap:20px}
+.room-h{display:flex;align-items:center;gap:12px;margin:0 0 8px}
+.room-h h3{margin:0;font-size:15px;font-weight:600;color:var(--brand);min-width:0;overflow-wrap:anywhere}
+.room-photo{flex:none;width:52px;height:52px;padding:0;border-radius:var(--r);border:1.5px dashed var(--line-2);background:var(--surface);color:var(--ink-3);display:grid;place-items:center;overflow:hidden;cursor:pointer}
+.room-photo.has{border:0}
+.room-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-big{display:block;width:100%;max-height:50vh;object-fit:cover;border-radius:var(--r-lg);margin-bottom:14px}
+
+/* Plan du Nid */
+.view-seg{flex:none;display:flex;border:1px solid var(--line-2);border-radius:999px;padding:2px;gap:2px}
+.view-seg button{min-height:40px;min-width:64px;padding:0 14px;border:0;border-radius:999px;background:none;color:var(--ink-2);font-size:14px;cursor:pointer}
+.view-seg button[aria-pressed="true"]{background:var(--fill);color:var(--on-fill);font-weight:600}
+.plan{position:relative;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+.plan .corr{position:absolute;background:var(--surface-2)}
+.pr{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:3px;margin:0;border:1.5px solid var(--ink);border-radius:0;background:var(--bg);color:var(--ink);font-size:11.5px;line-height:1.15;text-align:center;cursor:pointer;overflow:hidden;overflow-wrap:normal;-webkit-hyphens:auto;hyphens:auto;transition:background .2s}
+.pr b{font-weight:600}
+.pr small{font-size:11px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.pr.lit{background:var(--lit)}
+.pr.lit small{color:var(--ink)}
+.pr.none{color:var(--ink-2)}
+.pr.pool{background:var(--pool);border-color:var(--pool);color:var(--pool-ink);border-radius:3px}
+.pr.pool small{color:var(--pool-ink)}
+.pr.out{background:transparent;border:1.5px dashed var(--line-2);color:var(--ink-2)}
+.pr.out.lit{background:var(--lit);color:var(--ink)}
+.pr.vt{writing-mode:vertical-rl}
+.pr.zone{border:1px dashed var(--line-2)}
+.pwall{position:absolute;z-index:2;border:1.5px solid var(--ink);pointer-events:none}
+.miniplan .pwall{border-width:1px}
+.pr.ramp{background:var(--surface-2);border:1.5px dashed var(--line-2);color:var(--ink-2);border-radius:3px}
+.pr.ramp.lit{background:var(--lit);color:var(--ink)}
+.pdeco{position:absolute;display:flex;align-items:center;justify-content:center;border:1px solid var(--line-2);background:repeating-linear-gradient(90deg,var(--bg) 0 6px,var(--line-2) 6px 7px);font-size:11px;color:var(--ink-2);overflow:hidden;pointer-events:none}
+.pdeco.vt{writing-mode:vertical-rl;background:repeating-linear-gradient(0deg,var(--bg) 0 6px,var(--line-2) 6px 7px)}
+.pdeco span{background:var(--bg);padding:1px 5px}
+.pr.bad::after{content:"";position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;background:var(--bad)}
+.pr:active{filter:brightness(.95)}
+.plan-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin:10px 0 0;font-size:13px;color:var(--ink-2)}
+.plan-legend span{display:inline-flex;align-items:center;gap:6px}
+.plan-legend i{width:14px;height:14px;border:1.5px solid var(--ink);background:var(--lit);display:inline-block}
+.plan-legend i.dot{width:9px;height:9px;border:0;border-radius:50%;background:var(--bad)}
+.plan-legend i.glass{width:18px;height:8px;background:var(--glass)}
+.bay{position:absolute;z-index:3;padding:0;margin:0;border:1.5px solid var(--ink);border-radius:1px;background:var(--glass);cursor:pointer;overflow:visible}
+.bay::before{content:"";position:absolute;inset:-9px}
+.bay i{position:absolute;left:0;top:0;width:100%;height:100%;background:var(--ink);opacity:.72;pointer-events:none}
+.bay.bad{border-color:var(--bad);border-style:dashed}
+.miniplan{display:block;width:100%;margin-top:12px;padding:0;border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg);text-align:left;cursor:pointer;overflow:hidden}
+.miniplan .plan{border:0;border-radius:0;pointer-events:none}
+.miniplan .pr{border-width:1px}
+.miniplan .bay{border-width:1px}
+.miniplan .pdeco span{display:none}
+/* Tableau de bord (iPad posé) */
+.wall-go{display:none}
+@media (min-width:900px){.wall-go{display:inline-flex}}
+.sec-tools{display:flex;align-items:center;gap:8px}
+body.wall .top,body.wall .tabs{display:none}
+body.wall .wrap{max-width:none;padding-block:max(14px,env(safe-area-inset-top,0px)) 16px}
+.wall-bar{display:flex;align-items:center;gap:24px;margin:0 0 14px}
+.wall-clock{font-family:var(--serif);font-size:60px;font-weight:500;line-height:1;color:var(--brand);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.wall-date{font-size:15px;color:var(--ink-3);margin-top:6px}
+.wall-state{flex:1;min-width:0;font-size:16px;color:var(--ink-2)}
+.wall-state b{display:block;color:var(--ink);font-size:20px;margin-bottom:2px}
+.wall-plan{margin:0 auto;width:min(100%,calc((100vh - 170px) * 35 / 20.5))}
+.mp-cap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-top:1px solid var(--line)}
+.mp-cap b{display:block;font-weight:600;font-size:15px}
+.mp-cap small{display:block;color:var(--ink-2);font-size:13px}
+.mp-go{flex:none;color:var(--brand);font-weight:600;font-size:14px}
+
+/* Commandes */
+.switch{flex:none;width:52px;height:32px;border-radius:999px;border:0;background:var(--line-2);position:relative;cursor:pointer;transition:background .2s}
+.switch span{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:var(--knob);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.switch[aria-checked="true"]{background:var(--accent)}
+.switch[aria-checked="true"] span{transform:translateX(20px)}
+.seg{flex:none;display:flex;border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden}
+.seg button{width:42px;height:40px;border:0;background:var(--bg);color:var(--brand);display:grid;place-items:center;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line-2)}
+.seg button:active{background:var(--surface-2)}
+.stepper{flex:none;display:flex;align-items:center;gap:6px}
+.stepper button{width:40px;height:40px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--bg);color:var(--brand);font-size:20px;line-height:1;cursor:pointer}
+.stepper b{min-width:54px;text-align:center;font-variant-numeric:tabular-nums}
+.tag{flex:none;display:inline-flex;align-items:center;min-height:26px;padding:0 10px;border-radius:999px;font-size:12.5px;font-weight:600;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.tag.ok{background:var(--ok-bg);color:var(--ok)} .tag.warn{background:var(--warn-bg);color:var(--warn)} .tag.bad{background:var(--bad-bg);color:var(--bad)}
+
+/* Boutons et formulaires */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 16px;border-radius:var(--r);border:1px solid var(--line-2);background:var(--bg);color:var(--brand);font-weight:600;cursor:pointer;text-align:center}
+.btn.primary{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
+.btn.block{width:100%}
+.btn.small{min-height:38px;padding:0 12px;font-size:14px}
+.btn.danger{color:var(--bad)}
+.btn+.btn.block{margin-top:10px}
+.mt{margin-top:14px}
+.row-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field label,.checks legend{font-weight:600;font-size:14px}
+.field input,.field textarea{font:inherit;font-size:16px;padding:12px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--bg);color:var(--ink);width:100%}
+.field textarea{min-height:110px;resize:vertical}
+.field textarea.short{min-height:70px}
+.field small{color:var(--ink-3);font-size:12.5px;overflow-wrap:anywhere}
+.checks{border:0;margin:0 0 14px;padding:0}
+.checks legend{padding:0;margin-bottom:8px}
+.checks .list label{display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:52px;cursor:pointer}
+.checks .list label+label{border-top:1px solid var(--line)}
+.checks input,.opt input,.o-name input{width:22px;height:22px;accent-color:var(--accent);flex:none}
+.opt{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r-lg);margin-bottom:14px;cursor:pointer}
+.opt input{margin:1px 0 0}
+.opt b{display:block;font-weight:600}
+.opt small{display:block;color:var(--ink-2);font-size:13px}
+.form-msg{min-height:20px;margin:0 0 10px;font-size:14px;color:var(--ink-2)}
+.form-msg.ok{color:var(--ok)} .form-msg.bad{color:var(--bad)}
+.note{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;padding:12px 14px;border-radius:var(--r);background:var(--surface-2);color:var(--ink-2);font-size:14px;margin:0 0 14px}
+.note.warn{background:var(--warn-bg);color:var(--ink)}
+.note > span{flex:1 1 200px}
+details.help{margin-top:14px;border:1px solid var(--line);border-radius:var(--r);padding:0 14px;background:var(--bg)}
+details.help summary{min-height:48px;display:flex;align-items:center;cursor:pointer;font-weight:600;color:var(--brand)}
+details.help ol,details.help p{color:var(--ink-2);font-size:14px;margin:0 0 14px}
+details.help ol{padding-left:20px;display:grid;gap:8px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:var(--surface-2);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+
+/* Partage */
+.cards{display:grid;gap:10px}
+.card{border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;background:var(--bg);min-width:0}
+.card .row{padding:0;min-height:0}
+.avatar{flex:none;width:40px;height:40px;border-radius:50%;background:var(--surface-2);color:var(--brand);display:grid;place-items:center;font-weight:700}
+.foot{margin:18px 0 0;color:var(--ink-3);font-size:13.5px;text-align:center}
+.foot .linkbtn{min-height:40px}
+.cols{display:grid;gap:0 28px}
+
+/* Rangement par glisser-déposer */
+.order{margin:0;padding:0;list-style:none;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;-webkit-user-select:none;user-select:none}
+.order li{list-style:none;background:var(--bg)}
+.order > li+li{border-top:1px solid var(--line)}
+.o-row{display:flex;align-items:center;gap:8px;padding:4px 4px 4px 14px;min-height:56px}
+.o-room{background:var(--surface)}
+.o-room .o-name span{font-weight:600;color:var(--brand)}
+.o-name{flex:1;min-width:0;display:flex;align-items:center;gap:12px;min-height:48px;cursor:pointer;overflow-wrap:anywhere}
+.handle{flex:none;width:48px;height:48px;border:0;border-radius:var(--r);background:none;color:var(--ink-3);display:grid;place-items:center;cursor:grab;touch-action:none;-webkit-touch-callout:none}
+.dev-list{margin:0;padding:0;list-style:none}
+.dev-list > li{border-top:1px solid var(--line)}
+.dev-list .o-row{padding-left:34px;min-height:52px}
+.dev-list:empty{border-top:1px dashed var(--line-2)}
+.dev-list:empty::before{content:"Glisse un appareil ici";display:block;padding:14px 34px;color:var(--ink-3);font-size:14px}
+.order li.off > .o-row .o-name span,.room-item.off .o-name span{color:var(--ink-3);font-weight:400}
+.order li.dragging{position:relative;z-index:2;box-shadow:var(--lift);border-radius:var(--r)}
+.order li.dragging > .o-row{background:var(--surface-2)}
+.order li.dragging > .o-row .handle{color:var(--brand);cursor:grabbing}
+.order.collapsed .dev-list{display:none}
+
+/* Mode invité : très gros boutons */
+.scenes.big{grid-template-columns:1fr;gap:14px}
+.scenes.big .scene{flex-direction:row;align-items:center;justify-content:flex-start;gap:18px;min-height:132px;padding:20px}
+.scenes.big .scene-ic{width:72px;height:72px;flex:none}
+.scenes.big .scene-ic .i{width:38px;height:38px}
+.scenes.big .scene-name{font-size:24px}
+.scenes.big .scene-ok{font-size:15px;top:12px;right:14px}
+
+/* Onglets */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.tabs-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.tab{background:none;border:0;padding:8px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--ink-3);cursor:pointer;min-height:58px}
+.tab[aria-current="page"]{color:var(--brand);font-weight:600}
+.tab[aria-current="page"] .i{stroke-width:2.2}
+
+/* Feuille et message */
+.sheet{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet-bg{position:absolute;inset:0;background:var(--scrim)}
+.sheet-card{position:relative;width:100%;max-width:560px;max-height:calc(100% - 20px - env(safe-area-inset-top,0px));overflow:auto;overscroll-behavior:contain;background:var(--bg);border-radius:14px 14px 0 0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 calc(22px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 30px rgba(22,24,27,.25)}
+.sheet-head{position:sticky;top:0;z-index:3;background:var(--bg);display:flex;align-items:center;gap:12px;padding-block:12px}
+.sheet-head h2{font-family:var(--serif);font-weight:500;font-size:22px;margin:0;color:var(--ink)}
+.sheet-head .icon-btn{margin-left:auto}
+.sheet-body > .sec:first-child{margin-top:4px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:30;width:max-content;max-width:calc(100% - 32px);background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:var(--r);font-weight:500;box-shadow:var(--shadow)}
+.toast.bad{background:var(--bad);color:var(--bg)}
+.loading{padding:30px 0;text-align:center;color:var(--ink-3)}
+
+/* iPad */
+@media (min-width:700px){
+  .scenes{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .scenes.big{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .share-top{max-width:520px}
+  .sheet{align-items:center;padding:24px}
+  .sheet-card{border-radius:14px;max-height:min(86vh,900px);padding-bottom:22px;box-shadow:var(--lift)}
+}
+@media (min-width:760px){
+  .rooms{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+}
+@media (min-width:960px){
+  .home{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:28px;align-items:start}
+  .home-side{position:sticky;top:calc(80px + env(safe-area-inset-top,0px))}
+  .home-main > .sec-row:first-child{margin-top:0}
+  .cols{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+}
+
+/* ===== Le Nid, version douce : formes arrondies, cartes flottantes, laiton et Bodoni ===== */
+:root{--r:16px;--r-lg:24px;--hair:rgba(168,135,79,.22);--plan-line:rgba(22,24,27,.5);
+  --card-sh:0 1px 2px rgba(69,51,36,.05),0 10px 30px rgba(69,51,36,.08);
+  --disc:linear-gradient(140deg,#e2c891 0%,#b8975c 52%,#7e6136 100%);--disc-ink:#16181b;
+  --lit-grad:radial-gradient(120% 90% at 50% 35%,#fae3b6 0%,#f2c27c 100%);
+  --pool-grad:linear-gradient(160deg,#86bbfb 0%,#4e8de4 100%);
+  --page:radial-gradient(140% 60% at 50% 0%,#fbf9f5 0%,#f3eee6 70%)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--hair:rgba(210,174,109,.18);--plan-line:rgba(243,238,230,.42);
+  --card-sh:0 1px 0 rgba(255,255,255,.04) inset,0 12px 34px rgba(0,0,0,.42);
+  --lit-grad:radial-gradient(120% 90% at 50% 35%,#86602b 0%,#4b3519 100%);
+  --pool-grad:linear-gradient(160deg,#3d7fd0 0%,#255da6 100%);
+  --page:radial-gradient(140% 60% at 50% 0%,#1d1f25 0%,#111317 70%)}}
+:root[data-theme="dark"]{--hair:rgba(210,174,109,.18);--plan-line:rgba(243,238,230,.42);
+  --card-sh:0 1px 0 rgba(255,255,255,.04) inset,0 12px 34px rgba(0,0,0,.42);
+  --lit-grad:radial-gradient(120% 90% at 50% 35%,#86602b 0%,#4b3519 100%);
+  --pool-grad:linear-gradient(160deg,#3d7fd0 0%,#255da6 100%);
+  --page:radial-gradient(140% 60% at 50% 0%,#1d1f25 0%,#111317 70%)}
+body{background:var(--bg) var(--page) no-repeat fixed}
+:focus-visible{outline-color:var(--accent)}
+/* En-tête translucide */
+.top{background:color-mix(in srgb,var(--bg) 80%,transparent);-webkit-backdrop-filter:saturate(1.3) blur(16px);backdrop-filter:saturate(1.3) blur(16px);border-bottom:1px solid var(--hair)}
+.top-in{padding-block:12px}
+.logo{border-radius:50%;background:var(--disc);color:var(--disc-ink);box-shadow:0 2px 8px rgba(126,97,54,.35)}
+h1{font-size:28px;letter-spacing:.005em}
+.icon-btn{border-radius:50%;border:1px solid var(--hair);background:var(--surface);box-shadow:var(--card-sh)}
+/* Titres de rubrique : petites capitales laiton */
+.sec{font-size:11px;letter-spacing:.18em;color:var(--accent);font-weight:600;margin:30px 0 12px}
+.sec-row{margin:30px 0 12px}
+.linkbtn{color:var(--accent)}
+/* Cartes */
+.status{border-radius:var(--r-lg);padding:18px 18px 18px 16px;box-shadow:var(--card-sh)}
+.status-dot{width:44px;height:44px;box-shadow:0 0 0 6px color-mix(in srgb,currentColor 0%,transparent)}
+.status h2{font-size:23px}
+.allclose,.miniplan,.list,.card,.order,.opt,details.help{border:1px solid var(--hair);border-radius:var(--r-lg);background:var(--surface);box-shadow:var(--card-sh)}
+.allclose{min-height:72px;padding:12px 16px;margin-top:14px}
+.allclose .row-ic,.scene-ic{background:var(--disc);color:var(--disc-ink);border-radius:50%;box-shadow:0 2px 6px rgba(126,97,54,.28)}
+.row-ic{border-radius:50%;background:var(--surface-2)}
+.row{padding:14px 16px}
+.row+.row{border-top:1px solid var(--hair)}
+.mp-cap{border-top:1px solid var(--hair);padding:12px 16px}
+/* Scènes : tuiles douces, nom en Bodoni */
+.scenes{gap:12px}
+.scene{border:1px solid var(--hair);border-radius:var(--r-lg);background:var(--surface);box-shadow:var(--card-sh);min-height:122px;padding:16px}
+.scene.now{border:1.5px solid var(--accent);padding:15.5px}
+.scene-ic{width:46px;height:46px}
+.scene-name{font-family:var(--serif);font-weight:500;font-size:20px;line-height:1.15}
+.scene-now{background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--ink)}
+.scene.done{background:var(--fill);border-color:var(--fill)}
+.ask{border:1px dashed var(--accent);border-radius:999px;color:var(--ink);min-height:56px}
+/* Boutons en pastille */
+.btn,.stepper button,.field input,.field textarea{border-radius:999px}
+.field textarea{border-radius:var(--r)}
+.btn{border-color:var(--hair);background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(69,51,36,.06)}
+.btn.primary{background:var(--fill);border-color:var(--fill);color:var(--on-fill)}
+.seg{border-radius:999px;border-color:var(--hair);background:var(--surface)}
+.seg button{background:transparent;color:var(--ink)}
+.seg button+button{border-left-color:var(--hair)}
+.view-seg{border-color:var(--hair);background:var(--surface)}
+.chip{border-color:var(--hair);background:var(--surface)}
+.note{border-radius:18px}
+.tag{border-radius:999px}
+/* Plan : traits fins, angles adoucis, lumière qui rayonne */
+.plan{border:1px solid var(--hair);border-radius:var(--r-lg);box-shadow:var(--card-sh);background:var(--surface)}
+.miniplan .plan{box-shadow:none;border:0}
+.pr{border:1px solid var(--plan-line);background:var(--surface);font-size:11.5px;letter-spacing:.01em}
+.pr b{font-weight:600}
+.pr.lit{background:var(--lit-grad)}
+.pr.pool{background:var(--pool-grad);border-color:transparent;border-radius:16px}
+.pr.out,.pr.ramp{border-radius:12px;border-color:var(--hair)}
+.pr.zone{border-color:var(--hair)}
+.pwall{border:1.5px solid var(--plan-line);border-radius:2px}
+.bay{border:1px solid var(--plan-line);border-radius:4px}
+.plan-legend i{border:1px solid var(--plan-line);border-radius:4px;background:var(--lit-grad)}
+.pdeco{border-color:var(--hair)}
+/* Barre d'onglets flottante */
+.tabs{left:50%;right:auto;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(520px,calc(100% - 24px));padding:0;border:1px solid var(--hair);border-radius:30px;background:color-mix(in srgb,var(--surface) 97%,transparent);-webkit-backdrop-filter:saturate(1.3) blur(18px);backdrop-filter:saturate(1.3) blur(18px);box-shadow:0 12px 34px rgba(0,0,0,.14)}
+.tab{min-height:62px;font-size:11.5px;letter-spacing:.02em}
+.tab[aria-current="page"]{color:var(--ink)}
+.tab[aria-current="page"] .i{color:var(--accent)}
+.wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+/* Feuilles */
+.sheet-card{border-radius:28px 28px 0 0;background:var(--surface)}
+.sheet-head{background:var(--surface)}
+.sheet-head h2{font-size:25px}
+@media (min-width:700px){.sheet-card{border-radius:28px}}
+.top .icon-btn+.icon-btn{margin-left:8px}
+/* Tableau de bord iPad */
+.wall-clock{font-size:66px;color:var(--ink)}
+.wall-date{letter-spacing:.04em}
+/* ===== Lévitation : relief, lumière venant d'en haut, ombres détachées ===== */
+:root{--float:inset 0 1px 0 rgba(255,255,255,.95),0 1px 2px rgba(69,51,36,.05),0 22px 38px -16px rgba(69,51,36,.30),0 46px 60px -36px rgba(69,51,36,.30);
+  --float-lo:inset 0 1px 0 rgba(255,255,255,.95),0 1px 2px rgba(69,51,36,.06),0 10px 18px -10px rgba(69,51,36,.30);
+  --face:linear-gradient(180deg,#ffffff 0%,#fbf8f3 100%);
+  --medal:inset 0 1px 1px rgba(255,255,255,.7),inset 0 -3px 5px rgba(60,40,15,.22),0 7px 12px -3px rgba(126,97,54,.5),0 16px 18px -12px rgba(30,20,10,.45);
+  --glow:0 0 0 1px rgba(242,176,94,.35),0 0 26px rgba(242,176,94,.55);
+  --page:radial-gradient(120% 55% at 50% -5%,#fffdf9 0%,#f4efe7 55%,#ebe4d8 100%)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--float:inset 0 1px 0 rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.4),0 24px 40px -16px rgba(0,0,0,.65),0 50px 70px -40px rgba(0,0,0,.7);
+  --float-lo:inset 0 1px 0 rgba(255,255,255,.07),0 12px 20px -10px rgba(0,0,0,.6);
+  --face:linear-gradient(180deg,#25282e 0%,#1b1d22 100%);
+  --medal:inset 0 1px 1px rgba(255,255,255,.55),inset 0 -3px 5px rgba(40,25,5,.35),0 7px 14px -3px rgba(0,0,0,.6),0 0 18px rgba(210,174,109,.18);
+  --glow:0 0 0 1px rgba(242,176,94,.25),0 0 28px rgba(242,176,94,.35);
+  --page:radial-gradient(110% 55% at 50% -5%,#2a2d34 0%,#16181c 55%,#0e0f12 100%)}}
+:root[data-theme="dark"]{--float:inset 0 1px 0 rgba(255,255,255,.07),0 1px 2px rgba(0,0,0,.4),0 24px 40px -16px rgba(0,0,0,.65),0 50px 70px -40px rgba(0,0,0,.7);
+  --float-lo:inset 0 1px 0 rgba(255,255,255,.07),0 12px 20px -10px rgba(0,0,0,.6);
+  --face:linear-gradient(180deg,#25282e 0%,#1b1d22 100%);
+  --medal:inset 0 1px 1px rgba(255,255,255,.55),inset 0 -3px 5px rgba(40,25,5,.35),0 7px 14px -3px rgba(0,0,0,.6),0 0 18px rgba(210,174,109,.18);
+  --glow:0 0 0 1px rgba(242,176,94,.25),0 0 28px rgba(242,176,94,.35);
+  --page:radial-gradient(110% 55% at 50% -5%,#2a2d34 0%,#16181c 55%,#0e0f12 100%)}
+/* Les cartes flottent au-dessus de la page */
+.allclose,.miniplan,.list,.card,.scene,.plan,.opt,details.help{background:var(--face);box-shadow:var(--float);border-color:transparent}
+.status{box-shadow:var(--float)}
+.miniplan .plan{background:var(--surface);box-shadow:none}
+.scenes{gap:16px}
+.allclose,.miniplan{margin-top:18px}
+.list+.list,.cams .allclose{margin-top:16px}
+/* À l'appui, la carte se pose */
+.scene,.allclose,.miniplan,.btn,.icon-btn{transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s}
+.scene:active,.allclose:active,.miniplan:active{transform:translateY(2px) scale(.985);box-shadow:var(--float-lo)}
+/* Médaillons laiton en relief, qui respirent doucement */
+.allclose .row-ic,.scene-ic,.logo{box-shadow:var(--medal)}
+@keyframes nid-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.scene-ic,.logo{animation:nid-float 6s ease-in-out infinite}
+.scene:nth-child(2n) .scene-ic{animation-delay:-2s}.scene:nth-child(3n) .scene-ic{animation-delay:-4s}
+.btn,.icon-btn,.chip,.view-seg,.seg{box-shadow:var(--float-lo)}
+.btn.primary{box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 10px 18px -8px rgba(46,74,54,.55)}
+/* Le plan : relief et lumière qui rayonne */
+.pr.lit{box-shadow:var(--glow);z-index:1}
+.pr.pool{box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 10px 22px -10px rgba(78,141,228,.7)}
+.plan{border-radius:28px}
+/* Barre d'onglets en apesanteur */
+.tabs{bottom:calc(14px + env(safe-area-inset-bottom,0px));box-shadow:var(--float);border-color:transparent;background:var(--face)}
+.tab[aria-current="page"] .i{filter:drop-shadow(0 3px 4px rgba(126,97,54,.45))}
+.top{box-shadow:0 10px 30px -22px rgba(0,0,0,.35)}
+/* Police unique : Jost ; titres en laiton */
+h1,.status h2,.scene-name,.sheet-head h2,.wall-clock{font-weight:600}
+h1{font-size:25px;letter-spacing:.01em}
+.scene-name{font-size:18px;line-height:1.2}
+.status h2{font-size:20px}
+.sheet-head h2{font-size:21px}
+.wall-clock{font-size:64px;font-weight:500}
+:root{--title:#7e6136}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--title:#d2ae6d}}
+:root[data-theme="dark"]{--title:#d2ae6d}
+h1,.scene-name,.row-txt b,.allclose b,.mp-cap b,.sheet-head h2,.wall-clock,.room-h h3{color:var(--title)}
+.scene.done .scene-name{color:var(--on-fill)}
+/* Onglet actif en laiton, titres plus fins */
+.tab[aria-current="page"],.tab[aria-current="page"] .i{color:var(--title)}
+h1,.status h2,.scene-name,.sheet-head h2,.row-txt b,.allclose b,.mp-cap b,.room-h h3{font-weight:500}
+h1{letter-spacing:.02em}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26"><ellipse cx="9.2" cy="9.8" rx="2.5" ry="3.6" fill="currentColor"/><ellipse cx="14.8" cy="9.8" rx="2.5" ry="3.6" fill="currentColor"/><path d="M2.6 13.2h18.8a9.4 7 0 0 1-18.8 0z" fill="currentColor" stroke="var(--fill)" stroke-width="1.2"/><path d="M6.6 18.2l3-3.6M10.4 19.6l3.8-5M15 19.1l3.4-4.5" fill="none" stroke="var(--fill)" stroke-width="1.1" stroke-linecap="round"/></svg></span>
+    <div class="brand-txt"><h1 id="hello">Le Nid</h1><span id="conn" class="pill">Démo</span></div>
+    <button id="theme-btn" class="icon-btn" type="button" aria-label="Ambiance"></button>
+    <button id="gear" class="icon-btn" type="button" aria-label="Réglages"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+  </div>
+</header>
+
+<main id="view" class="wrap" aria-live="polite"></main>
+
+<nav id="tabs" class="tabs" aria-label="Navigation">
+  <div class="tabs-in">
+    <button class="tab" type="button" data-tab="home"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>Accueil</button>
+    <button class="tab" type="button" data-tab="rooms"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M12 4v16M3 12h9"/></svg>Pièces</button>
+    <button class="tab" type="button" data-tab="share"><svg class="i" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></svg>Partager</button>
+    <button class="tab" type="button" data-tab="apps"><svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M17 14v6M14 17h6"/></svg>Applis</button>
+  </div>
+</nav>
+
+<div id="sheet" class="sheet" hidden>
+  <div class="sheet-bg" data-close></div>
+  <div class="sheet-card" id="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="sheet-head"><h2 id="sheet-title"></h2><button class="icon-btn" type="button" data-close aria-label="Fermer"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="sheet-body" class="sheet-body"></div>
+  </div>
+</div>
+<input type="file" id="photo-input" accept="image/*" hidden>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- Outils ---------- */
+const P={
+  house:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+  leave:'<path d="M9 4H5v16h4"/><path d="M14 8l4 4-4 4"/><path d="M18 12H9"/>',
+  moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  wave:'<path d="M2 16c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/><path d="M2 20c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/><path d="M8 12V6a2 2 0 0 1 4 0M13 12V6a2 2 0 0 1 4 0"/>',
+  film:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 5v14M17 5v14M3 9h4M3 15h4M17 9h4M17 15h4"/>',
+  thermo:'<path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z"/><path d="M12 9v7"/>',
+  spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/>',
+  bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>',
+  plug:'<path d="M9 3v5M15 3v5"/><path d="M6 8h12v3a6 6 0 0 1-12 0z"/><path d="M12 17v4"/>',
+  blinds:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M4 7h16M4 11h16M4 15h16"/>',
+  camera:'<rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 11l5-3v8l-5-3"/>',
+  sensor:'<circle cx="12" cy="12" r="2.5"/><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 7.5a6.4 6.4 0 0 1 0 9"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  dot:'<circle cx="12" cy="12" r="7"/>',
+  up:'<path d="M6 15l6-6 6 6"/>', down:'<path d="M6 9l6 6 6-6"/>', stop:'<rect x="8" y="8" width="8" height="8" rx="1"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>', check:'<path d="M5 12.5l4.5 4.5L19 7"/>',
+  chat:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',
+  copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  apps:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M17 14v6M14 17h6"/>',
+  grip:'<path d="M5 8h14M5 12h14M5 16h14"/>',
+  photo:'<rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8.5 6l1.5-2h4l1.5 2"/>'
+};
+const I=n=>'<svg class="i" viewBox="0 0 24 24" aria-hidden="true">'+(P[n]||P.dot)+'</svg>';
+const $=(s,r)=>(r||document).querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf1=new Intl.NumberFormat('fr-FR',{maximumFractionDigits:1});
+const nf0=new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0});
+const byName=(a,b)=>String(a.name||'').localeCompare(String(b.name||''),'fr');
+const store={
+  get(k,d){try{const v=localStorage.getItem('mm.'+k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('mm.'+k,JSON.stringify(v));return true}catch(e){return false}},
+  del(k){try{localStorage.removeItem('mm.'+k)}catch(e){}},
+  raw(k){try{return localStorage.getItem('mm.'+k)||''}catch(e){return ''}},
+  setRaw(k,v){try{localStorage.setItem('mm.'+k,v);return true}catch(e){return false}}
+};
+const THEMES=['auto','light','dark'], TH_LABEL={auto:'Auto, comme l’iPhone',light:'Jour',dark:'Soir'};
+const TH_IC={auto:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="currentColor"/>',light:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M2.5 12h2M19.5 12h2M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',dark:'<path d="M19.5 14.5A7.5 7.5 0 0 1 9.5 4.5a7.5 7.5 0 1 0 10 10z"/>'};
+function applyTheme(){ const t=store.get('theme','auto'); if(t==='auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme=t; const b=document.getElementById('theme-btn'); if(b){ b.innerHTML='<svg class="i" viewBox="0 0 24 24">'+TH_IC[t]+'</svg>'; b.setAttribute('aria-label','Ambiance : '+TH_LABEL[t]); b.title='Ambiance : '+TH_LABEL[t]; } }
+applyTheme();
+const inClaude=()=>!!window.claude||/claude/i.test(location.hostname);
+function b64e(s){return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function b64d(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return decodeURIComponent(escape(atob(s)))}
+
+/* ---------- État ---------- */
+let cfg=store.get('cfg',null);
+let guest=store.get('guest',null);
+let mode=guest?'guest':(cfg&&cfg.key?'live':'demo');
+let conn=mode==='demo'?'demo':'loading';
+let base='', lastErr='';
+let data={zones:{},devices:{},flows:[],apps:null};
+let tab=store.get('tab','home'); if(!['home','rooms','share','apps'].includes(tab)) tab='home';
+let room='all', preview=null, flash={id:'',until:0}, sheetActions={}, photoZone=null;
+const sfx=()=>mode==='demo'?'Demo':'';
+
+/* ---------- Démo ---------- */
+function makeDemo(){
+  const zones={};
+  [['root','Maison',null],['salon','Salon','root'],['cuisine','Cuisine','root'],['chambre','Ma Chambre','root'],['combles','Bureau','root'],['entree','Entrée','root'],['ext','Extérieur','root'],['piscine','Piscine','root']]
+    .forEach(([id,name,parent])=>zones[id]={id,name,parent});
+  const cap=(id,value,x)=>[id,Object.assign({id,value,setable:true},x||{})];
+  const ro={setable:false};
+  const devices={};
+  [
+    ['d1','Store baie droite 1','salon','windowcoverings',[cap('windowcoverings_state','idle'),cap('windowcoverings_set',1)]],
+    ['d2','Lumière baie gauche','salon','light',[cap('onoff',true)]],
+    ['d3','Lumière descente','entree','socket',[cap('onoff',false),cap('measure_power',0,ro)]],
+    ['d4','Rideau ma chambre','chambre','windowcoverings',[cap('windowcoverings_state','idle'),cap('windowcoverings_set',1)]],
+    ['d5','Velux bureau','combles','windowcoverings',[cap('windowcoverings_set',0)]],
+    ['d6','Store Velux','combles','windowcoverings',[cap('windowcoverings_state','idle'),cap('windowcoverings_set',1)]],
+    ['d7','Température bureau','combles','sensor',[cap('measure_temperature',22.4,ro),cap('measure_humidity',48,ro)]],
+    ['d8','Porte d’entrée','entree','sensor',[cap('alarm_contact',false,ro),cap('measure_battery',82,ro)]],
+    ['d9','Sonnette Entrée','entree','doorbell',[cap('alarm_motion',false,ro),cap('measure_battery',15,ro)]],
+    ['d10','Caméra du portail','ext','camera',[cap('alarm_motion',false,ro)]],
+    ['d11','Piscine','piscine','other',[cap('measure_temperature',24.5,ro),cap('measure_ph',7.4,{setable:false,title:'pH'}),cap('onoff',true,{title:'Filtration'})]],
+    ['d12','Lumière piscine','piscine','light',[cap('onoff',false)]]
+  ].forEach(([id,name,zone,cls,caps])=>devices[id]={id,name,zone,class:cls,available:true,capabilitiesObj:Object.fromEntries(caps)});
+  const flows=[['f1','Je pars'],['f2','Je rentre'],['f3','Bonne nuit'],['f4','Soirée piscine'],['f5','Réveil'],['f6','Sésame ouvre-toi']]
+    .map(([id,name])=>({id,name,type:'flow',trig:true}));
+  flows.push({id:'f7',name:'Fermer le Velux s’il pleut',type:'advancedflow',trig:false});
+  const apps={};
+  [['com.somfy.tahoma','Somfy TaHoma & Connexoon'],['com.vistapool.vistapool-sugarvalley-hayward','Vistapool & Hayward'],['demo.eufy','Eufy Security'],['demo.aqara','Aqara']]
+    .forEach(([id,name])=>apps[id]={id,name,state:'running',ready:true,enabled:true,autoupdate:true});
+  return {zones,devices,flows,apps};
+}
+function demoSet(d,cap,val){
+  const c=d.capabilitiesObj;
+  if(cap==='windowcoverings_state'){ if(val==='up'&&c.windowcoverings_set)c.windowcoverings_set.value=1; if(val==='down'&&c.windowcoverings_set)c.windowcoverings_set.value=0; c.windowcoverings_state.value='idle'; return; }
+  if(c[cap]) c[cap].value=val;
+}
+function demoFx(id){
+  const fx={f1:{cover:0,light:false},f3:{cover:0,light:false},f2:{light:true},f4:{pool:true},f5:{cover:1},f6:{light:false}}[id];
+  if(!fx) return;
+  Object.values(data.devices).forEach(d=>{
+    const c=d.capabilitiesObj;
+    if(fx.cover!=null&&c.windowcoverings_set&&d.id!=='d5') c.windowcoverings_set.value=fx.cover;
+    if(fx.cover===0&&d.id==='d5') c.windowcoverings_set.value=0;
+    if(fx.light!=null&&d.class==='light'&&d.id!=='d12') c.onoff.value=fx.light;
+    if(fx.light===false&&d.id==='d12') c.onoff.value=false;
+    if(fx.pool&&d.id==='d12') c.onoff.value=true;
+  });
+}
+
+/* ---------- Connexion Homey ---------- */
+function normAddr(s){
+  s=String(s||'').trim().replace(/\/+$/,'');
+  if(!s) return '';
+  if(/^\d{1,3}(\.\d{1,3}){3}$/.test(s)) return 'https://'+s.replace(/\./g,'-')+'.homey.homeylocal.com';
+  if(/^[a-f0-9]{24}$/i.test(s)) return 'https://'+s.toLowerCase()+'.connect.athom.com';
+  if(/^https?:\/\//i.test(s)) return s;
+  return 'https://'+s;
+}
+async function req(path,o){
+  o=o||{};
+  const b=o.base||base, k=o.key||(cfg&&cfg.key)||'';
+  const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),o.timeout||9000);
+  try{
+    const h={'Authorization':'Bearer '+k};
+    if(o.body!==undefined) h['Content-Type']='application/json';
+    const r=await fetch(b+path,{method:o.method||'GET',headers:h,body:o.body!==undefined?JSON.stringify(o.body):undefined,signal:ctl.signal,cache:'no-store'});
+    if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e}
+    const tx=await r.text(); try{return tx?JSON.parse(tx):null}catch(_){return null}
+  }finally{clearTimeout(t)}
+}
+async function tryConnect(c){
+  let err=null;
+  for(const [m,u,to] of [['local',c.local,4000],['remote',c.remote,9000]]){
+    if(!u) continue;
+    try{ await req('/api/manager/zones/zone/',{base:u,key:c.key,timeout:to}); return {ok:true,mode:m,base:u}; }
+    catch(e){ err=e; }
+  }
+  return {ok:false,err};
+}
+function normFlows(m,type){
+  if(!m) return [];
+  return Object.values(m).filter(f=>f&&f.id&&f.enabled!==false)
+    .map(f=>({id:f.id,name:f.name||'Sans nom',type,trig:f.triggerable!==false})).sort(byName);
+}
+async function loadLive(){
+  const [z,d,f,af,ap]=await Promise.all([
+    req('/api/manager/zones/zone/'), req('/api/manager/devices/device/'),
+    req('/api/manager/flow/flow/').catch(()=>null), req('/api/manager/flow/advancedflow/').catch(()=>null),
+    req('/api/manager/apps/app/').catch(()=>null)
+  ]);
+  data={zones:z||{},devices:d||{},flows:normFlows(f,'flow').concat(normFlows(af,'advancedflow')),apps:ap};
+}
+async function refresh(){
+  if(mode!=='live') return;
+  try{
+    if(!base){ const r=await tryConnect(cfg); if(!r.ok) throw r.err; base=r.base; conn=r.mode; }
+    await loadLive();
+  }catch(e){ conn='off'; base=''; lastErr=errMsg(e); }
+  render();
+}
+function errMsg(e){
+  const s=e&&e.status;
+  if(s===401||s===403) return 'Homey refuse la clé. Vérifie-la, ou recrée-la avec les bons droits.';
+  if(s===404) return 'Cette adresse répond, mais ce n’est pas ton Homey. Vérifie l’adresse.';
+  if(s) return 'Homey a renvoyé une erreur ('+s+'). Réessaie dans un instant.';
+  return 'Homey ne répond pas. Vérifie l’adresse et, pour « À la maison », que tu es sur le Wi-Fi de la maison.';
+}
+
+/* ---------- Le Nid : les noms et les pièces de l’appli Maison ---------- */
+// Homey garde ses noms complets (plus clairs pour les alertes) ; l’appli affiche ceux de Le Nid.
+const nk=s=>String(s||'').trim().replace(/\s+/g,' ').toLowerCase();
+const NID_ROOM={'ma salle de bain':'Salle De Bain Ma Chambre','chambre de paul':'Chambre De Paul','chambre piscine':'Chambre Piscine','chambre artiste':'Chambre Artiste','arrière cuisine':'Arrière Cuisine','terrasse':'Extérieur','carport':'Extérieur'};
+const NID_DEV={
+  'base eufy':['Base eufy','Arrière Cuisine'], 'plaque de cuisson':['Plaque de cuisson','Buanderie'],
+  'clim bureau':['Clim','Bureau'], 'clim salon':['Clim','Salon'],
+  'clim ma chambre':['Clim','Ma Chambre'], 'clim chambre piscine':['Clim','Chambre Piscine'],
+  'lumière cuisine':['Lumière','Cuisine'], 'sonnette entrée':['Sonnette','Entrée'], 'rideau ma chambre':['Rideau','Ma Chambre'],
+  'lumière baie gauche':['Lumière Baie Gauche','Salon'], 'lumière baie droite':['Lumière Baie Droite','Salon'], 'lumière table':['Lumière Table','Salon'],
+  'store paul':['Store de Paul','Extérieur'], 'store chambre piscine':['Store de la chambre piscine','Extérieur'],
+  'store baie droite 1':['Store droit 1','Extérieur'], 'store baie droite 2':['Store droit 2','Extérieur'],
+  'store baie gauche 1':['Store Gauche 3','Extérieur'], 'store baie gauche 2':['Store gauche 4','Extérieur'],
+  'terrasse':['Terrasse','Extérieur'], 'terrasse nord':['Terrasse Nord','Extérieur']
+};
+const nidRoom=n=>NID_ROOM[nk(n)]||String(n||'').trim();
+const nidDev=n=>NID_DEV[nk(n)]||(nk(n).indexOf('echo dot')===0?['Echo Dot','Bureau']:null);
+const devName=d=>(nidDev(d.name)||[])[0]||String(d.name||'').trim();
+const zoneName=id=>String(id).indexOf('nid:')===0?id.slice(4):((data.zones[id]&&nidRoom(data.zones[id].name))||'Autre');
+function canonZone(room){
+  const t=nk(room), zs=Object.values(data.zones||{});
+  const z=zs.find(z=>nk(z.name)===t)||zs.find(z=>nk(nidRoom(z.name))===t);
+  return z?z.id:'nid:'+room;
+}
+function effZone(d){
+  const a=nidDev(d.name);
+  return canonZone(a&&a[1]?a[1]:nidRoom(data.zones[d.zone]&&data.zones[d.zone].name));
+}
+
+/* ---------- Lecture des appareils ---------- */
+const isPh=(k,v)=>k==='measure_ph'||(/^measure_/.test(k)&&v&&/\bph\b/i.test(v.title||''));
+const ALARM={alarm_smoke:'fumée détectée',alarm_co:'monoxyde de carbone détecté',alarm_co2:'CO₂ élevé',alarm_water:'fuite d’eau',alarm_fire:'incendie détecté',alarm_heat:'chaleur anormale',alarm_tamper:'sabotage détecté',alarm_generic:'alerte'};
+function ctrlKind(d){
+  const c=d.capabilitiesObj||{}, can=k=>c[k]&&c[k].setable!==false;
+  if(can('windowcoverings_state')) return 'cover';
+  if(can('windowcoverings_set')) return 'coverset';
+  if(can('target_temperature')) return 'thermo';
+  if(can('onoff')) return 'toggle';
+  return 'read';
+}
+function devIcon(d){
+  const cl=d.class||'';
+  if(/piscine|pool/i.test(d.name)&&cl!=='light') return 'wave';
+  if(cl==='light') return 'bulb';
+  if(cl==='socket') return 'plug';
+  if(/windowcoverings|blinds|curtain|sunshade|garagedoor/.test(cl)) return 'blinds';
+  if(/thermostat|heater|airconditioning|fan/.test(cl)) return 'thermo';
+  if(/camera|doorbell/.test(cl)) return 'camera';
+  if(cl==='lock') return 'lock';
+  if(cl==='sensor') return 'sensor';
+  return 'dot';
+}
+function fmtMeasure(k,v){
+  const x=v.value; if(typeof x!=='number') return '';
+  if(isPh(k,v)) return 'pH '+nf1.format(x);
+  const M={measure_temperature:()=>nf1.format(x)+' °C',measure_humidity:()=>nf0.format(x)+' %',measure_power:()=>nf0.format(x)+' W',measure_battery:()=>'Pile '+nf0.format(x)+' %',measure_luminance:()=>nf0.format(x)+' lx',measure_co2:()=>nf0.format(x)+' ppm'};
+  if(M[k]) return M[k]();
+  return ((v.title?v.title+' ':'')+nf1.format(x)+(v.units?' '+v.units:'')).trim();
+}
+function stateText(d){
+  const c=d.capabilitiesObj||{}, parts=[];
+  if(d.available===false) return d.unavailableMessage||'Ne répond plus';
+  if(c.windowcoverings_set&&typeof c.windowcoverings_set.value==='number'){
+    const p=Math.round(c.windowcoverings_set.value*100);
+    parts.push(p>=99?'Ouvert':p<=1?'Fermé':'Ouvert à '+p+' %');
+  }
+  if(c.target_temperature&&typeof c.target_temperature.value==='number') parts.push('Consigne '+nf1.format(c.target_temperature.value)+' °C');
+  for(const k of Object.keys(c)){
+    if(parts.length>=3) break;
+    const v=c[k]; if(!v) continue;
+    if(/^measure_/.test(k)){ const t=fmtMeasure(k,v); if(t) parts.push(t); }
+    else if(k==='alarm_contact') parts.push(v.value?'Ouverte':'Fermée');
+    else if(k==='alarm_motion') parts.push(v.value?'Mouvement détecté':'Calme');
+    else if(/^alarm_/.test(k)&&v.value===true) parts.push(ALARM[k]||'Alerte');
+  }
+  if(c.onoff){
+    const lbl=c.onoff.title&&!/^(on\/off|allum|turned|aan|ein)/i.test(c.onoff.title)?c.onoff.title+' ':'';
+    if(lbl) parts.push(lbl+(c.onoff.value?'en marche':'à l’arrêt'));
+    else if(!parts.length) parts.push(d.class==='light'?(c.onoff.value?'Allumée':'Éteinte'):(c.onoff.value?'En marche':'À l’arrêt'));
+  }
+  return parts.join(' · ');
+}
+function watchList(){
+  const out=[];
+  for(const d of Object.values(data.devices||{})){
+    const c=d.capabilitiesObj||{};
+    const nm=devName(d), rech=d.class==='curtain'||d.class==='blinds';
+    if(d.available===false){ out.push(nm+(rech?' ne répond plus : batterie à recharger ?':' ne répond plus')); continue; }
+    let batt=false;
+    for(const [k,v] of Object.entries(c)){
+      if(!v) continue; const x=v.value;
+      if(ALARM[k]&&x===true) out.push(nm+' : '+ALARM[k]);
+      if(!batt&&((k==='alarm_battery'&&x===true)||(k==='measure_battery'&&typeof x==='number'&&x<(rech?25:20)))){ batt=true; out.push(rech?nm+' : batterie '+(typeof x==='number'?'à '+nf0.format(x)+' %':'faible')+', à recharger':nm+' : pile '+(typeof x==='number'?'à '+nf0.format(x)+' %':'faible')); }
+      if(isPh(k,v)&&typeof x==='number'&&(x<7.2||x>7.6)) out.push('pH de la piscine à '+nf1.format(x)+' (idéal entre 7,2 et 7,6)');
+    }
+  }
+  if(data.apps) for(const a of Object.values(data.apps)) if(appState(a)[0]==='bad') out.push('Appli '+appName(a)+' en panne');
+  return out;
+}
+function summary(){
+  const devs=Object.values(data.devices||{}), parts=[];
+  const pool=devs.find(d=>/piscine|pool/i.test(d.name)&&d.capabilitiesObj&&d.capabilitiesObj.measure_temperature&&typeof d.capabilitiesObj.measure_temperature.value==='number');
+  if(pool){
+    parts.push('Piscine '+nf1.format(pool.capabilitiesObj.measure_temperature.value)+' °C');
+    const ph=Object.entries(pool.capabilitiesObj).find(([k,v])=>isPh(k,v)&&typeof v.value==='number');
+    if(ph) parts.push('pH '+nf1.format(ph[1].value));
+  }
+  const n=devs.length; parts.push(n+' appareil'+(n>1?'s':''));
+  return parts.join(' · ');
+}
+const appName=a=>typeof a.name==='string'?a.name:((a.name&&(a.name.fr||a.name.en))||a.id);
+function appState(a){
+  if(a.crashed||a.state==='crashed') return ['bad','En panne'];
+  if(a.enabled===false||a.state==='stopped'||a.state==='disabled') return ['warn','Arrêtée'];
+  if(a.ready===false) return ['','Démarre…'];
+  return ['ok','OK'];
+}
+const coverDevices=()=>Object.values(data.devices||{}).filter(d=>d.available!==false&&/^cover/.test(ctrlKind(d)));
+
+/* ---------- Rangement des pièces ---------- */
+function getLayout(){ const l=store.get('layout'+sfx(),null); return l&&Array.isArray(l.rooms)?l:null; }
+function roomsView(){
+  const out=[], byZone={}, placed=new Set();
+  const ensure=z=>{ if(!byZone[z]){ byZone[z]={id:z,name:zoneName(z),off:false,devs:[]}; out.push(byZone[z]); } return byZone[z]; };
+  const L=getLayout();
+  if(L) for(const r of L.rooms){
+    if(!r||typeof r.z!=='string') continue;
+    const rv=ensure(r.z); rv.off=!!r.off;
+    for(const x of (Array.isArray(r.d)?r.d:[])){ const d=x&&data.devices[x.i]; if(d&&!placed.has(d.id)){ rv.devs.push({dev:d,off:!!x.off}); placed.add(d.id); } }
+  }
+  const rest=Object.values(data.devices||{}).filter(d=>!placed.has(d.id)).sort((a,b)=>devName(a).localeCompare(devName(b),'fr'));
+  [...new Set(rest.map(effZone))].filter(z=>!byZone[z]).map(z=>({id:z,name:zoneName(z)})).sort(byName).forEach(z=>ensure(z.id));
+  rest.forEach(d=>ensure(effZone(d)).devs.push({dev:d,off:false}));
+  return out.filter(r=>r.devs.length);
+}
+
+/* ---------- Photos des pièces ---------- */
+const photoKey=z=>'photo'+sfx()+'.'+z;
+function getPhoto(z){ const v=store.raw(photoKey(z)); return /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(v)?v:''; }
+function loadPhoto(file){
+  return new Promise((res,rej)=>{
+    const url=URL.createObjectURL(file), img=new Image();
+    img.onload=()=>{
+      const m=480, s=Math.min(1,m/Math.max(img.naturalWidth,img.naturalHeight));
+      const c=document.createElement('canvas'); c.width=Math.max(1,Math.round(img.naturalWidth*s)); c.height=Math.max(1,Math.round(img.naturalHeight*s));
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg',.72));
+    };
+    img.onerror=()=>{ URL.revokeObjectURL(url); rej(new Error('image')); };
+    img.src=url;
+  });
+}
+function photoBtn(r){
+  const p=getPhoto(r.id);
+  return '<button class="room-photo'+(p?' has':'')+'" type="button" data-photo="'+esc(r.id)+'" aria-label="'+(p?'Photo : ':'Ajouter une photo : ')+esc(r.name)+'">'+(p?'<img src="'+p+'" alt="">':I('photo'))+'</button>';
+}
+
+/* ---------- Actions ---------- */
+async function setCap(id,cap,val){
+  const d=data.devices[id]; if(!d) return;
+  const c=d.capabilitiesObj&&d.capabilitiesObj[cap]; const old=c?c.value:undefined;
+  if(mode==='demo'){ demoSet(d,cap,val); render(); return; }
+  if(c) c.value=val; render();
+  try{
+    await req('/api/manager/devices/device/'+encodeURIComponent(id)+'/capability/'+encodeURIComponent(cap),{method:'PUT',body:{value:val}});
+    setTimeout(refresh,1500);
+  }catch(e){
+    if(c) c.value=old; render();
+    const s=e&&e.status;
+    toast(s===401||s===403?'Ta clé n’a pas le droit de piloter cet appareil.':'Commande non passée : Homey ne répond pas.','bad');
+  }
+}
+async function closeAll(btn){
+  const list=coverDevices(); if(!list.length) return;
+  btn.classList.add('busy');
+  const cmd=d=>ctrlKind(d)==='cover'?['windowcoverings_state','down']:['windowcoverings_set',0];
+  let fail=0;
+  if(mode==='demo') list.forEach(d=>{ const [c,v]=cmd(d); demoSet(d,c,v); });
+  else{
+    const r=await Promise.allSettled(list.map(d=>{ const [c,v]=cmd(d); return req('/api/manager/devices/device/'+encodeURIComponent(d.id)+'/capability/'+c,{method:'PUT',body:{value:v}}); }));
+    fail=r.filter(x=>x.status==='rejected').length;
+    setTimeout(refresh,2500);
+  }
+  render();
+  const n=list.length, ok=n-fail;
+  if(!fail) toast(n>1?n+' volets et fenêtres se ferment':'Le volet se ferme');
+  else if(!ok) toast('Aucun volet ne répond. Réessaie dans un instant.','bad');
+  else toast(ok+' se ferment, '+fail+' ne répondent pas','bad');
+}
+async function trigger(f,g){
+  const demo=g?g.a==='demo':mode==='demo';
+  if(demo){ demoFx(f.id); return; }
+  const t=f.type==='advancedflow'?'advancedflow':'flow';
+  await req('/api/manager/flow/'+t+'/'+encodeURIComponent(f.id)+'/trigger',{method:'POST',body:{},base:g?g.a:base,key:g?g.k:cfg.key});
+}
+async function runScene(btn){
+  if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
+  const f={id:btn.dataset.flow,type:btn.dataset.type,name:btn.dataset.name};
+  const g=mode==='guest'?guest:null;
+  btn.classList.add('busy');
+  try{
+    await trigger(f,g);
+    flash={id:f.id,until:Date.now()+1800};
+    toast('« '+f.name+' » lancé');
+    render(); setTimeout(render,1900);
+    if(mode==='live') setTimeout(refresh,2500);
+  }catch(e){
+    btn.classList.remove('busy');
+    const s=e&&e.status;
+    let m='Pas lancé : Homey ne répond pas.';
+    if(s===401||s===403) m=g?'Ce bouton n’est plus autorisé. Demande un nouveau lien.':'Ta clé n’a pas le droit de lancer les scènes.';
+    if(s===404) m='Cette scène n’existe plus dans Homey.';
+    toast(m,'bad');
+  }
+}
+
+/* ---------- Écrans ---------- */
+function sceneIcon(n){
+  n=String(n||'').toLowerCase();
+  if(/pars|départ|depart|sortie|absent|vacances/.test(n)) return 'leave';
+  if(/rentr|retour|arriv|bienvenue/.test(n)) return 'house';
+  if(/nuit|dodo|couch/.test(n)) return 'moon';
+  if(/matin|réveil|reveil|lever/.test(n)) return 'sun';
+  if(/piscine|pool|baign/.test(n)) return 'wave';
+  if(/ciné|cine|film|télé|tele|tv/.test(n)) return 'film';
+  if(/clim|chauff|froid|chaud/.test(n)) return 'thermo';
+  return 'spark';
+}
+function nowScene(list){
+  const h=new Date().getHours();
+  const M=/réveil|reveil|matin|lever|bonjour/i, R=/rentr|retour|arriv|bienvenue/i, L=/soir|apéro|apero|piscine|ciné|cine|film/i, N=/nuit|dodo|couch/i;
+  const order=h>=5&&h<11?[M]:h>=16&&h<20?[R,L]:h>=20&&h<22?[L,N]:(h>=22||h<3)?[N]:[];
+  for(const re of order){ const f=list.find(x=>re.test(x.name)); if(f) return f; }
+  return null;
+}
+function sceneBtn(f,isNow){
+  const done=flash.id===f.id&&Date.now()<flash.until;
+  return '<button class="scene'+(done?' done':'')+(isNow?' now':'')+'" type="button" data-flow="'+esc(f.id)+'" data-type="'+esc(f.type)+'" data-name="'+esc(f.name)+'">'
+    +'<span class="scene-ic">'+I(sceneIcon(f.name))+'</span><span class="scene-name">'+esc(f.name)+'</span>'
+    +(isNow?'<span class="scene-now">Maintenant</span>':'')
+    +'<span class="scene-ok">'+I('check')+'Lancé</span></button>';
+}
+function homeFlows(){
+  const trig=data.flows.filter(f=>f.trig), sel=store.get('home'+sfx(),null);
+  if(Array.isArray(sel)) return sel.map(id=>trig.find(f=>f.id===id)).filter(Boolean);
+  return trig.slice(0,8);
+}
+function renderHome(){
+  const w=watchList(), ok=!w.length, nCov=coverDevices().length;
+  let fl=homeFlows(); const now=nowScene(fl);
+  if(now) fl=[now].concat(fl.filter(f=>f!==now));
+  let top='';
+  if(mode==='demo') top='<div class="note"><span>Démo avec des appareils d’exemple.</span><button class="btn small" type="button" id="open-settings">Connecter mon Homey</button></div>';
+  let side='<section class="status '+(ok?'ok':'warn')+'"><div class="status-dot" aria-hidden="true">'+(ok?I('check'):'!')+'</div><div class="status-txt">'
+    +'<h2>'+(ok?'Tout va bien à la maison':w.length+(w.length>1?' points à regarder':' point à regarder'))+'</h2>'
+    +(ok?'':'<ul>'+w.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>')
+    +'<p class="sum">'+esc(summary())+'</p></div></section>';
+  side+=miniPlan();
+  if(nCov) side+='<button class="allclose" type="button" id="allclose"><span class="row-ic">'+I('blinds')+'</span><span class="row-txt"><b>Tout fermer</b><small>'+(nCov>1?nCov+' volets et fenêtres':'1 volet')+'</small></span></button>';
+  side+='<div class="cams"><h3 class="sec">Caméras</h3>'
+    +'<a class="allclose" href="shortcuts://run-shortcut?name=Cameras%20Alexa"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Toutes les caméras</b><small>eufy et Aqara réunies · ouvre Alexa</small></span></a>'
+    +'<a class="allclose" href="shortcuts://run-shortcut?name=Cameras%20eufy"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Sherlock</b><small>Caméras eufy · ouvre l’appli</small></span></a>'
+    +'<a class="allclose" href="shortcuts://run-shortcut?name=Cameras%20Aqara"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Aqara</b><small>Caméras Aqara · ouvre l’appli</small></span></a></div>';
+  let main='<div class="sec-row"><h3 class="sec">Scènes</h3>'+(data.flows.some(f=>f.trig)?'<button class="linkbtn" type="button" id="arrange">Ranger</button>':'')+'</div>';
+  main+=fl.length?'<div class="scenes">'+fl.map(f=>sceneBtn(f,f===now)).join('')+'</div>'
+    :'<p class="muted">Aucune scène à lancer. Crée dans Homey un Flow qui se lance à la main, il apparaîtra ici.</p>';
+  main+='<button class="ask" type="button" id="ask">'+I('chat')+'Demander un nouveau scénario</button>';
+  return top+'<div class="home"><div class="home-side">'+side+'</div><div class="home-main">'+main+'</div></div>';
+}
+function devRow(d){
+  const c=d.capabilitiesObj||{}, k=ctrlKind(d), off=d.available===false, id=esc(d.id), nm=esc(devName(d));
+  let ctrl='';
+  if(off) ctrl='<span class="tag bad">Hors ligne</span>';
+  else if(k==='cover') ctrl='<div class="seg" role="group" aria-label="'+nm+'">'
+    +'<button type="button" data-dev="'+id+'" data-cap="windowcoverings_state" data-val="up" aria-label="Ouvrir">'+I('up')+'</button>'
+    +'<button type="button" data-dev="'+id+'" data-cap="windowcoverings_state" data-val="idle" aria-label="Stop">'+I('stop')+'</button>'
+    +'<button type="button" data-dev="'+id+'" data-cap="windowcoverings_state" data-val="down" aria-label="Fermer">'+I('down')+'</button></div>';
+  else if(k==='coverset') ctrl='<div class="seg" role="group" aria-label="'+nm+'">'
+    +'<button type="button" data-dev="'+id+'" data-cap="windowcoverings_set" data-num="1" aria-label="Ouvrir">'+I('up')+'</button>'
+    +'<button type="button" data-dev="'+id+'" data-cap="windowcoverings_set" data-num="0" aria-label="Fermer">'+I('down')+'</button></div>';
+  else if(k==='thermo'){ const v=c.target_temperature.value; ctrl='<div class="stepper"><button type="button" data-dev="'+id+'" data-step="-0.5" aria-label="Baisser">−</button><b>'+(typeof v==='number'?nf1.format(v)+'°':'–')+'</b><button type="button" data-dev="'+id+'" data-step="0.5" aria-label="Monter">+</button></div>'; }
+  else if(k==='toggle') ctrl='<button class="switch" type="button" role="switch" aria-checked="'+(!!c.onoff.value)+'" data-dev="'+id+'" data-toggle aria-label="'+nm+'"><span></span></button>';
+  return '<div class="row'+(off?' is-off':'')+'"><span class="row-ic">'+I(devIcon(d))+'</span><div class="row-txt"><b>'+nm+'</b><small>'+esc(stateText(d))+'</small></div>'+ctrl+'</div>';
+}
+/* Le plan : x le long de la maison, y de l’arrière (0) vers la piscine, en mètres. Plan simplifié, pas à l’échelle exacte. */
+// D'après le plan de masse : à l'arrière (nord-ouest, en haut), le garage, l'allée en pente
+// (la descente) qui y mène, et l'escalier hachuré le long de la façade jusqu'à l'entrée.
+// Piscine devant (sud-est).
+// Bloc arrière d'environ 11 × 11 m coupé dans la longueur : buanderie (11 × 3) collée à la maison,
+// garage (11 × 8) derrière.
+const PLAN_W=35, PLAN_H=20.5;
+const PLAN=[
+  {n:'Garage',x:2.4,y:0.3,w:12.9,h:5.66},
+  {n:'Buanderie',s:'Buanderie · arrière-cuisine',t:'Buanderie et arrière-cuisine',also:['Arrière Cuisine'],x:2.4,y:5.96,w:12.9,h:2.14,v:1},
+  {n:'Descente',s:'Descente du garage',dev:'lumière descente',x:15.3,y:0.3,w:19.7,h:3.5,k:'ramp'},
+  {n:'Chambre Artiste',s:'Ch. artiste',x:0,y:8.1,w:3.55,h:3.4},
+  {n:'Salle De Bain Artiste',s:'Bain artiste',x:3.55,y:8.1,w:2.2,h:3.4},
+  {n:'Bureau',x:5.75,y:8.1,w:3.55,h:3.4},
+  {n:'Chambre De Paul',s:'Ch. Paul',x:0,y:12.7,w:3.55,h:3.4},
+  {n:'Salle De Bain Paul',s:'Bain Paul',x:3.55,y:12.7,w:2.2,h:3.4},
+  {n:'Chambre Piscine',s:'Ch. piscine',x:5.75,y:12.7,w:3.55,h:3.4},
+  {n:'Cuisine',x:9.3,y:8.1,w:6.6,h:8,k:'zone'},
+  {n:'Entrée',x:15.9,y:8.1,w:4,h:8,k:'zone'},
+  {n:'Salon',x:19.9,y:8.1,w:8,h:8,k:'zone'},
+  {n:'Salle De Bain Ma Chambre',s:'Salle de bain',x:31,y:8.1,w:4,h:3.7},
+  {n:'Ma Chambre',x:27.9,y:8.1,w:7.1,h:8,notch:[4/7.1,3.7/8],nx:1},
+  {n:'Piscine',x:2.6,y:16.8,w:22.9,h:3.5,k:'pool'},
+  {n:'Extérieur',x:26.2,y:16.8,w:8.8,h:3.5,k:'out'}
+];
+const PLAN_CORR={x:0,y:11.5,w:9.3,h:1.2};
+const PLAN_DECO=[{t:'Escalier vers l’entrée',x:15.3,y:6.4,w:19.7,h:1.7,v:1}];
+// Cuisine, entrée et salon : une seule grande pièce ouverte (murs extérieurs seulement)
+const PLAN_WALLS=[{x:9.3,y:8.1,w:18.6,h:8}];
+const tallPlan=()=>window.matchMedia('(max-width: 699px)').matches;
+let planRoom=null;
+function roomDevs(name){
+  const o=PLAN.find(p=>p.n===name);
+  if(o&&o.dev) return Object.values(data.devices||{}).filter(d=>nk(d.name)===o.dev);
+  const names=[name].concat(o&&o.also||[]).map(nk), out=[];
+  for(const r of roomsView()) if(!r.off&&names.includes(nk(r.name))) out.push(...r.devs.filter(x=>!x.off).map(x=>x.dev));
+  return out;
+}
+// Affichage dans le sens du plan de masse : piscine en haut, garage en bas (iPad) ;
+// sur iPhone, le même plan tourné d'un quart de tour (piscine à gauche).
+function planBox(o,tall){
+  const p=v=>(Math.round(v*1000)/10)+'%', yf=PLAN_H-o.y-o.h, xf=PLAN_W-o.x-o.w;
+  let s=tall?'left:'+p(yf/PLAN_H)+';top:'+p(xf/PLAN_W)+';width:'+p(o.h/PLAN_H)+';height:'+p(o.w/PLAN_W)
+    :'left:'+p(o.x/PLAN_W)+';top:'+p(yf/PLAN_H)+';width:'+p(o.w/PLAN_W)+';height:'+p(o.h/PLAN_H);
+  if(o.notch){ // coin arrière occupé par une autre pièce (salle de bain, arrière-cuisine)
+    const a=tall?o.notch[1]:o.notch[0], b=tall?o.notch[0]:o.notch[1];
+    const A=p(a), B=p(1-b), C=p(1-a), D=p(b);
+    if(!tall&&!o.nx) s+=';clip-path:polygon(0 0,100% 0,100% 100%,'+A+' 100%,'+A+' '+B+',0 '+B+')';
+    else if(!tall) s+=';clip-path:polygon(0 0,100% 0,100% '+B+','+C+' '+B+','+C+' 100%,0 100%)';
+    else if(!o.nx) s+=';clip-path:polygon(0 0,100% 0,100% '+B+','+C+' '+B+','+C+' 100%,0 100%)';
+    else s+=';clip-path:polygon(0 0,'+C+' 0,'+C+' '+D+',100% '+D+',100% 100%,0 100%)';
+    s+=(tall&&o.nx)?';justify-content:flex-end;padding-bottom:12px':';justify-content:flex-start;padding-top:12px';
+  }
+  return s;
+}
+// Baies vitrées côté piscine, chacune avec son store (noms Homey)
+const PLAN_BAYS=[
+  {dev:'store baie gauche 1',x:20.2,w:1.75},{dev:'store baie gauche 2',x:22.1,w:1.75},
+  {dev:'store baie droite 1',x:24,w:1.75},{dev:'store baie droite 2',x:25.9,w:1.75},
+  {dev:'store chambre piscine',x:6.5,w:2},{dev:'store paul',x:0.8,w:2}
+].map(b=>Object.assign({y:15.65,h:0.9},b));
+const bayDev=k=>Object.values(data.devices||{}).find(d=>nk(d.name)===k);
+function roomState(o){
+  const devs=roomDevs(o.n), live=devs.filter(d=>d.available!==false);
+  const lit=live.filter(d=>(d.class==='light'||/lumi[eè]re/i.test(d.name))&&d.capabilitiesObj&&d.capabilitiesObj.onoff&&d.capabilitiesObj.onoff.value).length;
+  const bad=devs.some(d=>d.available===false);
+  const th=live.find(d=>d.capabilitiesObj&&d.capabilitiesObj.measure_temperature&&typeof d.capabilitiesObj.measure_temperature.value==='number'&&!/piscine|pool/i.test(d.name));
+  let sub='';
+  if(o.n==='Piscine'){ const p=live.find(d=>d.capabilitiesObj&&d.capabilitiesObj.measure_temperature&&typeof d.capabilitiesObj.measure_temperature.value==='number'); if(p) sub=nf1.format(p.capabilitiesObj.measure_temperature.value)+'°'; }
+  else if(lit) sub=lit+(lit>1?' allumées':' allumée');
+  else if(th) sub=nf1.format(th.capabilitiesObj.measure_temperature.value)+'°';
+  return {devs,lit,bad,sub};
+}
+function bayState(d){
+  const c=d.capabilitiesObj||{}, v=c.windowcoverings_set&&typeof c.windowcoverings_set.value==='number'?c.windowcoverings_set.value:null;
+  return {closed:v===null?null:Math.max(0,Math.min(1,1-v)), bad:d.available===false};
+}
+function planHtml(mini){
+  const tall=!mini&&tallPlan(), tag=mini?'span':'button';
+  let h='<div class="plan'+(mini?' mini':'')+'" style="aspect-ratio:'+(tall?PLAN_H+' / '+PLAN_W:PLAN_W+' / '+PLAN_H)+'">';
+  h+='<span class="corr" aria-hidden="true" style="'+planBox(PLAN_CORR,tall)+'"></span>';
+  for(const o of PLAN_DECO) h+='<span class="pdeco'+(tall&&o.v?' vt':'')+'" aria-hidden="true" style="'+planBox(o,tall)+'"><span>'+esc(o.t)+'</span></span>';
+  for(const o of PLAN){
+    const st=roomState(o);
+    const cls='pr'+(o.k?' '+o.k:'')+(st.lit?' lit':'')+(st.bad?' bad':'')+(!st.devs.length&&!o.k?' none':'')+(tall&&o.v?' vt':'');
+    if(mini){ h+='<span class="'+cls+'" style="'+planBox(o,false)+'"></span>'; continue; }
+    const say=o.n+(st.sub?', '+st.sub:'')+(st.bad?', un appareil ne répond pas':'')+(st.devs.length?'':', rien de relié à Homey');
+    h+='<button class="'+cls+'" type="button" data-plan="'+esc(o.n)+'" style="'+planBox(o,tall)+'" aria-label="'+esc(say)+'"><b>'+esc(o.s||o.n)+'</b>'+(st.sub?'<small>'+esc(st.sub)+'</small>':'')+'</button>';
+  }
+  for(const w of PLAN_WALLS) h+='<span class="pwall" aria-hidden="true" style="'+planBox(w,tall)+'"></span>';
+  for(const b of PLAN_BAYS){
+    const d=bayDev(b.dev); if(!d) continue;
+    const s=bayState(d), cl=s.closed===null?'':s.closed>.95?' shut':s.closed>.05?' half':' open';
+    const fill=s.closed===null?'':'<i style="'+(tall?'width':'height')+':'+Math.round(s.closed*100)+'%"></i>';
+    const say=devName(d)+', '+stateText(d);
+    h+=mini?'<span class="bay'+cl+(s.bad?' bad':'')+'" style="'+planBox(b,false)+'">'+fill+'</span>'
+      :'<button class="bay'+cl+(s.bad?' bad':'')+(tall?' tv':'')+'" type="button" data-bay="'+esc(b.dev)+'" style="'+planBox(b,tall)+'" aria-label="'+esc(say)+'">'+fill+'</button>';
+  }
+  h+='</div>';
+  if(!mini) h+='<p class="plan-legend"><span><i></i>Lumière allumée</span><span><i class="dot"></i>Ne répond pas</span><span><i class="glass"></i>Baie et son store</span><span>Touche une pièce ou une baie</span></p>';
+  return h;
+}
+function miniPlan(){
+  const lit=PLAN.filter(o=>roomState(o).lit).map(o=>o.n);
+  const txt=lit.length?'Allumé : '+lit.join(', '):'Tout est éteint';
+  return '<button class="miniplan" type="button" id="go-plan" aria-label="Le Nid, '+esc(txt)+'. Ouvrir le plan">'+planHtml(true)
+    +'<span class="mp-cap"><span><b>Le Nid</b><small>'+esc(txt)+'</small></span><span class="mp-go">Plan ›</span></span></button>';
+}
+function planSheetHtml(id){
+  if(String(id).indexOf('bay:')===0){ const d=bayDev(id.slice(4)); return d?'<div class="list">'+devRow(d)+'</div>':'<p class="muted">Ce store ne répond plus.</p>'; }
+  const devs=roomDevs(id);
+  if(!devs.length) return '<p class="muted">Rien de relié à Homey dans cette pièce. Ce qui s’y trouve se pilote dans l’appli Maison.</p>';
+  return '<div class="list">'+devs.map(devRow).join('')+'</div>';
+}
+function openRoom(name){ const o=PLAN.find(p=>p.n===name); planRoom=name; openSheet((o&&o.t)||name,planSheetHtml(name),{}); }
+function openBay(k){ const d=bayDev(k); if(!d) return; planRoom='bay:'+k; openSheet(devName(d),planSheetHtml(planRoom),{}); }
+function renderRooms(){
+  const all=roomsView();
+  const pv=store.get('roomsView','plan')!=='list';
+  const seg='<div class="view-seg" role="group" aria-label="Affichage"><button type="button" data-rview="plan" aria-pressed="'+pv+'">Plan</button><button type="button" data-rview="list" aria-pressed="'+(!pv)+'">Liste</button></div>';
+  if(pv) return '<div class="sec-row" style="margin-top:4px"><h3 class="sec">Le Nid</h3><div class="sec-tools"><button class="btn small wall-go" type="button" id="wall-go">Plein écran</button>'+seg+'</div></div>'+planHtml();
+  if(!all.length) return '<div class="sec-row" style="margin-top:4px"><h3 class="sec">Pièces</h3>'+seg+'</div><p class="muted">Aucun appareil pour l’instant.</p>';
+  const rv=all.filter(r=>!r.off).map(r=>({id:r.id,name:r.name,devs:r.devs.filter(x=>!x.off).map(x=>x.dev)})).filter(r=>r.devs.length);
+  if(room!=='all'&&!rv.some(r=>r.id===room)) room='all';
+  let h='<div class="sec-row" style="margin-top:4px"><h3 class="sec">Pièces</h3>'+seg+'</div><div class="chips-row"><div class="chips" role="group" aria-label="Pièces"><button class="chip" type="button" data-room="all" aria-pressed="'+(room==='all')+'">Toutes</button>'
+    +rv.map(r=>'<button class="chip" type="button" data-room="'+esc(r.id)+'" aria-pressed="'+(room===r.id)+'">'+esc(r.name)+'</button>').join('')
+    +'</div><button class="linkbtn" type="button" id="arrange-rooms">Ranger</button></div>';
+  if(!rv.length) return h+'<p class="muted">Tout est masqué. Touche « Ranger » pour réafficher des pièces.</p>';
+  h+='<div class="rooms">'+(room==='all'?rv:rv.filter(r=>r.id===room)).map(r=>
+    '<section class="room"><div class="room-h">'+photoBtn(r)+'<h3>'+esc(r.name)+'</h3></div><div class="list">'+r.devs.map(devRow).join('')+'</div></section>'
+  ).join('')+'</div>';
+  return h;
+}
+const isWide=()=>window.matchMedia('(min-width: 900px)').matches;
+function wallTime(){ const d=new Date(); const t=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); const j=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}); return {t, d:j.charAt(0).toUpperCase()+j.slice(1)}; }
+function renderWall(){
+  const tm=wallTime(), w=watchList(), lit=PLAN.filter(o=>roomState(o).lit).map(o=>o.s||o.n);
+  const st=w.length?(w.length>1?w.length+' points à regarder : ':'À regarder : ')+w.slice(0,2).join(', ')+(w.length>2?'…':''):'Tout va bien à la maison';
+  return '<div class="wall-bar"><div><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div></div>'
+    +'<div class="wall-state"><b>'+esc(st)+'</b>'+esc(lit.length?'Allumé : '+lit.join(', '):'Tout est éteint')+'</div>'
+    +'<button class="btn small" type="button" id="wall-exit">Quitter</button></div>'
+    +'<div class="wall-plan">'+planHtml()+'</div>';
+}
+function getShares(){
+  let s=store.get('shares'+sfx(),null);
+  if(s===null&&mode==='demo') s=[{id:'s0',n:'Marie (exemple)',k:'demo',g:1,b:[{i:'f2',t:'flow',n:'Je rentre'},{i:'f3',t:'flow',n:'Bonne nuit'}]}];
+  return Array.isArray(s)?s:[];
+}
+function renderShare(){
+  const sh=getShares();
+  let h='<div class="share-top"><p class="lead">Donne des boutons à quelqu’un, sans accès au reste de la maison.</p>'
+    +'<button class="btn primary block" type="button" id="share-new">'+I('plus')+'Partager des boutons</button></div>';
+  h+='<h3 class="sec">Personnes</h3>';
+  if(!sh.length) h+='<p class="muted">Personne pour l’instant.</p>';
+  else h+='<div class="cards">'+sh.map(s=>
+    '<div class="card"><div class="row"><span class="avatar" aria-hidden="true">'+esc((s.n||'?').trim().charAt(0).toUpperCase())+'</span><div class="row-txt"><b>'+esc(s.n)+'</b><small>'+s.b.length+' bouton'+(s.b.length>1?'s':'')+(s.g?' · très gros':'')+' · '+esc(s.b.map(x=>x.n).join(', '))+'</small></div></div>'
+    +'<div class="row-btns"><button class="btn small" type="button" data-copy-share="'+esc(s.id)+'">'+I('copy')+'Copier le lien</button>'
+    +'<button class="btn small" type="button" data-preview="'+esc(s.id)+'">'+I('eye')+'Aperçu</button>'
+    +'<button class="btn small danger" type="button" data-remove="'+esc(s.id)+'">Retirer</button></div></div>'
+  ).join('')+'</div>';
+  h+='<details class="help"><summary>Couper l’accès de quelqu’un</summary><p>Sur my.homey.app, ouvre Réglages puis Clés API, et supprime la clé de cette personne. Ses boutons ne marchent plus.</p></details>';
+  return h;
+}
+const RECO=[
+  {m:a=>a.id==='com.somfy.tahoma',n:'Somfy TaHoma & Connexoon',w:'Volets et fenêtres Velux, via ta box TaHoma.',s:'Somfy TaHoma'},
+  {m:a=>a.id==='com.vistapool.vistapool-sugarvalley-hayward',n:'Vistapool & Hayward',w:'Piscine : filtration, lumière, pH, volet.',s:'Vistapool'},
+  {m:a=>/eufy/i.test(appName(a)),n:'Eufy Security',w:'Caméras et sonnette. Crée un 2e compte eufy réservé à Homey.',s:'Eufy'},
+  {m:a=>/aqara/i.test(appName(a)),n:'Aqara',w:'Capteurs de porte, de température…',s:'Aqara'},
+  {m:a=>/meross/i.test(appName(a)),n:'Meross',w:'Prises, à ajouter par Matter.',s:'Meross'},
+  {m:a=>/ifttt/i.test(appName(a)),n:'IFTTT',w:'Pour la clim Airzone, dont l’appli Homey n’est plus à jour.',s:'IFTTT'}
+];
+function renderApps(){
+  const apps=data.apps?Object.values(data.apps).sort((a,b)=>appName(a).localeCompare(appName(b),'fr')):null;
+  let h='';
+  if(apps){
+    const bad=apps.filter(a=>appState(a)[0]!=='ok').length;
+    h+='<section class="status '+(bad?'warn':'ok')+'"><div class="status-dot" aria-hidden="true">'+(bad?'!':I('check'))+'</div><div class="status-txt"><h2>'
+      +(bad?bad+' appli'+(bad>1?'s':'')+' à regarder':'Toutes tes applis tournent')+'</h2><p class="sum">'+apps.length+' appli'+(apps.length>1?'s':'')+' dans Homey</p></div></section>';
+  } else if(mode==='live'){
+    h+='<p class="note"><span>Pour voir l’état de tes applis, ajoute le droit « applis » à ta clé Homey.</span></p>';
+  }
+  h+='<div class="cols">';
+  if(apps) h+='<section><h3 class="sec">Tes applis Homey</h3><div class="list">'+apps.map(a=>{
+    const st=appState(a), sub=[a.version?'v'+a.version:'',a.autoupdate===true?'mise à jour auto':a.autoupdate===false?'mise à jour manuelle':''].filter(Boolean).join(' · ');
+    return '<div class="row"><span class="row-ic">'+I('apps')+'</span><div class="row-txt"><b>'+esc(appName(a))+'</b>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</div><span class="tag '+st[0]+'">'+esc(st[1])+'</span></div>';
+  }).join('')+'</div></section>';
+  h+='<section><h3 class="sec">À ajouter dans Homey</h3><p class="muted" style="margin-bottom:10px">Dans l’appli Homey, ouvre Applis et cherche le nom.</p><div class="list">'
+    +RECO.map(r=>{ const inst=apps&&apps.some(r.m);
+      return '<div class="row"><div class="row-txt"><b>'+esc(r.n)+'</b><small>'+esc(r.w)+'</small></div><span class="tag '+(inst?'ok':'')+'">'+(inst?'Installée':'Cherche « '+esc(r.s)+' »')+'</span></div>';
+    }).join('')+'</div></section>';
+  h+='<section><h3 class="sec">Déjà prévu par Homey</h3><div class="list">'
+    +'<div class="row"><div class="row-txt"><b>Le Nid sur iPhone et Siri</b><small>Dans l’appli Maison d’Apple, domicile Le Nid : Ajouter un accessoire, puis scanne le code HomeKit affiché par Homey.</small></div></div>'
+    +'<div class="row"><div class="row-txt"><b>Alexa</b><small>Active la skill Homey dans l’appli Alexa.</small></div></div></div></section>';
+  h+='<section><h3 class="sec">Restent dans leur appli</h3><div class="list">'
+    +'<div class="row"><div class="row-txt"><b>Beatbot</b><small>Aucune intégration Homey trouvée.</small></div></div>'
+    +'<div class="row"><div class="row-txt"><b>Connect Mesh (Häfele)</b><small>Bluetooth : il faut la passerelle Wi-Fi Häfele.</small></div></div>'
+    +'<div class="row"><div class="row-txt"><b>VELUX ACTIVE</b><small>Tu pourras la supprimer quand tes Velux seront dans TaHoma.</small></div></div></div></section>';
+  return h+'</div>';
+}
+function guestBig(g,isPrev){
+  if(isPrev) return !!g.g;
+  const pref=store.get('guestBig',null);
+  return typeof pref==='boolean'?pref:!!g.g;
+}
+function renderGuest(g,isPrev){
+  const big=guestBig(g,isPrev);
+  let h='';
+  if(isPrev) h+='<div class="note"><span>Aperçu de ce que voit '+esc(g.n)+'. Rien n’est lancé.</span><button class="btn small" type="button" id="preview-close">Fermer l’aperçu</button></div>';
+  h+='<div class="scenes'+(big?' big':'')+'">'+g.b.map(f=>sceneBtn({id:f.i,type:f.t,name:f.n},false)).join('')+'</div>';
+  h+='<p class="foot">Ces boutons ont été partagés avec toi.';
+  if(!isPrev) h+='<br><button class="linkbtn" type="button" id="guest-size">'+(big?'Boutons plus petits':'Boutons plus grands')+'</button>'
+    +'<br><button class="linkbtn" type="button" id="guest-quit">Retirer ces boutons de cet appareil</button>';
+  return h+'</p>';
+}
+function render(){
+  const g=mode==='guest'?guest:preview;
+  const wall=!g&&tab==='rooms'&&store.get('roomsView','plan')!=='list'&&store.get('wall',false)===true&&isWide();
+  document.body.classList.toggle('wall',wall);
+  $('#hello').textContent=g?'Bonjour '+g.n.replace(/\s*\(exemple\)$/,''):'Le Nid';
+  const pill=$('#conn');
+  const PL={demo:['','Démo'],loading:['','Connexion…'],local:['ok','À la maison'],remote:['ok','À distance'],off:['bad','Hors ligne']};
+  if(g){ pill.className='pill ok'; pill.textContent=preview?'Aperçu invité':'Boutons partagés'; }
+  else { const p=PL[conn]||PL.off; pill.className='pill '+p[0]; pill.textContent=p[1]; }
+  $('#gear').hidden=mode==='guest'||!!preview;
+  $('#tabs').hidden=!!g;
+  document.querySelectorAll('.tab').forEach(b=>{ if(b.dataset.tab===tab) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+  const v=$('#view');
+  if(g){ v.innerHTML=renderGuest(g,!!preview); return; }
+  if(mode==='live'&&conn==='loading'){ v.innerHTML='<p class="loading">Connexion à Homey…</p>'; return; }
+  if(mode==='live'&&conn==='off'&&tab!=='share'){
+    v.innerHTML='<section class="status bad"><div class="status-dot" aria-hidden="true">!</div><div class="status-txt"><h2>Homey ne répond pas</h2><p>'+esc(lastErr)+'</p><div class="row-btns"><button class="btn small" type="button" id="retry">Réessayer</button><button class="btn small" type="button" id="open-settings">Réglages</button></div></div></section>';
+    return;
+  }
+  v.innerHTML=tab==='home'?renderHome():tab==='rooms'?(wall?renderWall():renderRooms()):tab==='share'?renderShare():renderApps();
+  if(planRoom&&!$('#sheet').hidden) $('#sheet-body').innerHTML=planSheetHtml(planRoom);
+}
+
+/* ---------- Feuilles ---------- */
+function openSheet(title,html,actions){
+  $('#sheet-title').textContent=title; $('#sheet-body').innerHTML=html; sheetActions=actions||{};
+  $('#sheet').hidden=false; $('#sheet-card').scrollTop=0; document.body.style.overflow='hidden';
+}
+function closeSheet(){ $('#sheet').hidden=true; document.body.style.overflow=''; sheetActions={}; planRoom=null; }
+function setMsg(id,txt,cls){ const el=$('#'+id); if(el){ el.textContent=txt; el.className='form-msg'+(cls?' '+cls:''); } }
+async function copyText(text,fallbackId){
+  try{ await navigator.clipboard.writeText(text); return true; }
+  catch(e){ const t=fallbackId&&$('#'+fallbackId); if(t){ t.hidden=false; t.value=text; t.focus(); t.select(); } return false; }
+}
+function flowChecks(prefix,selected){
+  return '<div class="list">'+data.flows.filter(f=>f.trig).map(f=>'<label><input type="checkbox" id="'+prefix+esc(f.id)+'" value="'+esc(f.id)+'"'+(selected.includes(f.id)?' checked':'')+'><span>'+esc(f.name)+'</span></label>').join('')+'</div>';
+}
+function checkedIds(prefix){ return [...document.querySelectorAll('#sheet-body input[id^="'+prefix+'"]:checked')].map(i=>i.value); }
+const handle=n=>'<button type="button" class="handle" aria-label="Déplacer '+n+' (flèches haut et bas)">'+I('grip')+'</button>';
+
+/* Glisser-déposer : pièces, appareils et scènes */
+function enableDrag(root,scroller){
+  let drag=null, lastY=0, raf=0;
+  const items=p=>[...p.children].filter(x=>x!==drag.li);
+  function place(y){
+    if(drag.kind==='dev'){
+      const rooms=[...root.children];
+      let target=rooms[rooms.length-1];
+      for(const r of rooms){ if(y<r.getBoundingClientRect().bottom){ target=r; break; } }
+      const ul=target.querySelector('.dev-list'); let before=null;
+      for(const it of items(ul)){ const b=it.getBoundingClientRect(); if(y<b.top+b.height/2){ before=it; break; } }
+      if(drag.li.parentNode!==ul||drag.li.nextElementSibling!==before) ul.insertBefore(drag.li,before);
+    } else {
+      const par=drag.li.parentNode; let before=null;
+      for(const it of items(par)){ const b=it.getBoundingClientRect(); if(y<b.top+b.height/2){ before=it; break; } }
+      if(drag.li.nextElementSibling!==before) par.insertBefore(drag.li,before);
+    }
+  }
+  function tick(){
+    if(!drag) return;
+    const r=scroller.getBoundingClientRect(); let dy=0;
+    if(lastY<r.top+90) dy=-Math.ceil((r.top+90-lastY)/6);
+    else if(lastY>r.bottom-70) dy=Math.ceil((lastY-(r.bottom-70))/6);
+    if(dy){ const before=scroller.scrollTop; scroller.scrollTop+=dy; if(scroller.scrollTop!==before) place(lastY); }
+    raf=requestAnimationFrame(tick);
+  }
+  root.addEventListener('pointerdown',e=>{
+    const h=e.target.closest('.handle'); if(!h) return;
+    const li=h.closest('li');
+    drag={li,id:e.pointerId,kind:li.classList.contains('dev-item')?'dev':li.classList.contains('room-item')?'room':'item'};
+    lastY=e.clientY;
+    if(drag.kind==='room'){
+      const off=e.clientY-li.getBoundingClientRect().top;
+      root.classList.add('collapsed');
+      scroller.scrollTop+=li.getBoundingClientRect().top-(e.clientY-off);
+    }
+    li.classList.add('dragging');
+    try{ h.setPointerCapture(e.pointerId); }catch(_){}
+    e.preventDefault();
+    raf=requestAnimationFrame(tick);
+  });
+  root.addEventListener('pointermove',e=>{ if(!drag||e.pointerId!==drag.id) return; lastY=e.clientY; place(lastY); });
+  const end=()=>{
+    if(!drag) return;
+    const li=drag.li; li.classList.remove('dragging'); root.classList.remove('collapsed'); drag=null; cancelAnimationFrame(raf);
+    const r=li.getBoundingClientRect(), s=scroller.getBoundingClientRect();
+    if(r.top<s.top+60||r.top>s.bottom-60) scroller.scrollTop+=r.top-s.top-120;
+  };
+  root.addEventListener('pointerup',end);
+  root.addEventListener('pointercancel',end);
+  root.addEventListener('keydown',e=>{
+    const h=e.target.closest('.handle'); if(!h||(e.key!=='ArrowUp'&&e.key!=='ArrowDown')) return;
+    e.preventDefault();
+    const li=h.closest('li'), par=li.parentNode, up=e.key==='ArrowUp', sib=up?li.previousElementSibling:li.nextElementSibling;
+    if(sib) par.insertBefore(li,up?sib:sib.nextElementSibling);
+    else if(li.classList.contains('dev-item')){
+      const rl=par.closest('li'), other=rl&&(up?rl.previousElementSibling:rl.nextElementSibling);
+      if(other){ const ul=other.querySelector('.dev-list'); ul.insertBefore(li,up?null:ul.firstElementChild); }
+    }
+    h.focus();
+  });
+  root.addEventListener('change',e=>{ const li=e.target.closest('li'); if(li) li.classList.toggle('off',!e.target.checked); });
+}
+function openArrange(){
+  const trig=data.flows.filter(f=>f.trig);
+  if(!trig.length){ toast('Aucune scène à ranger pour l’instant.'); return; }
+  const shown=homeFlows().map(f=>f.id);
+  const ids=shown.concat(trig.filter(f=>!shown.includes(f.id)).map(f=>f.id));
+  const h='<p class="lead">Coche les scènes à afficher. Fais glisser la poignée pour changer l’ordre.</p>'
+    +'<ul class="order" id="hb-list">'+ids.map(id=>{
+      const f=trig.find(x=>x.id===id), on=shown.includes(id), n=esc(f.name);
+      return '<li data-id="'+esc(id)+'"'+(on?'':' class="off"')+'><div class="o-row"><label class="o-name"><input type="checkbox" id="hb-'+esc(id)+'"'+(on?' checked':'')+'><span>'+n+'</span></label>'+handle(n)+'</div></li>';
+    }).join('')+'</ul>'
+    +'<button class="btn primary block mt" type="button" id="hb-save">Enregistrer</button>';
+  openSheet('Boutons de l’accueil',h,{'hb-save':()=>{
+    const sel=[...document.querySelectorAll('#hb-list > li')].filter(li=>li.querySelector('input').checked).map(li=>li.dataset.id);
+    store.set('home'+sfx(),sel); closeSheet(); tab='home'; store.set('tab',tab); render(); toast('Boutons enregistrés');
+  }});
+  enableDrag($('#hb-list'),$('#sheet-card'));
+}
+function openArrangeRooms(){
+  const rv=roomsView();
+  if(!rv.length){ toast('Aucun appareil à ranger pour l’instant.'); return; }
+  const h='<p class="lead">Fais glisser les poignées : les pièces pour l’ordre, un appareil pour le changer de pièce. Décoche ce que tu ne veux pas voir.</p>'
+    +'<ul class="order" id="rm-list">'+rv.map(r=>{
+      const rn=esc(r.name);
+      return '<li class="room-item'+(r.off?' off':'')+'" data-z="'+esc(r.id)+'"><div class="o-row o-room"><label class="o-name"><input type="checkbox" id="rm-'+esc(r.id)+'"'+(r.off?'':' checked')+'><span>'+rn+'</span></label>'+handle(rn)+'</div>'
+        +'<ul class="dev-list">'+r.devs.map(x=>{ const dn=esc(x.dev.name);
+          return '<li class="dev-item'+(x.off?' off':'')+'" data-i="'+esc(x.dev.id)+'"><div class="o-row"><label class="o-name"><input type="checkbox" id="rd-'+esc(x.dev.id)+'"'+(x.off?'':' checked')+'><span>'+dn+'</span></label>'+handle(dn)+'</div></li>';
+        }).join('')+'</ul></li>';
+    }).join('')+'</ul>'
+    +'<button class="btn primary block mt" type="button" id="rm-save">Enregistrer</button>'
+    +(getLayout()?'<button class="btn block" type="button" id="rm-reset">Revenir au rangement de Homey</button>':'');
+  openSheet('Pièces et appareils',h,{
+    'rm-save':()=>{
+      const rooms=[...document.querySelectorAll('#rm-list > li')].map(li=>({
+        z:li.dataset.z,
+        off:!li.querySelector(':scope > .o-row input').checked,
+        d:[...li.querySelectorAll(':scope > .dev-list > li')].map(x=>({i:x.dataset.i,off:!x.querySelector('input').checked}))
+      }));
+      store.set('layout'+sfx(),{rooms}); closeSheet(); room='all'; render(); toast('Pièces enregistrées');
+    },
+    'rm-reset':b=>{
+      if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Toucher encore pour confirmer'; return; }
+      store.del('layout'+sfx()); closeSheet(); room='all'; render(); toast('Rangement de Homey rétabli');
+    }
+  });
+  enableDrag($('#rm-list'),$('#sheet-card'));
+}
+function openPhoto(z){
+  const p=getPhoto(z);
+  openSheet(zoneName(z),'<img class="photo-big" src="'+p+'" alt="Photo : '+esc(zoneName(z))+'">'
+    +'<button class="btn primary block" type="button" id="ph-change">'+I('photo')+'Changer la photo</button>'
+    +'<button class="btn block danger" type="button" id="ph-del">Retirer la photo</button>',{
+    'ph-change':()=>{ photoZone=z; $('#photo-input').click(); },
+    'ph-del':()=>{ store.del(photoKey(z)); closeSheet(); render(); toast('Photo retirée'); }
+  });
+}
+
+function openSettings(){
+  const c=cfg||{}, trig=data.flows.filter(f=>f.trig), nDev=Object.keys(data.devices||{}).length;
+  let h='';
+  if(inClaude()) h+='<p class="note warn"><span>Ici, c’est l’aperçu dans Claude : il ne peut pas joindre ton Homey. La connexion marche depuis l’appli installée sur ton iPhone ou ton iPad.</span></p>';
+  h+='<h3 class="sec">Connexion à Homey</h3>'
+    +'<div class="field"><label for="cf-local">À la maison</label><input id="cf-local" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="IP du Homey, ex. 192.168.1.50" value="'+esc(c.localRaw||'')+'"><small id="cf-local-h">'+esc(c.local||'')+'</small></div>'
+    +'<div class="field"><label for="cf-remote">En déplacement</label><input id="cf-remote" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Identifiant Homey (24 caractères)" value="'+esc(c.remoteRaw||'')+'"><small id="cf-remote-h">'+esc(c.remote||'')+'</small></div>'
+    +'<div class="field"><label for="cf-key">Clé API</label><input id="cf-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Colle la clé ici" value="'+esc(c.key||'')+'"><small>Elle reste sur cet appareil.</small></div>'
+    +'<details class="help"><summary>Où trouver ces trois infos ?</summary><ol>'
+    +'<li>Sur un ordinateur, ouvre <code>my.homey.app</code>, puis Réglages, Clés API, Nouvelle clé API. Appelle-la « Le Nid ».</li>'
+    +'<li>Coche les droits : voir et piloter les appareils, voir et lancer les Flows, voir les pièces et les applis. Crée la clé et copie-la : elle ne s’affiche qu’une fois.</li>'
+    +'<li>À la maison : l’adresse IP de ton Homey, visible dans l’appli de ta box internet. En déplacement : ton identifiant Homey, affiché sur <code>tools.developer.homey.app</code>, rubrique System.</li></ol></details>'
+    +'<p class="form-msg mt" id="cf-msg" role="status"></p>'
+    +'<button class="btn primary block" type="button" id="cf-save">Tester et enregistrer</button>'
+    +(mode==='live'?'<button class="btn block danger" type="button" id="cf-forget">Oublier la connexion</button>':'');
+  if(trig.length||nDev){
+    h+='<h3 class="sec">Affichage</h3>';
+    if(trig.length) h+='<button class="btn block" type="button" id="cf-arrange">Ranger les boutons de l’accueil</button>';
+    if(nDev) h+='<button class="btn block" type="button" id="cf-arrange-rooms">Ranger les pièces et les appareils</button>';
+  }
+  h+='<h3 class="sec">iPhone et iPad</h3>';
+  if(mode==='live') h+='<button class="btn block" type="button" id="cf-export">'+I('copy')+'Copier mes réglages</button>'
+    +'<p class="muted mt">Puis, sur l’autre appareil, colle-les ci-dessous. Ne les envoie à personne : ils contiennent ta clé.</p>'
+    +'<div class="field mt"><textarea id="cf-export-out" class="short" readonly hidden aria-label="Réglages à copier"></textarea></div>';
+  h+='<div class="field mt"><label for="cf-import">Coller les réglages de mon autre appareil</label><textarea id="cf-import" class="short" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Touche ici, puis Coller"></textarea></div>'
+    +'<p class="form-msg" id="imp-msg" role="status"></p>'
+    +'<button class="btn block" type="button" id="cf-import-btn">Importer</button>';
+  openSheet('Réglages',h,{
+    'cf-save':saveSettings,
+    'cf-forget':b=>{
+      if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Confirmer : oublier la connexion'; return; }
+      cfg=null; store.del('cfg'); mode='demo'; base=''; conn='demo'; data=makeDemo(); closeSheet(); render(); toast('Connexion oubliée. Retour à la démo.');
+    },
+    'cf-arrange':openArrange,
+    'cf-arrange-rooms':openArrangeRooms,
+    'cf-export':async()=>{ const ok=await copyText(exportCode(),'cf-export-out'); toast(ok?'Réglages copiés. Colle-les sur l’autre appareil.':'Sélectionne le texte affiché et copie-le.'); },
+    'cf-import-btn':importSettings
+  });
+  ['local','remote'].forEach(k=>{ const i=$('#cf-'+k); i.addEventListener('input',()=>{ $('#cf-'+k+'-h').textContent=normAddr(i.value); }); });
+}
+function exportCode(){
+  return 'MAMAISON1.'+b64e(JSON.stringify({l:cfg.localRaw||'',r:cfg.remoteRaw||'',k:cfg.key,h:store.get('home',null),s:store.get('shares',[]),y:store.get('layout',null)}));
+}
+async function importSettings(){
+  const raw=($('#cf-import').value||'').replace(/\s+/g,'');
+  const m=raw.match(/^MAMAISON1\.([A-Za-z0-9_-]+)$/);
+  let p=null; try{ if(m) p=JSON.parse(b64d(m[1])); }catch(e){}
+  if(!p||typeof p.k!=='string'||!p.k||typeof p.l!=='string'||typeof p.r!=='string'){ setMsg('imp-msg','Code non reconnu. Recopie-le depuis l’autre appareil.','bad'); return; }
+  $('#cf-local').value=p.l; $('#cf-remote').value=p.r; $('#cf-key').value=p.k;
+  ['local','remote'].forEach(k=>{ $('#cf-'+k+'-h').textContent=normAddr($('#cf-'+k).value); });
+  setMsg('imp-msg','Test de la connexion…');
+  const ok=await saveSettings($('#cf-save'));
+  if(!ok){ setMsg('imp-msg','Réglages lus, mais Homey ne répond pas d’ici. Voir le message plus haut.','bad'); return; }
+  if(Array.isArray(p.h)) store.set('home',p.h.filter(x=>typeof x==='string'));
+  if(Array.isArray(p.s)) store.set('shares',p.s.filter(s=>s&&typeof s.id==='string'&&typeof s.n==='string'&&typeof s.k==='string'&&Array.isArray(s.b)&&s.b.every(x=>x&&typeof x.i==='string'&&typeof x.n==='string'&&(x.t==='flow'||x.t==='advancedflow'))));
+  if(p.y&&Array.isArray(p.y.rooms)) store.set('layout',p.y);
+  render(); toast('Réglages importés');
+}
+async function saveSettings(b){
+  const localRaw=$('#cf-local').value.trim(), remoteRaw=$('#cf-remote').value.trim(), key=$('#cf-key').value.trim();
+  const tmp={localRaw,remoteRaw,local:normAddr(localRaw),remote:normAddr(remoteRaw),key};
+  if(!key){ setMsg('cf-msg','Colle d’abord ta clé API.','bad'); return false; }
+  if(!tmp.local&&!tmp.remote){ setMsg('cf-msg','Remplis au moins une adresse.','bad'); return false; }
+  b.disabled=true; setMsg('cf-msg','Test en cours…');
+  const r=await tryConnect(tmp);
+  b.disabled=false;
+  if(!r.ok){ setMsg('cf-msg',errMsg(r.err),'bad'); return false; }
+  cfg=tmp; store.set('cfg',cfg); mode='live'; base=r.base; conn=r.mode;
+  try{ await loadLive(); }catch(e){}
+  const nd=Object.keys(data.devices).length, ns=data.flows.filter(f=>f.trig).length;
+  setMsg('cf-msg','Connecté : '+nd+' appareil'+(nd>1?'s':'')+', '+ns+' scène'+(ns>1?'s':'')+'.','ok');
+  render(); setTimeout(closeSheet,1400);
+  return true;
+}
+function openAsk(){
+  const h='<div class="field"><label for="ask-text">Que doit faire la maison ?</label><textarea id="ask-text" placeholder="Ex. : quand je pars, fermer les volets et le Velux, éteindre la lumière de la piscine"></textarea></div>'
+    +'<p class="form-msg" id="ask-msg" role="status"></p>'
+    +'<button class="btn primary block" type="button" id="ask-copy">'+I('copy')+'Copier la demande pour Claude</button>'
+    +'<div class="field mt"><textarea id="ask-out" readonly hidden aria-label="Demande à copier"></textarea></div>';
+  openSheet('Nouveau scénario',h,{'ask-copy':async()=>{
+    const wish=$('#ask-text').value.trim();
+    if(!wish){ setMsg('ask-msg','Décris d’abord ce que tu veux.','bad'); return; }
+    const devs=Object.values(data.devices).sort(byName).slice(0,80).map(d=>'- '+d.name+' ('+zoneName(d.zone)+')').join('\n');
+    const fl=data.flows.map(f=>'- '+f.name).join('\n');
+    const txt='Nouveau scénario pour ma maison (Homey Pro Early 2023)\n\nCe que je veux : '+wish+'\n\nMes appareils :\n'+(devs||'- (aucun)')+'\n\nMes scènes existantes :\n'+(fl||'- (aucune)')
+      +'\n\nDonne-moi le Flow à créer dans Homey, carte par carte (Quand / Et / Alors), et dis-moi s’il manque un appareil ou une appli.';
+    const ok=await copyText(txt,'ask-out');
+    setMsg('ask-msg',ok?'Copié. Colle-le dans Claude, projet Domotique : tu recevras le Flow à créer.':'Sélectionne le texte ci-dessous et copie-le.','ok');
+  }});
+  setTimeout(()=>$('#ask-text')&&$('#ask-text').focus(),50);
+}
+function inviteLink(s){
+  const addr=mode==='demo'?'demo':((cfg&&(cfg.remote||cfg.local))||'');
+  return location.href.split('#')[0]+'#invite='+b64e(JSON.stringify({v:1,n:s.n,a:addr,k:s.k,g:s.g?1:0,b:s.b}));
+}
+function openShareForm(){
+  const trig=data.flows.filter(f=>f.trig);
+  let h='';
+  if(mode==='live'&&cfg&&!cfg.remote) h+='<p class="note warn"><span>Sans adresse « En déplacement » dans Réglages, le lien ne marchera que sur le Wi-Fi de la maison.</span></p>';
+  h+='<div class="field"><label for="sh-name">Prénom</label><input id="sh-name" maxlength="40" autocomplete="off" placeholder="Ex. : Marie"></div>'
+    +'<div class="field"><label for="sh-key">Clé Homey de cette personne</label><input id="sh-key" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="'+(mode==='demo'?'Pas besoin en démo':'Colle sa clé ici')+'">'
+    +'<small>Sur my.homey.app : Réglages, Clés API. Crée une clé à son nom en cochant uniquement le droit de lancer les Flows.</small></div>';
+  h+=trig.length?'<fieldset class="checks"><legend>Ses boutons</legend>'+flowChecks('sh-f-',[])+'</fieldset>':'<p class="muted">Aucune scène à partager pour l’instant.</p>';
+  h+='<label class="opt" for="sh-big"><input type="checkbox" id="sh-big"><span><b>Très gros boutons</b><small>Un bouton par ligne, en grand. Pour une personne moins à l’aise avec le téléphone.</small></span></label>';
+  h+='<p class="form-msg" id="sh-msg" role="status"></p><button class="btn primary block" type="button" id="sh-create">Créer le lien</button>'
+    +'<div class="field mt"><textarea id="sh-out" readonly hidden aria-label="Lien à copier"></textarea></div>';
+  openSheet('Partager des boutons',h,{'sh-create':async()=>{
+    const n=$('#sh-name').value.trim(), k=$('#sh-key').value.trim()||(mode==='demo'?'demo':''), ids=checkedIds('sh-f-');
+    if(!n){ setMsg('sh-msg','Indique un prénom.','bad'); return; }
+    if(!k){ setMsg('sh-msg','Colle la clé de cette personne.','bad'); return; }
+    if(!ids.length){ setMsg('sh-msg','Coche au moins un bouton.','bad'); return; }
+    const s={id:'s'+Date.now(),n,k,g:$('#sh-big').checked?1:0,b:ids.map(id=>{const f=trig.find(x=>x.id===id);return {i:f.id,t:f.type,n:f.name};}),at:Date.now()};
+    const all=getShares(); all.push(s); store.set('shares'+sfx(),all);
+    const ok=await copyText(inviteLink(s),'sh-out');
+    if(ok){ closeSheet(); render(); toast('Lien copié : envoie-le à '+n+' par message.'); }
+    else { render(); setMsg('sh-msg','Lien créé. Sélectionne-le ci-dessous et copie-le.','ok'); }
+  }});
+}
+
+/* ---------- Invitation ----------
+   Le lien reste dans l'adresse : ajouté à l'écran d'accueil, il garde les boutons. */
+function readInvite(){
+  const m=location.hash.match(/^#invite=([A-Za-z0-9_-]+)$/);
+  if(!m) return;
+  try{
+    const p=JSON.parse(b64d(m[1]));
+    const okB=Array.isArray(p.b)&&p.b.length>0&&p.b.length<=24&&p.b.every(x=>x&&/^[\w-]{1,64}$/.test(x.i)&&(x.t==='flow'||x.t==='advancedflow')&&typeof x.n==='string'&&x.n.length<=80);
+    if(typeof p.n!=='string'||p.n.length>40||typeof p.k!=='string'||p.k.length>300||!okB||!(p.a==='demo'||/^https:\/\/[^\s/]+$/.test(p.a))) throw new Error('bad');
+    const g={n:p.n,a:p.a,k:p.k,g:p.g===1?1:0,b:p.b.map(x=>({i:x.i,t:x.t,n:x.n}))};
+    if(!guest||JSON.stringify(guest)!==JSON.stringify(g)) store.del('guestBig');
+    guest=g; store.set('guest',guest); mode='guest';
+  }catch(e){ setTimeout(()=>toast('Ce lien de partage est illisible. Demande-en un nouveau.','bad'),300); }
+}
+
+/* ---------- Message ---------- */
+let tt;
+function toast(msg,kind){ const el=$('#toast'); el.textContent=msg; el.className='toast'+(kind?' '+kind:''); el.hidden=false; clearTimeout(tt); tt=setTimeout(()=>{el.hidden=true},2800); }
+
+/* ---------- Événements ---------- */
+$('#tabs').addEventListener('click',e=>{ const b=e.target.closest('[data-tab]'); if(!b) return; tab=b.dataset.tab; store.set('tab',tab); render(); window.scrollTo(0,0); });
+$('#gear').addEventListener('click',openSettings);
+$('#theme-btn').addEventListener('click',()=>{ const t=store.get('theme','auto'), n=THEMES[(THEMES.indexOf(t)+1)%THEMES.length]; store.set('theme',n); applyTheme(); toast('Ambiance : '+TH_LABEL[n]); });
+function devClick(b){
+  const d=b.dataset.dev&&data.devices[b.dataset.dev]; if(!d) return false;
+  if(b.hasAttribute('data-toggle')){ setCap(d.id,'onoff',!d.capabilitiesObj.onoff.value); return true; }
+  if(b.dataset.cap){ setCap(d.id,b.dataset.cap,b.dataset.num!==undefined?Number(b.dataset.num):b.dataset.val); return true; }
+  if(b.dataset.step){
+    const c=d.capabilitiesObj.target_temperature; let v=(typeof c.value==='number'?c.value:20)+Number(b.dataset.step);
+    v=Math.round(v*2)/2; if(typeof c.min==='number') v=Math.max(c.min,v); if(typeof c.max==='number') v=Math.min(c.max,v);
+    setCap(d.id,'target_temperature',v); return true;
+  }
+  return false;
+}
+$('#view').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.flow){ runScene(b); return; }
+  if(b.dataset.plan){ openRoom(b.dataset.plan); return; }
+  if(b.dataset.bay){ openBay(b.dataset.bay); return; }
+  if(b.dataset.rview){ store.set('roomsView',b.dataset.rview); render(); return; }
+  if(b.dataset.room){ room=b.dataset.room; render(); return; }
+  if(b.dataset.photo){ if(getPhoto(b.dataset.photo)) openPhoto(b.dataset.photo); else { photoZone=b.dataset.photo; $('#photo-input').click(); } return; }
+  if(devClick(b)) return;
+  switch(b.id){
+    case 'allclose': closeAll(b); return;
+    case 'go-plan': tab='rooms'; store.set('tab',tab); store.set('roomsView','plan'); render(); window.scrollTo(0,0); return;
+    case 'wall-go': store.set('wall',true); render(); window.scrollTo(0,0); return;
+    case 'wall-exit': store.set('wall',false); render(); return;
+    case 'ask': openAsk(); return;
+    case 'arrange': openArrange(); return;
+    case 'arrange-rooms': openArrangeRooms(); return;
+    case 'open-settings': openSettings(); return;
+    case 'retry': conn='loading'; render(); refresh(); return;
+    case 'share-new': openShareForm(); return;
+    case 'preview-close': preview=null; render(); return;
+    case 'guest-size': store.set('guestBig',!guestBig(guest,false)); render(); return;
+    case 'guest-quit':
+      if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Toucher encore pour confirmer'; return; }
+      try{ history.replaceState(null,'',location.href.split('#')[0]); }catch(_){}
+      guest=null; store.del('guest'); store.del('guestBig'); mode=cfg&&cfg.key?'live':'demo'; conn=mode==='demo'?'demo':'loading'; if(mode==='demo') data=makeDemo(); render(); if(mode==='live') refresh(); return;
+  }
+  const sid=b.dataset.copyShare||b.dataset.preview||b.dataset.remove;
+  const s=sid&&getShares().find(x=>x.id===sid);
+  if(!s) return;
+  if(b.dataset.copyShare){ copyText(inviteLink(s)).then(ok=>toast(ok?'Lien copié : envoie-le à '+s.n+' par message.':'Copie impossible ici. Utilise « Aperçu » pour vérifier.',ok?'':'bad')); return; }
+  if(b.dataset.preview){ preview=s; render(); window.scrollTo(0,0); return; }
+  if(b.dataset.remove){
+    if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Confirmer'; return; }
+    store.set('shares'+sfx(),getShares().filter(x=>x.id!==sid)); render();
+    toast(mode==='demo'?'Retiré de la liste.':'Retiré. Supprime aussi sa clé dans Homey.');
+  }
+});
+$('#photo-input').addEventListener('change',async e=>{
+  const f=e.target.files&&e.target.files[0], z=photoZone; e.target.value=''; photoZone=null;
+  if(!f||!z) return;
+  try{
+    const url=await loadPhoto(f);
+    if(!store.setRaw(photoKey(z),url)){ toast('Plus de place pour les photos sur cet appareil.','bad'); return; }
+    if(!$('#sheet').hidden) closeSheet();
+    render(); toast('Photo ajoutée');
+  }catch(err){ toast('Cette image ne s’ouvre pas. Essaie une autre photo.','bad'); }
+});
+$('#sheet').addEventListener('click',e=>{
+  if(e.target.closest('[data-close]')){ closeSheet(); return; }
+  const db=e.target.closest('button[data-dev]'); if(db&&devClick(db)) return;
+  const b=e.target.closest('button[id]'); if(b&&sheetActions[b.id]) sheetActions[b.id](b);
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('#sheet').hidden) closeSheet(); });
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&mode==='live') refresh(); });
+setInterval(()=>{
+  if(document.hidden||!$('#sheet').hidden||(tab!=='home'&&tab!=='rooms')) return;
+  if(mode==='live'&&conn!=='off'&&conn!=='loading') refresh();
+  else if(mode==='demo'&&tab==='home') render();
+},15000);
+
+try{ window.matchMedia('(max-width: 699px)').addEventListener('change',()=>{ if(tab==='rooms') render(); }); }catch(_){}
+try{ window.matchMedia('(min-width: 900px)').addEventListener('change',()=>{ if(tab==='rooms') render(); }); }catch(_){}
+setInterval(()=>{ const c=$('#wall-clock'); if(!c) return; const tm=wallTime(); c.textContent=tm.t; const d=$('#wall-date'); if(d) d.textContent=tm.d; },10000);
+
+/* ---------- Démarrage ---------- */
+readInvite();
+if(mode==='demo'){ data=makeDemo(); conn='demo'; }
+render();
+if(mode==='live') refresh();
+})();
+</script>
+</body></html>
