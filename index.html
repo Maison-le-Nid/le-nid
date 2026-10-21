@@ -1404,6 +1404,8 @@ function openSettings(){
   let h='';
   if(SETUP&&mode!=='live') h+='<div class="note"><span><b>Il ne manque que ta clé.</b> Crée-la sur Homey, copie-la, puis reviens la coller ici.</span><a class="btn small primary" href="https://my.homey.app/homeys/'+SETUP+'/settings/system/api-keys" target="_blank" rel="noopener">Créer ma clé</a></div>';
   if(inClaude()) h+='<p class="note warn"><span>Ici, c’est l’aperçu dans Claude : il ne peut pas joindre ton Homey. La connexion marche depuis l’appli installée sur ton iPhone ou ton iPad.</span></p>';
+  if(mode==='live') h+='<button class="btn primary block" type="button" id="cf-send">'+I('copy')+'Envoyer à mon iPad</button>'
+    +'<p class="muted mt">Choisis AirDrop, puis ton iPad : l’appli s’y branche toute seule. Le lien contient ta clé, ne l’envoie qu’à tes appareils.</p>';
   h+='<h3 class="sec">Connexion à Homey</h3>'
     +'<div class="field"><label for="cf-local">À la maison</label><input id="cf-local" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="IP du Homey, ex. 192.168.1.50" value="'+esc(c.localRaw||'')+'"><small id="cf-local-h">'+esc(c.local||'')+'</small></div>'
     +'<div class="field"><label for="cf-remote">En déplacement</label><input id="cf-remote" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Identifiant Homey (24 caractères)" value="'+esc(rr)+'"><small id="cf-remote-h">'+esc(normAddr(rr))+'</small></div>'
@@ -1436,9 +1438,26 @@ function openSettings(){
     'cf-arrange':openArrange,
     'cf-arrange-rooms':openArrangeRooms,
     'cf-export':async()=>{ const ok=await copyText(exportCode(),'cf-export-out'); toast(ok?'Réglages copiés. Colle-les sur l’autre appareil.':'Sélectionne le texte affiché et copie-le.'); },
-    'cf-import-btn':importSettings
+    'cf-import-btn':importSettings,
+    'cf-send':async()=>{ const url=setupLink();
+      try{ if(navigator.share){ await navigator.share({title:'Le Nid',url}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+      const ok=await copyText(url,'cf-export-out'); toast(ok?'Lien copié : ouvre-le sur l’iPad.':'Sélectionne le lien affiché et copie-le.'); }
   });
   ['local','remote'].forEach(k=>{ const i=$('#cf-'+k); i.addEventListener('input',()=>{ $('#cf-'+k+'-h').textContent=normAddr(i.value); }); });
+}
+// Lien de branchement pour un autre appareil : adresses + clé, lus au démarrage (#setup=…)
+function setupLink(){ return location.href.split('#')[0]+'#setup='+b64e(JSON.stringify({l:cfg.localRaw||'',r:cfg.remoteRaw||'',k:cfg.key})); }
+let setupGot=false;
+function readSetup(){
+  const m=location.hash.match(/^#setup=([A-Za-z0-9_-]+)$/); if(!m) return;
+  try{
+    const p=JSON.parse(b64d(m[1]));
+    if(typeof p.k!=='string'||!p.k||p.k.length>300||typeof p.l!=='string'||typeof p.r!=='string') throw new Error('bad');
+    if(cfg&&cfg.key===p.k) return;
+    cfg={localRaw:p.l,remoteRaw:p.r,local:normAddr(p.l),remote:normAddr(p.r),key:p.k}; store.set('cfg',cfg);
+    if(mode!=='guest'){ mode='live'; conn='loading'; base=''; }
+    setupGot=true;
+  }catch(e){ setTimeout(()=>toast('Ce lien de branchement est illisible. Renvoie-le depuis l’iPhone.','bad'),300); }
 }
 function exportCode(){
   return 'MAMAISON1.'+b64e(JSON.stringify({l:cfg.localRaw||'',r:cfg.remoteRaw||'',k:cfg.key,h:store.get('home',null),s:store.get('shares',[]),y:store.get('layout',null)}));
@@ -1621,6 +1640,8 @@ setInterval(()=>{ const c=$('#wall-clock'); if(!c) return; const tm=wallTime(); 
 
 /* ---------- Démarrage ---------- */
 readInvite();
+readSetup();
+if(setupGot) setTimeout(()=>toast('Réglages reçus de ton iPhone : connexion à Homey…'),400);
 if(mode==='demo'){ data=makeDemo(); conn='demo'; }
 render();
 if(mode==='live') refresh();
