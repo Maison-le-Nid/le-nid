@@ -541,6 +541,51 @@ body.homebig .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
 .wl .card b.w-t{display:block;font-weight:600;color:var(--title);margin-bottom:4px}
 .wl .card .list{margin-top:10px;box-shadow:none;border:1px solid var(--hair)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+/* ===== DA du Nid sur l'accueil : laiton, crème, cartes qui flottent ===== */
+:root{--sage:#6f8b60;--sage-ink:#3f5636}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sage:#a3bf93;--sage-ink:#dbe8d2}}
+:root[data-theme="dark"]{--sage:#a3bf93;--sage-ink:#dbe8d2}
+/* Carte « points à regarder » */
+.hb-watch{flex-direction:row;align-items:center;gap:14px;padding:14px 20px 14px 14px;border-radius:24px;box-shadow:var(--float)}
+.hb-watch .status-dot{width:40px;height:40px;font-size:19px;background:var(--ok);color:var(--bg)}
+.hb-watch.warn .status-dot{background:var(--warn)}
+.hb-watch .status-dot .i{width:20px;height:20px}
+.hb-w-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.hb-watch b{color:var(--ok);font-weight:500;font-size:16px}
+.hb-watch.warn b{color:var(--warn)}
+/* Heure et météo en laiton */
+.hb-wx b{font-weight:400}
+.hb-wx small{letter-spacing:.01em}
+/* Boutons du plan : pastille crème, icône laiton */
+.pin{color:var(--title);border-color:var(--hair);background:var(--face);box-shadow:var(--float-lo)}
+.pin.on{color:var(--title)}
+.pin.bad{color:var(--bad);background:var(--surface)}
+.pin .pt{color:var(--title)}
+/* Les arbres : même pastille, feuillage vert sauge ; allumés, ils prennent la lumière dorée */
+.tree{background:var(--face);color:var(--sage);border:1px solid var(--hair);box-shadow:var(--float-lo)}
+.tree.on{background:var(--lit-grad);color:var(--sage-ink);box-shadow:var(--glow)}
+.plan.mini .tree{background:var(--sage);border:0;box-shadow:none}
+.plan.mini .tree.on{background:#f2c27c}
+/* Piscine : verre dépoli sur l'eau, petites capitales */
+.pc{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.32);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-radius:14px;padding:5px 11px}
+.pc small{font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;opacity:.8}
+.pc b{font-weight:500;font-size:14px}
+.pc.warn{background:var(--warn-bg);border-color:transparent;color:var(--warn)}
+.psw{color:var(--title);background:var(--face);border-color:var(--hair);box-shadow:var(--float-lo);font-weight:500}
+.psw.on{color:var(--title)}
+.pool-hud.tall .pc small{font-size:7.5px;letter-spacing:.08em}
+.pool-hud.tall .pc{padding:3px 2px;border-radius:10px}
+/* Fiche piscine : tuiles crème comme les autres cartes */
+.pool-panel .pc{background:var(--face);border:0;box-shadow:var(--float-lo);color:var(--ink);-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:20px;padding:12px 14px}
+.pool-panel .pc small{font-size:10.5px;letter-spacing:.16em;color:var(--accent);opacity:1}
+.pool-panel .pc small+b+small,.pool-panel .pc b+small{text-transform:none;letter-spacing:0;color:var(--ink-2);font-weight:400;font-size:12.5px}
+.pool-panel .pc b{font-size:22px;font-weight:500;color:var(--title)}
+.pool-panel .pc.warn{background:var(--warn-bg);box-shadow:none}
+.pool-panel .pc.warn b{color:var(--warn)}
+.pool-speed>span{font-weight:500;color:var(--title)}
+/* Barre sous le plan : icônes en laiton */
+.hb-nav button .i{color:var(--title)}
 </style>
 
 <header class="top">
@@ -1497,7 +1542,7 @@ function renderHomeBig(wall){
   if(mode==='demo') h+='<div class="note"><span>Démo avec des appareils d’exemple.</span><button class="btn small" type="button" id="open-settings">Connecter mon Homey</button></div>';
   h+='<div class="hb-top"><div class="hb-clock"><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div></div>'
     +'<div class="hb-wx">'+wxHtml()+'</div>'
-    +'<button class="hb-watch'+(n?' warn':'')+'" type="button" id="watch"><b>'+(n?n+(n>1?' points à regarder':' point à regarder'):'Tout va bien à la maison')+'</b><small>'+esc(n?it.slice(0,2).map(i=>i.txt).join(' · ')+(n>2?'…':''):summary())+'</small></button></div>';
+    +'<button class="hb-watch'+(n?' warn':'')+'" type="button" id="watch"><span class="status-dot" aria-hidden="true">'+(n?'!':I('check'))+'</span><span class="hb-w-txt"><b>'+(n?n+(n>1?' points à regarder':' point à regarder'):'Tout va bien à la maison')+'</b><small>'+esc(n?it.slice(0,2).map(i=>i.txt).join(' · ')+(n>2?'…':''):summary())+'</small></span></button></div>';
   h+='<div class="hb-plan">'+planHtml()+'</div>';
   h+='<div class="hb-tools">'+(isWide()?'<button class="btn small" type="button" id="'+(wall?'wall-exit':'wall-go')+'">'+(wall?'Quitter le plein écran':'Plein écran')+'</button>':'')
     +'<button class="btn small'+(pinEdit?' primary':'')+'" type="button" id="pin-edit">'+(pinEdit?I('check')+'Terminé':'Déplacer les boutons')+'</button>'
