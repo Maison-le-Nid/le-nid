@@ -563,10 +563,7 @@ body.homebig .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
 .pin.bad{color:var(--bad);background:var(--surface)}
 .pin .pt{color:var(--title)}
 /* Les arbres : même pastille, feuillage vert sauge ; allumés, ils prennent la lumière dorée */
-.tree{background:var(--face);color:var(--sage);border:1px solid var(--hair);box-shadow:var(--float-lo)}
-.tree.on{background:var(--lit-grad);color:var(--sage-ink);box-shadow:var(--glow)}
-.plan.mini .tree{background:var(--sage);border:0;box-shadow:none}
-.plan.mini .tree.on{background:#f2c27c}
+/* (les arbres gardent leur pastille vert plein et leur halo doré) */
 /* Piscine : verre dépoli sur l'eau, petites capitales */
 .pc{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.32);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-radius:14px;padding:5px 11px}
 .pc small{font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;opacity:.8}
@@ -588,7 +585,6 @@ body.homebig .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
 :root{--sage:#4f7343;--sage-ink:#2f4a27;--sage-bg:linear-gradient(180deg,#f4f8f0 0%,#e3ecdc 100%);--sage-line:rgba(79,115,67,.32)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sage:#a9c99a;--sage-ink:#1f2d1b;--sage-bg:linear-gradient(180deg,#2c3a2a 0%,#223020 100%);--sage-line:rgba(169,201,154,.3)}}
 :root[data-theme="dark"]{--sage:#a9c99a;--sage-ink:#1f2d1b;--sage-bg:linear-gradient(180deg,#2c3a2a 0%,#223020 100%);--sage-line:rgba(169,201,154,.3)}
-.tree{background:var(--sage-bg);border-color:var(--sage-line)}
 .tree .i{stroke-width:2.2}
 /* iPad : boutons du plan plus grands ; petites pièces : nom en haut, boutons dessous */
 @media (min-width:700px){
@@ -601,6 +597,23 @@ body.homebig .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
   .plan .pr.pinned.strip{padding-top:4px}
   .plan .pr.pinned.baytop{padding-top:22px}
 }
+/* Allumage : le halo naît doucement, et s'éteint de même */
+@keyframes nid-ignite{from{filter:saturate(.1) brightness(1.04);box-shadow:0 0 0 0 rgba(242,176,94,0)}}
+@keyframes nid-dim{from{box-shadow:0 0 0 1px rgba(242,176,94,.35),0 0 30px rgba(242,176,94,.6)}}
+.ignite{animation:nid-ignite 1.2s ease-out}
+.dim{animation:nid-dim 1s ease-in}
+/* Stores en mouvement : la toile glisse, une flèche montre le sens */
+.bay i{transition:height .4s linear,width .4s linear}
+.bay.moving{border-color:var(--accent)}
+.bay .mv{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--face);color:var(--title);display:grid;place-items:center;box-shadow:var(--float-lo);animation:nid-pulse 1.4s ease-in-out infinite;pointer-events:none}
+.bay .mv .i{width:14px;height:14px}
+@keyframes nid-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.86);opacity:.75}}
+.pin.moving{box-shadow:0 0 0 2px var(--accent),var(--float-lo)}
+.pin.moving .i{animation:nid-pulse 1.4s ease-in-out infinite}
+/* Le soir, le vert des arbres se fait plus sombre */
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tree{background:radial-gradient(circle at 40% 35%,#7f9f70,#3c5a34);color:#0f1c0c}}
+:root[data-theme="dark"] .tree{background:radial-gradient(circle at 40% 35%,#7f9f70,#3c5a34);color:#0f1c0c}
+@media (prefers-reduced-motion: reduce){.ignite,.dim,.bay .mv,.pin.moving .i{animation:none}.bay i{transition:none}}
 /* Barre sous le plan : icônes en laiton */
 .hb-nav button .i{color:var(--title)}
 </style>
@@ -1008,8 +1021,29 @@ function photoBtn(r){
 }
 
 /* ---------- Actions ---------- */
+/* ---------- Mouvements des stores et allumages animés ---------- */
+const coverMove={}; // id → {from,to,at,dur} (1 = ouvert, 0 = fermé)
+function noteMove(d,to){
+  const s=d.capabilitiesObj&&d.capabilitiesObj.windowcoverings_set, cur=s&&typeof s.value==='number'?s.value:(to?0:1);
+  if(Math.abs(cur-to)<.02){ delete coverMove[d.id]; return; }
+  coverMove[d.id]={from:cur,to,at:Date.now(),dur:d.class==='curtain'?20000:30000};
+}
+function moving(d){ const m=d&&coverMove[d.id]; if(!m) return null; if(Date.now()-m.at>m.dur){ delete coverMove[d.id]; return null; } return m; }
+const moveClosed=m=>1-(m.from+(m.to-m.from)*Math.min(1,(Date.now()-m.at)/m.dur));
+setInterval(()=>{
+  const ids=Object.keys(coverMove); if(!ids.length) return;
+  if(ids.some(id=>Date.now()-coverMove[id].at>coverMove[id].dur)){ ids.forEach(id=>{ if(Date.now()-coverMove[id].at>coverMove[id].dur) delete coverMove[id]; }); render(); return; }
+  document.querySelectorAll('[data-mv]').forEach(el=>{ const m=coverMove[el.dataset.mv]; if(m) el.style[el.dataset.dir==='w'?'width':'height']=(Math.round(moveClosed(m)*1000)/10)+'%'; });
+},400);
+const LIT=new Map();
+function litAnim(key,on){ const prev=LIT.get(key); LIT.set(key,!!on); return prev===undefined?'':(on&&!prev?' ignite':(!on&&prev?' dim':'')); }
 async function setCap(id,cap,val){
   const d=data.devices[id]; if(!d) return;
+  if(cap==='windowcoverings_state'||cap==='windowcoverings_set'){
+    const to=cap==='windowcoverings_set'?(typeof val==='number'?val:null):(val==='up'?1:val==='down'?0:null);
+    if(val==='idle') delete coverMove[id];
+    else if(to!==null&&!(coverMove[id]&&Date.now()-coverMove[id].at<1500)) noteMove(d,to);
+  }
   const c=d.capabilitiesObj&&d.capabilitiesObj[cap]; const old=c?c.value:undefined;
   if(mode==='demo'){ demoSet(d,cap,val); render(); return; }
   if(c) c.value=val; render();
@@ -1317,18 +1351,18 @@ function pinsHtml(tall,list){
   let h='';
   for(const p of list||pinList(tall)){
     const d=p.d, k=ctrlKind(d), light=isLightDev(d), cov=/^cover/.test(k);
-    const on=light&&isOn(d), open=cov&&isOpenCover(d), off=d.available===false;
+    const on=light&&isOn(d), open=cov&&isOpenCover(d), off=d.available===false, mv=cov&&moving(d), an=light?litAnim('p:'+d.id,on):'';
     const act=off?'ne répond pas':light?(on?'touche pour éteindre':'touche pour allumer'):cov?(open?'touche pour fermer':'touche pour ouvrir'):'touche pour régler';
     const mt=d.capabilitiesObj&&d.capabilitiesObj.measure_temperature, deg=p.sm&&devIcon(d)==='thermo'&&mt&&typeof mt.value==='number'?Math.round(mt.value)+'°':'';
-    h+='<button class="pin'+(p.sm?' sm':'')+(on?' on':'')+(open?' open':'')+(off?' bad':'')+'" type="button" data-pin="'+esc(d.id)+'" style="'+ptPos(p.o.x+p.fx*p.o.w,p.o.y+p.fy*p.o.h,tall)+'" title="'+esc(devName(d))+'" aria-label="'+esc(devName(d)+', '+stateText(d)+', '+act)+'">'+(deg?'<span class="pt">'+deg+'</span>':I(light?'bulb':devIcon(d)))+'</button>';
+    h+='<button class="pin'+(p.sm?' sm':'')+(on?' on':'')+(open?' open':'')+(off?' bad':'')+(mv?' moving':'')+an+'" type="button" data-pin="'+esc(d.id)+'" data-room="'+esc(p.o.n)+'" style="'+ptPos(p.o.x+p.fx*p.o.w,p.o.y+p.fy*p.o.h,tall)+'" title="'+esc(devName(d))+'" aria-label="'+esc(devName(d)+', '+stateText(d)+', '+act)+'">'+(deg?'<span class="pt">'+deg+'</span>':I(mv?(mv.to>mv.from?'up':'down'):light?'bulb':devIcon(d)))+'</button>';
   }
   return h;
 }
 function treesHtml(tall,mini){
   return PLAN_TREES.map((t,i)=>{
-    const d=treeDevAt(i), on=isOn(d), own=d&&treeNum(d)===i+1, nm=own?'Arbre '+(i+1):'Arbres';
+    const d=treeDevAt(i), on=isOn(d), own=d&&treeNum(d)===i+1, nm=own?'Arbre '+(i+1):'Arbres', an=!mini&&d?litAnim('t:'+i,on):'';
     return !mini&&d
-      ?'<button class="tree'+(on?' on':'')+'" type="button" data-tree="'+(i+1)+'" style="'+ptPos(t.x,t.y,tall)+'" aria-label="'+nm+', lumière '+(on?'allumée. Touche pour éteindre':'éteinte. Touche pour allumer')+'">'+I('tree')+'</button>'
+      ?'<button class="tree'+(on?' on':'')+an+'" type="button" data-tree="'+(i+1)+'" style="'+ptPos(t.x,t.y,tall)+'" aria-label="'+nm+', lumière '+(on?'allumée. Touche pour éteindre':'éteinte. Touche pour allumer')+'">'+I('tree')+'</button>'
       :'<span class="tree'+(on?' on':'')+'" aria-hidden="true" style="'+ptPos(t.x,t.y,tall)+'">'+I('tree')+'</span>';
   }).join('');
 }
@@ -1339,6 +1373,7 @@ async function pinTap(id){
   if(d.available!==false&&isLightDev(d)){ const on=!isOn(d); toast((on?'J’allume : ':'J’éteins : ')+devName(d)); await setCap(d.id,'onoff',on); return; }
   if(d.available!==false&&/^cover/.test(k)){
     const open=!isOpenCover(d), c=d.capabilitiesObj||{};
+    noteMove(d,open?1:0);
     toast(devName(d)+(open?' s’ouvre':' se ferme'));
     if(mode!=='demo'){ if(c.windowcoverings_set) c.windowcoverings_set.value=open?1:0; if(c.windowcoverings_closed) c.windowcoverings_closed.value=!open; }
     if(k==='cover') await setCap(d.id,'windowcoverings_state',open?'up':'down'); else await setCap(d.id,'windowcoverings_set',open?1:0);
@@ -1404,7 +1439,7 @@ function poolSw(d){
 function poolBits(d,tall,full){
   if(d.available===false) return '<span class="pc bad"><b>Ne répond pas</b></span>';
   return '<span class="pc-row">'+poolInd(d,full).map(i=>'<span class="pc'+(i.warn?' warn':'')+'"><small>'+esc(i.l)+'</small><b>'+esc(tall&&i.vs||i.v)+'</b>'+(i.x?'<small>'+esc(i.x)+'</small>':'')+'</span>').join('')+'</span>'
-    +poolSw(d).map(s=>'<button class="psw'+(s.on?' on':'')+'" type="button" data-pcap="'+esc(d.id)+'|'+s.k+'" aria-label="'+esc(s.l+' de la piscine, '+(s.on?'allumée. Touche pour éteindre':'éteinte. Touche pour allumer'))+'">'+I(s.i)+'<span>'+esc(s.l)+'</span></button>').join('');
+    +poolSw(d).map(s=>'<button class="psw'+(s.on?' on':'')+(full?'':litAnim('pl:'+s.k,s.on))+'" type="button" data-pcap="'+esc(d.id)+'|'+s.k+'" aria-label="'+esc(s.l+' de la piscine, '+(s.on?'allumée. Touche pour éteindre':'éteinte. Touche pour allumer'))+'">'+I(s.i)+'<span>'+esc(s.l)+'</span></button>').join('');
 }
 function poolHud(o,tall){ const d=poolDev(); return d?'<div class="pool-hud'+(tall?' tall':'')+'" style="'+planBox(o,tall)+'">'+poolBits(d,tall,false)+'</div>':''; }
 async function poolTap(v){
@@ -1440,7 +1475,7 @@ function planHtml(mini){
   for(const o of PLAN){
     const st=roomState(o);
     const hud=!mini&&o.k==='pool'&&poolDev();
-    const cls='pr'+(o.k?' '+o.k:'')+(hud?' hud':'')+(st.lit?' lit':'')+(st.bad?' bad':'')+(!st.devs.length&&!o.k?' none':'')+(tall&&o.v?' vt':'')+(pinned.has(o.n)&&((tall&&o.v)||smallRoom(o,tall)||stripRoom(o,tall))?' pinned'+(stripRoom(o,tall)?' strip':'')+(!tall&&smallRoom(o,tall)&&bayTop(o)?' baytop':''):'');
+    const cls='pr'+(o.k?' '+o.k:'')+(hud?' hud':'')+(st.lit?' lit':'')+(mini?'':litAnim('r:'+o.n,!!st.lit))+(st.bad?' bad':'')+(!st.devs.length&&!o.k?' none':'')+(tall&&o.v?' vt':'')+(pinned.has(o.n)&&((tall&&o.v)||smallRoom(o,tall)||stripRoom(o,tall))?' pinned'+(stripRoom(o,tall)?' strip':'')+(!tall&&smallRoom(o,tall)&&bayTop(o)?' baytop':''):'');
     if(mini){ h+='<span class="'+cls+'" style="'+planBox(o,false)+'"></span>'; continue; }
     const say=o.n+(st.sub?', '+st.sub:'')+(st.bad?', un appareil ne répond pas':'')+(st.devs.length?'':', rien de relié à Homey');
     h+='<button class="'+cls+'" type="button" data-plan="'+esc(o.n)+'" style="'+planBox(o,tall)+'" aria-label="'+esc(say)+'"><b>'+esc(tall&&o.ts||o.s||o.n)+'</b>'+(st.temp&&!hud?'<small>'+esc(st.temp)+'</small>':'')+'</button>';
@@ -1449,9 +1484,10 @@ function planHtml(mini){
   for(const b of PLAN_BAYS){
     const d=b.dev?bayDev(b.dev):null;
     if(!d){ h+='<span class="bay fixe" aria-hidden="true" style="'+planBox(b,tall)+'"></span>'; continue; }
-    const s=bayState(d), cl=s.closed===null?'':s.closed>.95?' shut':s.closed>.05?' half':' open';
-    const fill=s.closed===null?'':'<i style="'+(tall?'width':'height')+':'+Math.round(s.closed*100)+'%"></i>';
-    const say=devName(d)+', '+stateText(d)+(s.closed===null?'':s.closed>.5?'. Touche pour ouvrir':'. Touche pour fermer');
+    const s=bayState(d), mv=!mini&&moving(d), cl=(s.closed===null?'':s.closed>.95?' shut':s.closed>.05?' half':' open')+(mv?' moving':'');
+    const fill=mv?'<i data-mv="'+esc(d.id)+'" data-dir="'+(tall?'w':'h')+'" style="'+(tall?'width':'height')+':'+(Math.round(moveClosed(mv)*1000)/10)+'%"></i><b class="mv" aria-hidden="true">'+I(mv.to>mv.from?'up':'down')+'</b>'
+      :s.closed===null?'':'<i style="'+(tall?'width':'height')+':'+Math.round(s.closed*100)+'%"></i>';
+    const say=devName(d)+', '+(mv?(mv.to>mv.from?'en train de monter':'en train de descendre'):stateText(d))+(s.closed===null?'':s.closed>.5?'. Touche pour ouvrir':'. Touche pour fermer');
     h+=mini?'<span class="bay'+cl+(s.bad?' bad':'')+'" style="'+planBox(b,false)+'">'+fill+'</span>'
       :'<button class="bay'+cl+(s.bad?' bad':'')+(tall?' tv':'')+'" type="button" data-bay="'+esc(b.dev)+'" style="'+planBox(b,tall)+'" aria-label="'+esc(say)+'">'+fill+'</button>';
   }
@@ -1486,6 +1522,7 @@ async function toggleBay(k){
   const v=sc&&typeof sc.value==='number'?sc.value:null;
   if(v===null||(kind!=='cover'&&kind!=='coverset')){ openBay(k); return; }
   const open=v<.5;
+  noteMove(d,open?1:0);
   if(mode!=='demo') sc.value=open?1:0;
   toast(devName(d)+(open?' s’ouvre':' se ferme'));
   const ok=kind==='cover'?await setCap(d.id,'windowcoverings_state',open?'up':'down'):await setCap(d.id,'windowcoverings_set',open?1:0);
@@ -2005,7 +2042,7 @@ $('#view').addEventListener('click',e=>{
     case 'go-plan': store.set('homePlan','big'); render(); window.scrollTo(0,0); return;
     case 'plan-small': store.set('homePlan','small'); pinEdit=false; render(); window.scrollTo(0,0); return;
     case 'watch': openWatch(); return;
-    case 'pin-edit': pinEdit=!pinEdit; render(); toast(pinEdit?'Fais glisser les boutons dans les pièces, puis touche « Terminé ».':'Boutons rangés'); return;
+    case 'pin-edit': pinEdit=!pinEdit; render(); toast(pinEdit?'Fais glisser chaque bouton où tu veux dans sa pièce, puis touche « Terminé ».':'Boutons rangés'); return;
     case 'pin-reset': if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Toucher encore pour confirmer'; return; } store.del('pins'+sfx()); render(); toast('Boutons remis à leur place'); return;
     case 'wx-on':
       if(!navigator.geolocation){ toast('Position indisponible sur cet appareil.','bad'); return; }
@@ -2040,7 +2077,11 @@ $('#view').addEventListener('click',e=>{
 // Déplacer les boutons sur le plan (mode « Déplacer les boutons »)
 $('#view').addEventListener('pointerdown',e=>{
   if(!pinEdit) return; const b=e.target.closest('.pin'); if(!b) return;
-  pinDrag={b,plan:b.closest('.plan'),id:b.dataset.pin,pid:e.pointerId,moved:false};
+  const o=PLAN.find(x=>x.n===b.dataset.room), plan=b.closest('.plan'), tall=plan.classList.contains('tall');
+  // cadre de la pièce, en fractions du plan à l'écran
+  const box=!o?null:tall?{x0:(PLAN_H-o.y-o.h)/PLAN_H,x1:(PLAN_H-o.y)/PLAN_H,y0:(PLAN_W-o.x-o.w)/PLAN_W,y1:(PLAN_W-o.x)/PLAN_W}
+    :{x0:o.x/PLAN_W,x1:(o.x+o.w)/PLAN_W,y0:(PLAN_H-o.y-o.h)/PLAN_H,y1:(PLAN_H-o.y)/PLAN_H};
+  pinDrag={b,plan,o,box,id:b.dataset.pin,pid:e.pointerId,moved:false};
   try{ b.setPointerCapture(e.pointerId); }catch(_){}
   b.classList.add('drag'); e.preventDefault();
 });
@@ -2048,17 +2089,21 @@ $('#view').addEventListener('pointermove',e=>{
   const g=pinDrag; if(!g||e.pointerId!==g.pid) return;
   const r=g.plan.getBoundingClientRect();
   g.lx=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)); g.ly=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));
+  if(g.box){ const mx=14/r.width, my=14/r.height, B=g.box;
+    g.lx=Math.max(B.x0+Math.min(mx,(B.x1-B.x0)/2),Math.min(B.x1-Math.min(mx,(B.x1-B.x0)/2),g.lx));
+    g.ly=Math.max(B.y0+Math.min(my,(B.y1-B.y0)/2),Math.min(B.y1-Math.min(my,(B.y1-B.y0)/2),g.ly)); }
   g.b.style.left=(g.lx*100)+'%'; g.b.style.top=(g.ly*100)+'%'; g.moved=true;
 });
 function pinEnd(){
   const g=pinDrag; if(!g) return; pinDrag=null; g.b.classList.remove('drag');
   if(g.moved){
     const tall=g.plan.classList.contains('tall'), X=tall?PLAN_W*(1-g.ly):PLAN_W*g.lx, Y=tall?PLAN_H*(1-g.lx):PLAN_H*(1-g.ly);
-    let room=null; for(const o of PLAN) if(X>=o.x&&X<=o.x+o.w&&Y>=o.y&&Y<=o.y+o.h) room=o;
-    if(room){
+    let here=null; for(const o of PLAN) if(X>=o.x&&X<=o.x+o.w&&Y>=o.y&&Y<=o.y+o.h) here=o;
+    const room=g.o, d=data.devices[g.id];
+    if(room&&here===room){
       const m=store.get('pins'+sfx(),{})||{}; m[g.id]={r:room.n,fx:+((X-room.x)/room.w).toFixed(3),fy:+((Y-room.y)/room.h).toFixed(3)}; store.set('pins'+sfx(),m);
-      const d=data.devices[g.id]; toast((d?devName(d):'Bouton')+' → '+(room.t||room.s||room.n));
-    } else toast('Pose le bouton dans une pièce.','bad');
+      toast((d?devName(d):'Bouton')+' : bien placé');
+    } else toast((d?devName(d):'Ce bouton')+' reste dans '+(room?(room.t||room.s||room.n):'sa pièce')+'.','bad');
   }
   render();
 }
