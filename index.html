@@ -673,14 +673,14 @@ const NID_DEV={
   'lumière cuisine':['Lumière','Cuisine'], 'sonnette entrée':['Sonnette','Entrée'], 'rideau ma chambre':['Rideau','Ma Chambre'], 'rideaux ma chambre':['Rideau','Ma Chambre'],
   'lumière baie gauche':['Lumière Baie Gauche','Salon'], 'lumière baie droite':['Lumière Baie Droite','Salon'], 'lumière table':['Lumière Table','Salon'],
   'store paul':['Store de Paul','Extérieur'], 'store chambre piscine':['Store de la chambre piscine','Extérieur'],
-  'store chambre de maître':['Store de ma chambre','Extérieur'],
+  'store chambre de maître':['Store de ma chambre','Extérieur'], 'store ma chambre':['Store de ma chambre','Extérieur'],
   'store baie droite 1':['Store droit 1','Extérieur'], 'store baie droite 2':['Store droit 2','Extérieur'],
-  'store baie gauche 1':['Store gauche 3','Extérieur'], 'store baie gauche 2':['Store gauche 4','Extérieur'],
+  'store baie gauche 3':['Store gauche 3','Extérieur'], 'store baie droite 4':['Store gauche 4','Extérieur'],
   'rideau gauche':['Rideau gauche','Salon'], 'rideaux droit':['Rideau droit','Salon'], 'rideau paul':['Rideau','Chambre De Paul'],
   'terrasse':['Terrasse','Extérieur'], 'terrasse nord':['Terrasse Nord','Extérieur']
 };
 // Les stores restent dans « Extérieur », mais on les retrouve aussi dans leur pièce
-const NID_ALSO={'store chambre de maître':['Ma Chambre'],'store paul':['Chambre De Paul'],'store chambre piscine':['Chambre Piscine'],
+const NID_ALSO={'store ma chambre':['Ma Chambre'],'store chambre de maître':['Ma Chambre'],'store baie gauche 3':['Salon'],'store baie droite 4':['Salon'],'store paul':['Chambre De Paul'],'store chambre piscine':['Chambre Piscine'],
   'store baie droite 1':['Salon'],'store baie droite 2':['Salon'],'store baie gauche 1':['Salon'],'store baie gauche 2':['Salon']};
 const nidRoom=n=>NID_ROOM[nk(n)]||String(n||'').trim();
 const nidDev=n=>NID_DEV[nk(n)]||(nk(n).indexOf('echo dot')===0?['Echo Dot','Bureau']:null);
@@ -1013,8 +1013,8 @@ function planBox(o,tall){
 }
 // Baies vitrées côté piscine (avec leur store ou rideau quand il y en a un, noms Homey)
 const PLAN_BAYS=[
-  {x:1.5,w:3.5,dev:'store chambre de maître|rideaux ma chambre'},
-  {x:8.9,w:3,dev:'store baie gauche 2'},{x:13.9,w:3,dev:'store baie gauche 1'},
+  {x:1.5,w:3.5,dev:'store ma chambre|store chambre de maître|rideaux ma chambre'},
+  {x:8.9,w:3,dev:'store baie droite 4'},{x:13.9,w:3,dev:'store baie gauche 3'},
   {x:18.55,w:3,dev:'store baie droite 2'},{x:22.4,w:3,dev:'store baie droite 1'},
   {x:26.5,w:2,dev:'store chambre piscine'},
   {x:32.2,w:2,dev:'store paul'}
