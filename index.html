@@ -551,7 +551,7 @@ let conn=mode==='demo'?'demo':'loading';
 let base='', lastErr='';
 let data={zones:{},devices:{},flows:[],apps:null};
 let tab=store.get('tab','home'); if(!['home','rooms','share','apps'].includes(tab)) tab='home';
-let room='all', preview=null, flash={id:'',until:0}, sheetActions={}, photoZone=null;
+let room='all', preview=null, flash={id:'',until:0}, sheetActions={}, photoZone=null, nightSheet=false;
 const SETUP=((location.hash.match(/^#homey=([a-f0-9]{24})$/i)||[])[1]||'').toLowerCase();
 const sfx=()=>mode==='demo'?'Demo':'';
 
@@ -884,6 +884,53 @@ async function runScene(btn){
   }
 }
 
+/* ---------- Avant de dormir : ce qui est encore ouvert ou allumé ---------- */
+const isLightDev=d=>{ const c=d.capabilitiesObj||{}; if(!c.onoff||c.onoff.setable===false||/d[ée]clencheur/i.test(d.name)) return false;
+  return d.class==='light'||(/^(socket|other)$/.test(d.class||'')&&/lumi[eè]re|lampe|lampadaire|dressing|terrasse|arbre|descente|guirlande/i.test(d.name)); };
+const isOpenCover=d=>{ if(!/^cover/.test(ctrlKind(d))) return false; const c=d.capabilitiesObj||{};
+  if(c.windowcoverings_closed&&typeof c.windowcoverings_closed.value==='boolean') return !c.windowcoverings_closed.value;
+  const s=c.windowcoverings_set; return !!(s&&typeof s.value==='number'&&s.value>.05); };
+function nightList(){
+  const devs=Object.values(data.devices||{}).filter(d=>d.available!==false), by=(a,b)=>devName(a).localeCompare(devName(b),'fr');
+  return {covers:devs.filter(isOpenCover).sort(by), lights:devs.filter(d=>isLightDev(d)&&d.capabilitiesObj.onoff.value===true).sort(by)};
+}
+function nightBtn(){
+  const n=nightList(), t=n.covers.length+n.lights.length;
+  return '<button class="allclose" type="button" id="night"><span class="row-ic">'+I('moon')+'</span><span class="row-txt"><b>Avant de dormir</b><small>'
+    +(t?t+(t>1?' choses encore ouvertes ou allumées':' chose encore ouverte ou allumée'):'Tout est fermé et éteint')+'</small></span></button>';
+}
+function nightHtml(){
+  const n=nightList(), t=n.covers.length+n.lights.length;
+  let h='';
+  if(!t) h+='<section class="status ok"><div class="status-dot" aria-hidden="true">'+I('check')+'</div><div class="status-txt"><h2>Tout est fermé et éteint</h2><p>Bonne nuit.</p></div></section>';
+  else{
+    if(n.covers.length) h+='<h3 class="sec">Encore ouverts</h3><div class="list">'+n.covers.map(d=>devRow(d,true)).join('')+'</div>';
+    if(n.lights.length) h+='<h3 class="sec">Encore allumées</h3><div class="list">'+n.lights.map(d=>devRow(d,true)).join('')+'</div>';
+    h+='<button class="btn primary block mt" type="button" id="night-all">'+I('moon')+'Tout fermer et éteindre</button>';
+  }
+  h+='<p class="muted mt">Les Velux et la porte du garage ne passent pas par Homey : « Siri, dodo » s’en occupe. Vérifie-les dans l’appli Maison.</p>';
+  return h;
+}
+function openNight(){ nightSheet=true; openSheet('Avant de dormir',nightHtml(),{'night-all':nightAll}); }
+async function nightAll(btn){
+  const n=nightList(), jobs=[];
+  n.covers.forEach(d=>jobs.push(ctrlKind(d)==='cover'?[d,'windowcoverings_state','down']:[d,'windowcoverings_set',0]));
+  n.lights.forEach(d=>jobs.push([d,'onoff',false]));
+  if(!jobs.length) return;
+  btn.classList.add('busy'); btn.disabled=true;
+  let fail=0;
+  if(mode==='demo') jobs.forEach(([d,c,v])=>demoSet(d,c,v));
+  else{
+    const r=await Promise.allSettled(jobs.map(([d,c,v])=>req('/api/manager/devices/device/'+encodeURIComponent(d.id)+'/capability/'+c,{method:'PUT',body:{value:v}})));
+    r.forEach((x,i)=>{ const [d,c,v]=jobs[i], o=d.capabilitiesObj||{};
+      if(x.status==='rejected'){ fail++; return; }
+      if(c==='onoff') o.onoff.value=false; else { if(o.windowcoverings_set) o.windowcoverings_set.value=0; if(o.windowcoverings_closed) o.windowcoverings_closed.value=true; } });
+    setTimeout(refresh,2500);
+  }
+  render();
+  toast(!fail?'Tout se ferme et s’éteint. Bonne nuit.':fail+' appareil'+(fail>1?'s ne répondent':' ne répond')+' pas','bad'.slice(0,fail?3:0));
+}
+
 /* ---------- Écrans ---------- */
 function sceneIcon(n){
   n=String(n||'').toLowerCase();
@@ -925,8 +972,11 @@ function renderHome(){
     +'<h2>'+(ok?'Tout va bien à la maison':w.length+(w.length>1?' points à regarder':' point à regarder'))+'</h2>'
     +(ok?'':'<ul>'+w.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>')
     +'<p class="sum">'+esc(summary())+'</p></div></section>';
+  const hr=new Date().getHours(), soir=hr>=19||hr<6;
+  if(soir) side+=nightBtn();
   side+=miniPlan();
   if(nCov) side+='<button class="allclose" type="button" id="allclose"><span class="row-ic">'+I('blinds')+'</span><span class="row-txt"><b>Tout fermer</b><small>'+(nCov>1?nCov+' volets et fenêtres':'1 volet')+'</small></span></button>';
+  if(!soir) side+=nightBtn();
   side+='<div class="cams"><h3 class="sec">Caméras</h3>'
     +'<a class="allclose" href="shortcuts://run-shortcut?name=Cameras%20Alexa"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Toutes les caméras</b><small>eufy et Aqara réunies · ouvre Alexa</small></span></a>'
     +'<a class="allclose" href="shortcuts://run-shortcut?name=Cameras%20eufy"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Sherlock</b><small>Caméras eufy · ouvre l’appli</small></span></a>'
@@ -937,7 +987,8 @@ function renderHome(){
   main+='<button class="ask" type="button" id="ask">'+I('chat')+'Demander un nouveau scénario</button>';
   return top+'<div class="home"><div class="home-side">'+side+'</div><div class="home-main">'+main+'</div></div>';
 }
-function devRow(d){
+const roomLabel=d=>(NID_ALSO[nk(d.name)]||[])[0]||zoneName(effZone(d));
+function devRow(d,withRoom){
   const c=d.capabilitiesObj||{}, k=ctrlKind(d), off=d.available===false, id=esc(d.id), nm=esc(devName(d));
   let ctrl='';
   if(off) ctrl='<span class="tag bad">Hors ligne</span>';
@@ -950,7 +1001,7 @@ function devRow(d){
     +'<button type="button" data-dev="'+id+'" data-cap="windowcoverings_set" data-num="0" aria-label="Fermer">'+I('down')+'</button></div>';
   else if(k==='thermo'){ const v=c.target_temperature.value; ctrl='<div class="stepper"><button type="button" data-dev="'+id+'" data-step="-0.5" aria-label="Baisser">−</button><b>'+(typeof v==='number'?nf1.format(v)+'°':'–')+'</b><button type="button" data-dev="'+id+'" data-step="0.5" aria-label="Monter">+</button></div>'; }
   else if(k==='toggle') ctrl='<button class="switch" type="button" role="switch" aria-checked="'+(!!c.onoff.value)+'" data-dev="'+id+'" data-toggle aria-label="'+nm+'"><span></span></button>';
-  return '<div class="row'+(off?' is-off':'')+'"><span class="row-ic">'+I(devIcon(d))+'</span><div class="row-txt"><b>'+nm+'</b><small>'+esc(stateText(d))+'</small></div>'+ctrl+'</div>';
+  return '<div class="row'+(off?' is-off':'')+'"><span class="row-ic">'+I(devIcon(d))+'</span><div class="row-txt"><b>'+nm+'</b><small>'+esc(stateText(d))+(withRoom===true?' · '+esc(roomLabel(d)):'')+'</small></div>'+ctrl+'</div>';
 }
 /* Le plan : x le long de la maison, y de l’arrière (0) vers la piscine, en mètres. Plan simplifié, pas à l’échelle exacte. */
 // D'après le plan de masse : à l'arrière (nord-ouest, en haut), le garage, l'allée en pente
@@ -1208,6 +1259,7 @@ function render(){
   }
   v.innerHTML=tab==='home'?renderHome():tab==='rooms'?(wall?renderWall():renderRooms()):tab==='share'?renderShare():renderApps();
   if(planRoom&&!$('#sheet').hidden) $('#sheet-body').innerHTML=planSheetHtml(planRoom);
+  if(nightSheet&&!$('#sheet').hidden) $('#sheet-body').innerHTML=nightHtml();
 }
 
 /* ---------- Feuilles ---------- */
@@ -1215,7 +1267,7 @@ function openSheet(title,html,actions){
   $('#sheet-title').textContent=title; $('#sheet-body').innerHTML=html; sheetActions=actions||{};
   $('#sheet').hidden=false; $('#sheet-card').scrollTop=0; document.body.style.overflow='hidden';
 }
-function closeSheet(){ $('#sheet').hidden=true; document.body.style.overflow=''; sheetActions={}; planRoom=null; }
+function closeSheet(){ $('#sheet').hidden=true; document.body.style.overflow=''; sheetActions={}; planRoom=null; nightSheet=false; }
 function setMsg(id,txt,cls){ const el=$('#'+id); if(el){ el.textContent=txt; el.className='form-msg'+(cls?' '+cls:''); } }
 async function copyText(text,fallbackId){
   try{ await navigator.clipboard.writeText(text); return true; }
@@ -1512,6 +1564,7 @@ $('#view').addEventListener('click',e=>{
   if(devClick(b)) return;
   switch(b.id){
     case 'allclose': closeAll(b); return;
+    case 'night': openNight(); return;
     case 'go-plan': tab='rooms'; store.set('tab',tab); store.set('roomsView','plan'); render(); window.scrollTo(0,0); return;
     case 'wall-go': store.set('wall',true); render(); window.scrollTo(0,0); return;
     case 'wall-exit': store.set('wall',false); render(); return;
