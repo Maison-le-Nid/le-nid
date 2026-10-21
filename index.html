@@ -179,7 +179,7 @@ body.wall .wrap{max-width:none;padding-block:max(14px,env(safe-area-inset-top,0p
 .wall-date{font-size:15px;color:var(--ink-3);margin-top:6px}
 .wall-state{flex:1;min-width:0;font-size:16px;color:var(--ink-2)}
 .wall-state b{display:block;color:var(--ink);font-size:20px;margin-bottom:2px}
-.wall-plan{margin:0 auto;width:min(100%,calc((100vh - 170px) * 35 / 20.5))}
+.wall-plan{margin:0 auto;width:min(100%,calc((100vh - 170px) * 35 / 22.5))}
 .mp-cap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-top:1px solid var(--line)}
 .mp-cap b{display:block;font-weight:600;font-size:15px}
 .mp-cap small{display:block;color:var(--ink-2);font-size:13px}
@@ -459,6 +459,87 @@ h1,.scene-name,.row-txt b,.allclose b,.mp-cap b,.sheet-head h2,.wall-clock,.room
 .tab[aria-current="page"],.tab[aria-current="page"] .i{color:var(--title)}
 h1,.status h2,.scene-name,.sheet-head h2,.row-txt b,.allclose b,.mp-cap b,.room-h h3{font-weight:500}
 h1{letter-spacing:.02em}
+/* ===== Accueil : le grand plan qui pilote tout ===== */
+.hb-top{display:flex;align-items:center;gap:14px 24px;flex-wrap:wrap;margin:4px 0 12px}
+.hb-clock .wall-clock{font-size:54px;color:var(--title)}
+.hb-clock .wall-date{margin-top:4px;font-size:14px}
+.hb-wx{display:flex;flex-direction:column;gap:3px;min-width:0;max-width:360px}
+.hb-wx b{font-size:30px;font-weight:500;line-height:1;color:var(--title);font-variant-numeric:tabular-nums}
+.hb-wx small{font-size:13.5px;color:var(--ink-2)}
+.hb-wx .linkbtn{font-size:13px;text-align:left;min-height:30px}
+.hb-watch{margin-left:auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;max-width:470px;padding:12px 18px;border:0;border-radius:20px;background:var(--ok-bg);color:var(--ink);text-align:left;cursor:pointer;box-shadow:var(--float-lo)}
+.hb-watch.warn{background:var(--warn-bg)}
+.hb-watch b{font-weight:600;font-size:15px}
+.hb-watch small{font-size:12.5px;color:var(--ink-2)}
+.hb-tools{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:12px 0 0}
+.hb-plan{margin:0 auto;width:min(100%,calc((100vh - 215px) * 35 / 22.5))}
+body.wall .hb-plan{width:min(100%,calc((100vh - 150px) * 35 / 22.5))}
+.hb-plan .plan-legend{justify-content:center}
+.hb-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:640px;margin:16px auto 0}
+.hb-nav button{min-height:58px;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;background:var(--face);box-shadow:var(--float-lo);color:var(--title);font:inherit;font-weight:500;cursor:pointer}
+.hb-more{max-width:720px;margin:12px auto 0}
+body.homebig .tabs{display:none}
+body.homebig .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
+@media (max-width:699px){.hb-plan{width:100%}.hb-clock .wall-clock{font-size:42px}.hb-watch{margin-left:0;max-width:none;width:100%}}
+/* Boutons d'appareils posés sur le plan */
+.pin{position:absolute;z-index:4;width:32px;height:32px;margin:-16px 0 0 -16px;padding:0;border:1px solid var(--hair);border-radius:50%;background:var(--face);color:var(--ink-2);display:grid;place-items:center;box-shadow:var(--float-lo);cursor:pointer;transition:transform .15s}
+.pin .i{width:17px;height:17px}
+.pin.on{background:var(--lit-grad);color:var(--ink);box-shadow:var(--glow)}
+.pin.open{color:var(--accent)}
+.pin.bad{border:1.5px dashed var(--bad);color:var(--bad)}
+.pin:active{transform:scale(.92)}
+.plan.edit .pin{cursor:grab;touch-action:none;outline:2px dashed var(--accent);outline-offset:2px}
+.plan.edit .pin.drag{cursor:grabbing;transform:scale(1.15);z-index:6}
+.plan.edit .pr,.plan.edit .bay,.plan.edit .tree{pointer-events:none}
+/* iPhone : petites pièces, le nom en haut et les boutons dessous */
+.plan.tall .pr.pinned{justify-content:flex-start;padding-top:4px}
+.plan.tall .pr.pinned small,.plan.tall .pr.pinned::after{display:none}
+.plan.tall .pr.pinned b{font-size:11px;line-height:1.1}
+.plan.tall .pr.vt.pinned{justify-content:center;align-items:flex-start;padding:8px 3px}
+.pin .pt{font-size:10px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--ink)}
+@media (max-width:699px){.pin.sm{width:20px;height:20px;margin:-10px 0 0 -10px}.pin.sm .i{width:11px;height:11px}}
+@media (max-width:699px){.pin{width:24px;height:24px;margin:-12px 0 0 -12px}.pin .i{width:13px;height:13px}.tree{width:24px;height:24px;margin:-12px 0 0 -12px}.tree .i{width:14px;height:14px}}
+/* Les arbres devant la piscine */
+/* Piscine : indicateurs et boutons */
+.pr.pool.hud{justify-content:flex-start;padding-top:8px}
+.plan.tall .pr.pool.hud{padding-top:10px}
+.pool-hud{position:absolute;z-index:3;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;gap:8px;padding:0 10px 9px;box-sizing:border-box}
+.pool-hud .pc-row{display:flex;gap:6px}
+.pc{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:54px;padding:4px 9px;border-radius:12px;background:rgba(255,255,255,.22);color:var(--pool-ink);line-height:1.15;font-variant-numeric:tabular-nums}
+.pc small{font-size:10px;opacity:.85}
+.pc b{font-size:13.5px;font-weight:600;white-space:nowrap}
+.pc.warn{background:var(--lit);color:var(--ink)}
+.pc.bad{background:var(--face);color:var(--bad)}
+.psw{pointer-events:auto;display:flex;align-items:center;gap:6px;height:38px;padding:0 13px 0 9px;border:1px solid var(--hair);border-radius:999px;background:var(--face);color:var(--ink);font:inherit;font-size:13px;font-weight:600;box-shadow:var(--float-lo);cursor:pointer}
+.psw .i{width:17px;height:17px}
+.psw.on{background:var(--lit-grad);box-shadow:var(--glow)}
+.pool-hud.tall{flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:30px 3px 10px}
+.pool-hud.tall .pc-row{flex-direction:column;gap:5px}
+.pool-hud.tall .pc{min-width:0;width:100%;padding:3px 2px;border-radius:9px}
+.pool-hud.tall .pc small{font-size:9px}
+.pool-hud.tall .pc b{font-size:11px}
+.pool-hud.tall .psw{flex-direction:column;gap:1px;height:auto;width:100%;padding:5px 2px;border-radius:12px;font-size:9.5px}
+.pool-hud.tall .psw .i{width:15px;height:15px}
+.plan.edit .pool-hud .psw{pointer-events:none;opacity:.6}
+.pool-speed{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 14px;font-size:15px}
+.pool-speed .seg button{min-width:84px;padding:0 14px;font:inherit;font-size:14px}
+.pool-speed .seg button[aria-pressed="true"]{background:var(--fill);color:var(--on-fill);font-weight:600}
+.pool-panel{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:0 0 14px}
+.pool-panel .pc-row{display:flex;flex-wrap:wrap;gap:8px;flex:1 1 100%}
+.pool-panel .pc{flex:1 1 140px;align-items:flex-start;padding:10px 12px;border-radius:14px;background:var(--pool-grad);color:var(--pool-ink)}
+.pool-panel .pc b{font-size:20px}
+.pool-panel .pc small{font-size:12px}
+.pool-panel .pc.warn{background:var(--lit);color:var(--ink)}
+.pool-panel .psw{height:48px;font-size:15px;padding:0 18px 0 14px}
+.tree{position:absolute;z-index:3;width:30px;height:30px;margin:-15px 0 0 -15px;padding:0;border:0;border-radius:50%;background:radial-gradient(circle at 40% 35%,#a7c597,#5f8a55);color:#24401f;display:grid;place-items:center;cursor:pointer}
+.tree .i{width:18px;height:18px}
+.tree.on{box-shadow:0 0 0 2px rgba(244,209,154,.95),0 0 22px 7px rgba(242,176,94,.7)}
+.plan.mini .tree{width:8px;height:8px;margin:-4px 0 0 -4px}
+.plan.mini .tree .i{display:none}
+/* Points à regarder */
+.wl{display:grid;gap:12px}
+.wl .card b.w-t{display:block;font-weight:600;color:var(--title);margin-bottom:4px}
+.wl .card .list{margin-top:10px;box-shadow:none;border:1px solid var(--hair)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 
@@ -513,6 +594,8 @@ const P={
   sensor:'<circle cx="12" cy="12" r="2.5"/><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 7.5a6.4 6.4 0 0 1 0 9"/>',
   lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
   dot:'<circle cx="12" cy="12" r="7"/>',
+  appliance:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 8h16"/><circle cx="12" cy="14" r="3.5"/><path d="M7.5 5.5h.01M10.5 5.5h.01"/>',
+  shield:'<path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
   up:'<path d="M6 15l6-6 6 6"/>', down:'<path d="M6 9l6 6 6-6"/>', stop:'<rect x="8" y="8" width="8" height="8" rx="1"/>',
   plus:'<path d="M12 5v14M5 12h14"/>', check:'<path d="M5 12.5l4.5 4.5L19 7"/>',
   chat:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',
@@ -520,6 +603,10 @@ const P={
   eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
   apps:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M17 14v6M14 17h6"/>',
   grip:'<path d="M5 8h14M5 12h14M5 16h14"/>',
+  speaker:'<path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>',
+  tree:'<path d="M12 21v-6"/><path d="M12 3c-3.6 0-6.2 2.8-6.2 6.1 0 3.4 2.8 6 6.2 6s6.2-2.6 6.2-6C18.2 5.8 15.6 3 12 3z"/>',
+  rooms:'<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M12 4v16M3 12h9"/>',
+  share:'<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>',
   photo:'<rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8.5 6l1.5-2h4l1.5 2"/>'
 };
 const I=n=>'<svg class="i" viewBox="0 0 24 24" aria-hidden="true">'+(P[n]||P.dot)+'</svg>';
@@ -551,7 +638,7 @@ let conn=mode==='demo'?'demo':'loading';
 let base='', lastErr='';
 let data={zones:{},devices:{},flows:[],apps:null};
 let tab=store.get('tab','home'); if(!['home','rooms','share','apps'].includes(tab)) tab='home';
-let room='all', preview=null, flash={id:'',until:0}, sheetActions={}, photoZone=null, nightSheet=false;
+let room='all', preview=null, flash={id:'',until:0}, sheetActions={}, photoZone=null, nightSheet=false, watchSheet=false, pinEdit=false, pinDrag=null;
 const SETUP=((location.hash.match(/^#homey=([a-f0-9]{24})$/i)||[])[1]||'').toLowerCase();
 const sfx=()=>mode==='demo'?'Demo':'';
 
@@ -574,8 +661,7 @@ function makeDemo(){
     ['d8','Porte d’entrée','entree','sensor',[cap('alarm_contact',false,ro),cap('measure_battery',82,ro)]],
     ['d9','Sonnette Entrée','entree','doorbell',[cap('alarm_motion',false,ro),cap('measure_battery',15,ro)]],
     ['d10','Caméra du portail','ext','camera',[cap('alarm_motion',false,ro)]],
-    ['d11','Piscine','piscine','other',[cap('measure_temperature',24.5,ro),cap('measure_ph',7.4,{setable:false,title:'pH'}),cap('onoff',true,{title:'Filtration'})]],
-    ['d12','Lumière piscine','piscine','light',[cap('onoff',false)]]
+    ['d11','Piscine','piscine','other',[cap('measure_temperature',24.5,ro),cap('measure_ph',7.4,{setable:false,title:'pH'}),cap('measure_orp',690,{setable:false,title:'ORP',units:'mV'}),cap('measure_salt_level',50,{setable:false,title:'Hydrolysis',units:'%'}),cap('target_hydrolysis_level',50,{title:'Hydrolysis Level',min:0,max:100,step:1,units:'%'}),cap('filtration_speed','slow',{title:'Pump Speed'}),cap('status_filtration',true,{setable:false,title:'Filtration'}),cap('lighting_onoff',false,{title:'Pool Light'})]]
   ].forEach(([id,name,zone,cls,caps])=>devices[id]={id,name,zone,class:cls,available:true,capabilitiesObj:Object.fromEntries(caps)});
   const flows=[['f1','Je pars'],['f2','Je rentre'],['f3','Bonne nuit'],['f4','Soirée piscine'],['f5','Réveil'],['f6','Sésame ouvre-toi']]
     .map(([id,name])=>({id,name,type:'flow',trig:true}));
@@ -597,9 +683,9 @@ function demoFx(id){
     const c=d.capabilitiesObj;
     if(fx.cover!=null&&c.windowcoverings_set&&d.id!=='d5') c.windowcoverings_set.value=fx.cover;
     if(fx.cover===0&&d.id==='d5') c.windowcoverings_set.value=0;
-    if(fx.light!=null&&d.class==='light'&&d.id!=='d12') c.onoff.value=fx.light;
-    if(fx.light===false&&d.id==='d12') c.onoff.value=false;
-    if(fx.pool&&d.id==='d12') c.onoff.value=true;
+    if(fx.light!=null&&d.class==='light') c.onoff.value=fx.light;
+    if(fx.light===false&&d.id==='d11') c.lighting_onoff.value=false;
+    if(fx.pool&&d.id==='d11') c.lighting_onoff.value=true;
   });
 }
 
@@ -644,7 +730,8 @@ async function loadLive(){
     req('/api/manager/flow/flow/').catch(()=>null), req('/api/manager/flow/advancedflow/').catch(()=>null),
     req('/api/manager/apps/app/').catch(()=>null)
   ]);
-  data={zones:z||{},devices:d||{},flows:normFlows(f,'flow').concat(normFlows(af,'advancedflow')),apps:ap};
+  const dd=d||{}; for(const k of Object.keys(dd)) if(isHidden(dd[k])) delete dd[k];
+  data={zones:z||{},devices:dd,flows:normFlows(f,'flow').concat(normFlows(af,'advancedflow')),apps:ap};
 }
 async function refresh(){
   if(mode!=='live') return;
@@ -677,11 +764,15 @@ const NID_DEV={
   'store baie droite 1':['Store droit 1','Extérieur'], 'store baie droite 2':['Store droit 2','Extérieur'],
   'store baie gauche 3':['Store gauche 3','Extérieur'], 'store baie droite 4':['Store gauche 4','Extérieur'],
   'rideau gauche':['Rideau gauche','Salon'], 'rideaux droit':['Rideau droit','Salon'], 'rideau paul':['Rideau','Chambre De Paul'],
-  'terrasse':['Terrasse','Extérieur'], 'terrasse nord':['Terrasse Nord','Extérieur']
+  'terrasse':['Terrasse','Extérieur'], 'terrasse nord':['Terrasse Nord','Extérieur'],
+  'kajplats trompette 1':['Lampe trompette de ma chambre','Ma Chambre'], 'kajplats trompette 2':['Lampe trompette du bureau','Bureau']
 };
 // Les stores restent dans « Extérieur », mais on les retrouve aussi dans leur pièce
 const NID_ALSO={'store ma chambre':['Ma Chambre'],'store chambre de maître':['Ma Chambre'],'store baie gauche 3':['Salon'],'store baie droite 4':['Salon'],'store paul':['Chambre De Paul'],'store chambre piscine':['Chambre Piscine'],
   'store baie droite 1':['Salon'],'store baie droite 2':['Salon'],'store baie gauche 1':['Salon'],'store baie gauche 2':['Salon']};
+// Doublons : les ampoules réunies dans un groupe Homey (Lampadaire salon, Lampe petite table) et les déclencheurs de Siri
+const NID_HIDE=new Set(['kajplats lampadaire salon1','kajplats lampadaire salon 1','kajplats lampadaire salon 2','kajplats petite table1','kajplats petite table 1','kajplats table 2']);
+const isHidden=d=>NID_HIDE.has(nk(d.name))||/^d[ée]clencheur\b/.test(nk(d.name));
 const nidRoom=n=>NID_ROOM[nk(n)]||String(n||'').trim();
 const nidDev=n=>NID_DEV[nk(n)]||(nk(n).indexOf('echo dot')===0?['Echo Dot','Bureau']:null);
 const devName=d=>(nidDev(d.name)||[])[0]||String(d.name||'').trim();
@@ -709,13 +800,17 @@ function ctrlKind(d){
 }
 function devIcon(d){
   const cl=d.class||'';
+  if(/thermostat|heater|airconditioning|fan/.test(cl)) return 'thermo';
   if(/piscine|pool/i.test(d.name)&&cl!=='light') return 'wave';
+  if(cl==='homealarm'||/^base\b/i.test(d.name||'')) return 'shield';
+  if(/dishwasher|oven|washer|dryer|cooktop|hob|fridge|kettle|coffeemachine/.test(cl)||/lave|plaque|cuisson|four\b|frigo|r[ée]frig|cong[ée]l|s[èe]che-linge|hotte/i.test(d.name||'')) return 'appliance';
   if(cl==='light') return 'bulb';
   if(cl==='socket') return 'plug';
   if(/windowcoverings|blinds|curtain|sunshade|garagedoor/.test(cl)) return 'blinds';
   if(/thermostat|heater|airconditioning|fan/.test(cl)) return 'thermo';
   if(/camera|doorbell/.test(cl)) return 'camera';
   if(cl==='lock') return 'lock';
+  if(cl==='speaker') return 'speaker';
   if(cl==='sensor') return 'sensor';
   return 'dot';
 }
@@ -749,23 +844,50 @@ function stateText(d){
   }
   return parts.join(' · ');
 }
-function watchList(){
+function watchItems(){
   const out=[];
   for(const d of Object.values(data.devices||{})){
     const c=d.capabilitiesObj||{};
     const nm=devName(d), rech=d.class==='curtain'||d.class==='blinds';
-    if(d.available===false){ out.push(nm+(rech?' ne répond plus : batterie à recharger ?':' ne répond plus')); continue; }
+    if(d.available===false){ out.push({key:'off:'+d.id,kind:'off',dev:d,txt:nm+(rech?' ne répond plus : batterie à recharger ?':' ne répond plus')}); continue; }
     let batt=false;
     for(const [k,v] of Object.entries(c)){
       if(!v) continue; const x=v.value;
-      if(ALARM[k]&&x===true) out.push(nm+' : '+ALARM[k]);
-      if(!batt&&((k==='alarm_battery'&&x===true)||(k==='measure_battery'&&typeof x==='number'&&x<(rech?25:20)))){ batt=true; out.push(rech?nm+' : batterie '+(typeof x==='number'?'à '+nf0.format(x)+' %':'faible')+', à recharger':nm+' : pile '+(typeof x==='number'?'à '+nf0.format(x)+' %':'faible')); }
-      if(isPh(k,v)&&typeof x==='number'&&(x<7.2||x>7.6)) out.push('pH de la piscine à '+nf1.format(x)+' (idéal entre 7,2 et 7,6)');
+      if(ALARM[k]&&x===true) out.push({key:'al:'+d.id+':'+k,kind:'alarm',dev:d,txt:nm+' : '+ALARM[k]});
+      if(!batt&&((k==='alarm_battery'&&x===true)||(k==='measure_battery'&&typeof x==='number'&&x<(rech?25:20)))){ batt=true; out.push({key:'bat:'+d.id,kind:'batt',dev:d,txt:rech?nm+' : batterie '+(typeof x==='number'?'à '+nf0.format(x)+' %':'faible')+', à recharger':nm+' : pile '+(typeof x==='number'?'à '+nf0.format(x)+' %':'faible')}); }
+      if(isPh(k,v)&&typeof x==='number'&&(x<7.2||x>7.6)) out.push({key:'ph:'+d.id,kind:'ph',dev:d,txt:'pH de la piscine à '+nf1.format(x)+' (idéal entre 7,2 et 7,6)'});
     }
   }
-  if(data.apps) for(const a of Object.values(data.apps)) if(appState(a)[0]==='bad') out.push('Appli '+appName(a)+' en panne');
-  return out;
+  if(data.apps) for(const a of Object.values(data.apps)) if(appState(a)[0]==='bad') out.push({key:'app:'+a.id,kind:'app',txt:'Appli '+appName(a)+' en panne'});
+  const ign=store.get('ign'+sfx(),{})||{}, now=Date.now();
+  return out.filter(i=>!(ign[i.key]>now));
 }
+function watchList(){ return watchItems().map(i=>i.txt); }
+function watchHelp(i){
+  const msg=String(i.dev&&i.dev.unavailableMessage||'');
+  if(i.kind==='off'){
+    if(/not allowed|autoris|access/i.test(msg)) return 'Homey n’a plus le droit d’accéder à cet appareil : dans l’appli Homey, ouvre Applis, puis l’appli de la marque, et reconnecte ton compte.';
+    if(i.dev.class==='light') return 'Une ampoule sans courant ne répond plus : vérifie que l’interrupteur mural est allumé.';
+    if(i.dev.class==='curtain'||i.dev.class==='blinds') return 'Recharge le rideau, puis attends une minute.';
+    return 'Vérifie qu’il est branché et allumé, puis attends une minute.';
+  }
+  if(i.kind==='batt') return 'Recharge-le ou change la pile, puis touche « C’est fait ».';
+  if(i.kind==='alarm') return 'Va vérifier sur place.';
+  if(i.kind==='ph') return 'Ajuste le pH de la piscine (idéal entre 7,2 et 7,6).';
+  if(i.kind==='app') return 'Dans l’appli Homey : Applis, puis cette appli, puis Redémarrer.';
+  return '';
+}
+function watchHtml(){
+  const it=watchItems(), ign=store.get('ign'+sfx(),{})||{}, nIgn=Object.values(ign).filter(t=>t>Date.now()).length;
+  let h='';
+  if(!it.length) h+='<section class="status ok"><div class="status-dot" aria-hidden="true">'+I('check')+'</div><div class="status-txt"><h2>Tout va bien à la maison</h2><p>'+esc(summary())+'</p></div></section>';
+  else h+='<div class="wl">'+it.map(i=>'<div class="card"><b class="w-t">'+esc(i.txt)+'</b><p class="muted">'+esc(watchHelp(i))+'</p>'
+    +(i.dev?'<div class="list">'+devRow(i.dev)+'</div>':'')
+    +'<div class="row-btns"><button class="btn small" type="button" data-ign="'+esc(i.key)+'">'+(i.kind==='batt'?'C’est fait':'Masquer 7 jours')+'</button></div></div>').join('')+'</div>';
+  if(nIgn) h+='<p class="foot">'+nIgn+(nIgn>1?' points masqués':' point masqué')+' · <button class="linkbtn" type="button" data-ign-reset>Tout réafficher</button></p>';
+  return h;
+}
+function openWatch(){ watchSheet=true; openSheet('À regarder',watchHtml(),{}); }
 function summary(){
   const devs=Object.values(data.devices||{}), parts=[];
   const pool=devs.find(d=>/piscine|pool/i.test(d.name)&&d.capabilitiesObj&&d.capabilitiesObj.measure_temperature&&typeof d.capabilitiesObj.measure_temperature.value==='number');
@@ -962,6 +1084,12 @@ function homeFlows(){
   if(Array.isArray(sel)) return sel.map(id=>trig.find(f=>f.id===id)).filter(Boolean);
   return trig.slice(0,8);
 }
+function camsHtml(){
+  return '<div class="cams"><h3 class="sec">Caméras</h3>'
+    +'<a class="allclose" href="shortcuts://run-shortcut?name=Cameras%20Alexa"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Toutes les caméras</b><small>eufy et Aqara réunies · ouvre Alexa</small></span></a>'
+    +'<a class="allclose" href="shortcuts://run-shortcut?name=Cameras%20eufy"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Sherlock</b><small>Caméras eufy · ouvre l’appli</small></span></a>'
+    +'<a class="allclose" href="shortcuts://run-shortcut?name=Cameras%20Aqara"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Aqara</b><small>Caméras Aqara · ouvre l’appli</small></span></a></div>';
+}
 function renderHome(){
   const w=watchList(), ok=!w.length, nCov=coverDevices().length;
   let fl=homeFlows(); const now=nowScene(fl);
@@ -970,17 +1098,14 @@ function renderHome(){
   if(mode==='demo') top='<div class="note"><span>Démo avec des appareils d’exemple.</span><button class="btn small" type="button" id="open-settings">Connecter mon Homey</button></div>';
   let side='<section class="status '+(ok?'ok':'warn')+'"><div class="status-dot" aria-hidden="true">'+(ok?I('check'):'!')+'</div><div class="status-txt">'
     +'<h2>'+(ok?'Tout va bien à la maison':w.length+(w.length>1?' points à regarder':' point à regarder'))+'</h2>'
-    +(ok?'':'<ul>'+w.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>')
+    +(ok?'':'<ul>'+w.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><button class="linkbtn" type="button" id="watch">Voir et agir</button>')
     +'<p class="sum">'+esc(summary())+'</p></div></section>';
   const hr=new Date().getHours(), soir=hr>=19||hr<6;
   if(soir) side+=nightBtn();
   side+=miniPlan();
   if(nCov) side+='<button class="allclose" type="button" id="allclose"><span class="row-ic">'+I('blinds')+'</span><span class="row-txt"><b>Tout fermer</b><small>'+(nCov>1?nCov+' volets et fenêtres':'1 volet')+'</small></span></button>';
   if(!soir) side+=nightBtn();
-  side+='<div class="cams"><h3 class="sec">Caméras</h3>'
-    +'<a class="allclose" href="shortcuts://run-shortcut?name=Cameras%20Alexa"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Toutes les caméras</b><small>eufy et Aqara réunies · ouvre Alexa</small></span></a>'
-    +'<a class="allclose" href="shortcuts://run-shortcut?name=Cameras%20eufy"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Sherlock</b><small>Caméras eufy · ouvre l’appli</small></span></a>'
-    +'<a class="allclose" href="shortcuts://run-shortcut?name=Cameras%20Aqara"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Aqara</b><small>Caméras Aqara · ouvre l’appli</small></span></a></div>';
+  side+=camsHtml();
   let main='<div class="sec-row"><h3 class="sec">Scènes</h3>'+(data.flows.some(f=>f.trig)?'<button class="linkbtn" type="button" id="arrange">Ranger</button>':'')+'</div>';
   main+=fl.length?'<div class="scenes">'+fl.map(f=>sceneBtn(f,f===now)).join('')+'</div>'
     :'<p class="muted">Aucune scène à lancer. Crée dans Homey un Flow qui se lance à la main, il apparaîtra ici.</p>';
@@ -1009,10 +1134,10 @@ function devRow(d,withRoom){
 // Piscine devant (sud-est).
 // Bloc arrière d'environ 11 × 11 m coupé dans la longueur : buanderie (11 × 3) collée à la maison,
 // garage (11 × 8) derrière.
-const PLAN_W=35, PLAN_H=20.5;
+const PLAN_W=35, PLAN_H=22.5;
 const PLAN=[
   {n:'Garage',x:2.4,y:0.3,w:12.9,h:5.66},
-  {n:'Buanderie',s:'Buanderie · arrière-cuisine',t:'Buanderie et arrière-cuisine',also:['Arrière Cuisine'],x:2.4,y:5.96,w:12.9,h:2.14,v:1},
+  {n:'Buanderie',s:'Buanderie · arrière-cuisine',ts:'Buanderie',t:'Buanderie et arrière-cuisine',also:['Arrière Cuisine'],x:2.4,y:5.96,w:12.9,h:2.14,v:1},
   {n:'Descente',s:'Descente du garage',dev:'lumière descente',x:15.3,y:0.3,w:19.7,h:3.5,k:'ramp'},
   // Ta suite côté garage ; sa salle de bain côté cuisine, à l'arrière
   {n:'Ma Chambre',x:0,y:8.1,w:7.1,h:8,notch:[4/7.1,3.7/8],nx:1},
@@ -1071,6 +1196,160 @@ const PLAN_BAYS=[
   {x:32.2,w:2,dev:'store paul'}
 ].map(b=>Object.assign({y:15.65,h:0.9},b));
 const bayDev=k=>{ for(const n of String(k).split('|')){ const d=Object.values(data.devices||{}).find(x=>nk(x.name)===n); if(d) return d; } return null; };
+/* ---------- Plan : les arbres et les boutons d’appareils ---------- */
+// Les 6 arbres devant la piscine, répartis sur sa longueur
+const PLAN_TREES=[0,1,2,3,4,5].map(i=>({x:14.05+(i-2.5)*4,y:21.45}));
+function ptPos(X,Y,tall){ const p=v=>(Math.round(v*1000)/10)+'%'; return tall?'left:'+p((PLAN_H-Y)/PLAN_H)+';top:'+p((PLAN_W-X)/PLAN_W):'left:'+p(X/PLAN_W)+';top:'+p((PLAN_H-Y)/PLAN_H); }
+// Une prise pour tous les arbres (« Lumière Arbre »), ou une par arbre (« Lumière arbre 1 » … « Lumière arbre 6 », de gauche à droite)
+const TREE_RE=/^lumi[eè]re (des )?arbres?( ?n?°? ?(\d+))?$/;
+const treeDevs=()=>Object.values(data.devices||{}).filter(d=>TREE_RE.test(nk(d.name)));
+const treeNum=d=>{ const m=nk(d.name).match(TREE_RE); return m&&m[3]?+m[3]:0; };
+const treeDev=()=>treeDevs().find(d=>!treeNum(d))||null;
+const treeDevAt=i=>treeDevs().find(d=>treeNum(d)===i+1)||treeDev();
+const isOn=d=>!!(d&&d.capabilitiesObj&&d.capabilitiesObj.onoff&&d.capabilitiesObj.onoff.value===true);
+const pinSkip=d=>d.class==='sunshade'||/^store\b/.test(nk(d.name))||TREE_RE.test(nk(d.name));
+function cleanPins(o){ const out={}; if(!o||typeof o!=='object') return out;
+  for(const [id,v] of Object.entries(o)) if(v&&typeof v.r==='string'&&PLAN.some(p=>p.n===v.r)&&isFinite(v.fx)&&isFinite(v.fy)) out[id]={r:v.r,fx:Math.max(0,Math.min(1,+v.fx)),fy:Math.max(0,Math.min(1,+v.fy))};
+  return out; }
+// Place libre dans une pièce, loin de son nom (qui est au centre, ou en haut/bas pour les pièces en L)
+const smallRoom=(o,tall)=>tall&&!o.k&&!o.v&&o.w<5&&o.h<5;
+function spots(o,n,tall){
+  if(smallRoom(o,tall)){ // iPhone : nom en haut, petits boutons en bas, deux par rang
+    const cols=Math.min(n,2), out=[];
+    for(let i=0;i<n;i++){ const r=Math.floor(i/cols), c=i%cols, nc=Math.min(cols,n-r*cols); out.push({fx:.2+r*.34,fy:nc===1?.5:(c===0?.72:.28)}); }
+    return out;
+  }
+  let fx0=.1,fx1=.9,fy0=.1,fy1=.38;
+  if(o.notch){ if(tall){ fx0=o.nx?.32:.08; fx1=o.nx?.92:.8; fy0=.56; fy1=.94; } else { fx0=.06; fx1=.94; fy0=.55; fy1=.74; } }
+  else if(tall&&o.v){ fx0=.08; fx1=.62; fy0=.5; fy1=.5; }
+  else if(tall){ fx0=.1; fx1=.38; fy0=.12; fy1=.88; }
+  else if(o.h<3){ fy0=.06; fy1=.26; }
+  else if(o.h<4){ fy0=.05; fy1=.2; }
+  const W=tall?(fy1-fy0)*o.h:(fx1-fx0)*o.w, H=tall?(fx1-fx0)*o.w:(fy1-fy0)*o.h;
+  const cols=Math.max(1,Math.min(n,Math.ceil(Math.sqrt(n*W/Math.max(H,.01))))), rows=Math.ceil(n/cols), out=[];
+  for(let i=0;i<n;i++){
+    const r=Math.floor(i/cols), c=i%cols, nc=Math.min(cols,n-r*cols), u=(c+.5)/nc, v=(r+.5)/rows;
+    out.push(tall?{fx:fx1-(fx1-fx0)*v,fy:fy1-(fy1-fy0)*u}:{fx:fx0+(fx1-fx0)*u,fy:fy1-(fy1-fy0)*v});
+  }
+  return out;
+}
+function pinList(tall){
+  const saved=store.get('pins'+sfx(),{})||{}, byRoom={}, seen=new Set(), out=[], pd=poolDev();
+  for(const o of PLAN) for(const d of roomDevs(o.n)){
+    if(seen.has(d.id)||pinSkip(d)||d===pd) continue; seen.add(d.id);
+    const sv=saved[d.id], so=sv&&PLAN.find(p=>p.n===sv.r);
+    ((byRoom[(so||o).n])=byRoom[(so||o).n]||[]).push({d,sv:so?sv:null});
+  }
+  for(const o of PLAN){
+    const all=byRoom[o.n]||[]; if(!all.length) continue;
+    const sm=smallRoom(o,tall), auto=all.filter(x=>!x.sv), sp=spots(o,auto.length,tall);
+    auto.forEach((x,i)=>out.push({d:x.d,o,fx:sp[i].fx,fy:sp[i].fy,sm}));
+    for(const x of all) if(!auto.includes(x)) out.push({d:x.d,o,fx:+x.sv.fx,fy:+x.sv.fy,sm});
+  }
+  return out;
+}
+function pinsHtml(tall,list){
+  let h='';
+  for(const p of list||pinList(tall)){
+    const d=p.d, k=ctrlKind(d), light=isLightDev(d), cov=/^cover/.test(k);
+    const on=light&&isOn(d), open=cov&&isOpenCover(d), off=d.available===false;
+    const act=off?'ne répond pas':light?(on?'touche pour éteindre':'touche pour allumer'):cov?(open?'touche pour fermer':'touche pour ouvrir'):'touche pour régler';
+    const mt=d.capabilitiesObj&&d.capabilitiesObj.measure_temperature, deg=p.sm&&devIcon(d)==='thermo'&&mt&&typeof mt.value==='number'?Math.round(mt.value)+'°':'';
+    h+='<button class="pin'+(p.sm?' sm':'')+(on?' on':'')+(open?' open':'')+(off?' bad':'')+'" type="button" data-pin="'+esc(d.id)+'" style="'+ptPos(p.o.x+p.fx*p.o.w,p.o.y+p.fy*p.o.h,tall)+'" title="'+esc(devName(d))+'" aria-label="'+esc(devName(d)+', '+stateText(d)+', '+act)+'">'+(deg?'<span class="pt">'+deg+'</span>':I(light?'bulb':devIcon(d)))+'</button>';
+  }
+  return h;
+}
+function treesHtml(tall,mini){
+  return PLAN_TREES.map((t,i)=>{
+    const d=treeDevAt(i), on=isOn(d), own=d&&treeNum(d)===i+1, nm=own?'Arbre '+(i+1):'Arbres';
+    return !mini&&d
+      ?'<button class="tree'+(on?' on':'')+'" type="button" data-tree="'+(i+1)+'" style="'+ptPos(t.x,t.y,tall)+'" aria-label="'+nm+', lumière '+(on?'allumée. Touche pour éteindre':'éteinte. Touche pour allumer')+'">'+I('tree')+'</button>'
+      :'<span class="tree'+(on?' on':'')+'" aria-hidden="true" style="'+ptPos(t.x,t.y,tall)+'">'+I('tree')+'</span>';
+  }).join('');
+}
+async function pinTap(id){
+  const d=data.devices[id]; if(!d) return;
+  if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
+  const k=ctrlKind(d);
+  if(d.available!==false&&isLightDev(d)){ const on=!isOn(d); toast((on?'J’allume : ':'J’éteins : ')+devName(d)); await setCap(d.id,'onoff',on); return; }
+  if(d.available!==false&&/^cover/.test(k)){
+    const open=!isOpenCover(d), c=d.capabilitiesObj||{};
+    toast(devName(d)+(open?' s’ouvre':' se ferme'));
+    if(mode!=='demo'){ if(c.windowcoverings_set) c.windowcoverings_set.value=open?1:0; if(c.windowcoverings_closed) c.windowcoverings_closed.value=!open; }
+    if(k==='cover') await setCap(d.id,'windowcoverings_state',open?'up':'down'); else await setCap(d.id,'windowcoverings_set',open?1:0);
+    return;
+  }
+  openDev(d);
+}
+function openDev(d){ planRoom='dev:'+d.id; const nm=devName(d), r=roomLabel(d); openSheet(nk(nm).indexOf(nk(r))>=0?nm:nm+' · '+r,planSheetHtml(planRoom),{}); }
+async function treeTap(i){
+  const d=treeDevAt(i); if(!d) return;
+  if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
+  const own=treeNum(d)===i+1, nm=own?'l’arbre '+(i+1):'les arbres';
+  if(d.available===false){ toast((own?'La lumière de l’arbre '+(i+1):'La lumière des arbres')+' ne répond pas.','bad'); return; }
+  const on=!isOn(d); toast((on?'J’allume ':'J’éteins ')+nm); await setCap(d.id,'onoff',on);
+}
+
+/* ---------- Piscine : indicateurs et boutons, sur le plan et dans sa fiche ---------- */
+const poolDev=()=>roomDevs('Piscine').find(d=>{ const c=d.capabilitiesObj||{}; return c.measure_temperature||c.measure_ph||c.lighting_onoff||c.status_filtration; });
+const capNum=(c,k)=>c[k]&&typeof c[k].value==='number'?c[k].value:null;
+function poolInd(d,full){
+  const c=d.capabilitiesObj||{}, out=[], t=capNum(c,'measure_temperature'), ph=capNum(c,'measure_ph'), rx=capNum(c,'measure_orp'), el=capNum(c,'measure_salt_level');
+  const tp=capNum(c,'target_ph'), tr=capNum(c,'target_rx');
+  if(t!==null) out.push({l:'Eau',v:nf1.format(t)+'°'});
+  if(ph!==null) out.push({l:'pH',v:nf1.format(ph),warn:ph<7.2||ph>7.6,x:full&&tp!==null?'consigne '+nf1.format(tp):''});
+  if(rx!==null) out.push({l:'Redox',v:nf0.format(rx)+' mV',x:full&&tr!==null?'consigne '+nf0.format(tr)+' mV':''});
+  const sp=c.filtration_speed&&POOL_SPEED[c.filtration_speed.value];
+  if(c.status_filtration&&typeof c.status_filtration.value==='boolean'){ const on=c.status_filtration.value, md=c.filtration_mode&&{auto:'automatique',manual:'manuel',smart:'smart'}[c.filtration_mode.value];
+    out.push(full?{l:'Filtration',v:on?'En marche':'Arrêtée',x:on&&sp?'pompe '+sp:''}
+      :{l:'Filtration',v:on?(sp?'En marche · '+sp:'En marche'):'Arrêtée',vs:on?(sp?sp[0].toUpperCase()+sp.slice(1):'Marche'):'Arrêt'}); }
+  if(full&&el!==null&&!(c.target_hydrolysis_level&&c.target_hydrolysis_level.setable!==false)) out.push({l:'Électrolyse',v:nf0.format(el)+' %'});
+  return out;
+}
+const POOL_SW=[['lighting_onoff','Lumière','bulb'],['onoff','Marche','wave']];
+const POOL_SPEED={slow:'lente',medium:'moyenne',high:'rapide'};
+function poolSpeedHtml(d){
+  const c=d.capabilitiesObj||{}, f=c.filtration_speed; if(!f||f.setable===false||d.available===false) return '';
+  return '<div class="pool-speed"><span>Vitesse de la pompe</span><div class="seg" role="group" aria-label="Vitesse de la pompe">'
+    +Object.entries(POOL_SPEED).map(([k,l])=>'<button type="button" data-pspeed="'+esc(d.id)+'|'+k+'" aria-pressed="'+(f.value===k)+'">'+l[0].toUpperCase()+l.slice(1)+'</button>').join('')+'</div></div>';
+}
+function poolHydHtml(d){
+  const c=d.capabilitiesObj||{}, h=c.target_hydrolysis_level; if(!h||h.setable===false||d.available===false) return '';
+  const v=typeof h.value==='number'?h.value:null;
+  return '<div class="pool-speed"><span>Électrolyse</span><div class="stepper"><button type="button" data-phyd="'+esc(d.id)+'|-5" aria-label="Baisser l’électrolyse">−</button><b>'+(v===null?'–':nf0.format(v)+' %')+'</b><button type="button" data-phyd="'+esc(d.id)+'|5" aria-label="Monter l’électrolyse">+</button></div></div>';
+}
+async function poolHyd(v){
+  const [id,st]=String(v).split('|'), d=data.devices[id], h=d&&d.capabilitiesObj&&d.capabilitiesObj.target_hydrolysis_level; if(!h) return;
+  if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
+  const lo=typeof h.min==='number'?h.min:0, hi=typeof h.max==='number'?h.max:100;
+  const n=Math.max(lo,Math.min(hi,Math.round(((typeof h.value==='number'?h.value:50)+Number(st))/5)*5));
+  if(n===h.value) return;
+  toast('Électrolyse réglée à '+n+' %'); await setCap(id,'target_hydrolysis_level',n);
+}
+async function poolSpeed(v){
+  const [id,k]=String(v).split('|'), d=data.devices[id]; if(!d||!POOL_SPEED[k]) return;
+  if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
+  toast('Pompe en vitesse '+POOL_SPEED[k]); await setCap(id,'filtration_speed',k);
+}
+function poolSw(d){
+  const c=d.capabilitiesObj||{};
+  return POOL_SW.filter(([k])=>c[k]&&c[k].setable!==false&&typeof c[k].value==='boolean')
+    .map(([k,l,i])=>({k,l:k==='onoff'&&c[k].title&&!/^(on|allumé|turned on|marche)$/i.test(c[k].title)?c[k].title:l,i,on:c[k].value===true}));
+}
+function poolBits(d,tall,full){
+  if(d.available===false) return '<span class="pc bad"><b>Ne répond pas</b></span>';
+  return '<span class="pc-row">'+poolInd(d,full).map(i=>'<span class="pc'+(i.warn?' warn':'')+'"><small>'+esc(i.l)+'</small><b>'+esc(tall&&i.vs||i.v)+'</b>'+(i.x?'<small>'+esc(i.x)+'</small>':'')+'</span>').join('')+'</span>'
+    +poolSw(d).map(s=>'<button class="psw'+(s.on?' on':'')+'" type="button" data-pcap="'+esc(d.id)+'|'+s.k+'" aria-label="'+esc(s.l+' de la piscine, '+(s.on?'allumée. Touche pour éteindre':'éteinte. Touche pour allumer'))+'">'+I(s.i)+'<span>'+esc(s.l)+'</span></button>').join('');
+}
+function poolHud(o,tall){ const d=poolDev(); return d?'<div class="pool-hud'+(tall?' tall':'')+'" style="'+planBox(o,tall)+'">'+poolBits(d,tall,false)+'</div>':''; }
+async function poolTap(v){
+  const [id,k]=String(v).split('|'), d=data.devices[id], c=d&&d.capabilitiesObj&&d.capabilitiesObj[k]; if(!c) return;
+  if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
+  if(d.available===false){ toast('La piscine ne répond pas.','bad'); return; }
+  const on=!c.value, s=poolSw(d).find(x=>x.k===k), nm=s&&s.k==='lighting_onoff'?'la lumière de la piscine':'« '+(s?s.l:'piscine')+' »';
+  toast((on?'J’allume ':'J’éteins ')+nm); await setCap(id,k,on);
+}
+
 function roomState(o){
   const devs=roomDevs(o.n), live=devs.filter(d=>d.available!==false);
   const lit=live.filter(d=>(d.class==='light'||/lumi[eè]re/i.test(d.name))&&d.capabilitiesObj&&d.capabilitiesObj.onoff&&d.capabilitiesObj.onoff.value).length;
@@ -1080,7 +1359,8 @@ function roomState(o){
   if(o.n==='Piscine'){ const p=live.find(d=>d.capabilitiesObj&&d.capabilitiesObj.measure_temperature&&typeof d.capabilitiesObj.measure_temperature.value==='number'); if(p) sub=nf1.format(p.capabilitiesObj.measure_temperature.value)+'°'; }
   else if(lit) sub=lit+(lit>1?' allumées':' allumée');
   else if(th) sub=nf1.format(th.capabilitiesObj.measure_temperature.value)+'°';
-  return {devs,lit,bad,sub};
+  const temp=o.n==='Piscine'?sub:th?nf1.format(th.capabilitiesObj.measure_temperature.value)+'°':'';
+  return {devs,lit,bad,sub,temp};
 }
 function bayState(d){
   const c=d.capabilitiesObj||{}, v=c.windowcoverings_set&&typeof c.windowcoverings_set.value==='number'?c.windowcoverings_set.value:null;
@@ -1088,15 +1368,17 @@ function bayState(d){
 }
 function planHtml(mini){
   const tall=!mini&&tallPlan(), tag=mini?'span':'button';
-  let h='<div class="plan'+(mini?' mini':'')+'" style="aspect-ratio:'+(tall?PLAN_H+' / '+PLAN_W:PLAN_W+' / '+PLAN_H)+'">';
+  const pins=mini?[]:pinList(tall), pinned=new Set(pins.map(p=>p.o.n));
+  let h='<div class="plan'+(mini?' mini':'')+(tall?' tall':'')+(!mini&&pinEdit?' edit':'')+'" style="aspect-ratio:'+(tall?PLAN_H+' / '+PLAN_W:PLAN_W+' / '+PLAN_H)+'">';
   h+='<span class="corr" aria-hidden="true" style="'+planBox(PLAN_CORR,tall)+'"></span>';
   for(const o of PLAN_DECO) h+='<span class="pdeco'+(tall&&o.v?' vt':'')+'" aria-hidden="true" style="'+planBox(o,tall)+'"><span>'+esc(o.t)+'</span></span>';
   for(const o of PLAN){
     const st=roomState(o);
-    const cls='pr'+(o.k?' '+o.k:'')+(st.lit?' lit':'')+(st.bad?' bad':'')+(!st.devs.length&&!o.k?' none':'')+(tall&&o.v?' vt':'');
+    const hud=!mini&&o.k==='pool'&&poolDev();
+    const cls='pr'+(o.k?' '+o.k:'')+(hud?' hud':'')+(st.lit?' lit':'')+(st.bad?' bad':'')+(!st.devs.length&&!o.k?' none':'')+(tall&&o.v?' vt':'')+(tall&&pinned.has(o.n)&&(o.v||smallRoom(o,tall))?' pinned':'');
     if(mini){ h+='<span class="'+cls+'" style="'+planBox(o,false)+'"></span>'; continue; }
     const say=o.n+(st.sub?', '+st.sub:'')+(st.bad?', un appareil ne répond pas':'')+(st.devs.length?'':', rien de relié à Homey');
-    h+='<button class="'+cls+'" type="button" data-plan="'+esc(o.n)+'" style="'+planBox(o,tall)+'" aria-label="'+esc(say)+'"><b>'+esc(o.s||o.n)+'</b>'+(st.sub?'<small>'+esc(st.sub)+'</small>':'')+'</button>';
+    h+='<button class="'+cls+'" type="button" data-plan="'+esc(o.n)+'" style="'+planBox(o,tall)+'" aria-label="'+esc(say)+'"><b>'+esc(tall&&o.ts||o.s||o.n)+'</b>'+(st.temp&&!hud?'<small>'+esc(st.temp)+'</small>':'')+'</button>';
   }
   for(const w of PLAN_WALLS) h+='<span class="pwall" aria-hidden="true" style="'+planBox(w,tall)+'"></span>';
   for(const b of PLAN_BAYS){
@@ -1108,19 +1390,24 @@ function planHtml(mini){
     h+=mini?'<span class="bay'+cl+(s.bad?' bad':'')+'" style="'+planBox(b,false)+'">'+fill+'</span>'
       :'<button class="bay'+cl+(s.bad?' bad':'')+(tall?' tv':'')+'" type="button" data-bay="'+esc(b.dev)+'" style="'+planBox(b,tall)+'" aria-label="'+esc(say)+'">'+fill+'</button>';
   }
+  h+=treesHtml(tall,mini);
+  if(!mini) h+=poolHud(PLAN.find(o=>o.k==='pool'),tall);
+  if(!mini) h+=pinsHtml(tall,pins);
   h+='</div>';
-  if(!mini) h+='<p class="plan-legend"><span><i></i>Lumière allumée</span><span><i class="dot"></i>Ne répond pas</span><span><i class="glass"></i>Baie vitrée</span><span>Touche une baie : son store s’ouvre ou se ferme</span></p>';
+  if(!mini) h+='<p class="plan-legend"><span><i></i>Lumière allumée</span><span><i class="dot"></i>Ne répond pas</span><span><i class="glass"></i>Baie vitrée</span><span>Touche un bouton ou une baie pour allumer, ouvrir ou fermer</span></p>';
   return h;
 }
 function miniPlan(){
   const lit=PLAN.filter(o=>roomState(o).lit).map(o=>o.n);
   const txt=lit.length?'Allumé : '+lit.join(', '):'Tout est éteint';
   return '<button class="miniplan" type="button" id="go-plan" aria-label="Le Nid, '+esc(txt)+'. Ouvrir le plan">'+planHtml(true)
-    +'<span class="mp-cap"><span><b>Le Nid</b><small>'+esc(txt)+'</small></span><span class="mp-go">Plan ›</span></span></button>';
+    +'<span class="mp-cap"><span><b>Le Nid</b><small>'+esc(txt)+'</small></span><span class="mp-go">Agrandir ›</span></span></button>';
 }
 function planSheetHtml(id){
+  if(String(id).indexOf('dev:')===0){ const d=data.devices[id.slice(4)]; return d?'<div class="list">'+devRow(d)+'</div>':'<p class="muted">Cet appareil n’est plus dans Homey.</p>'; }
   if(String(id).indexOf('bay:')===0){ const d=bayDev(id.slice(4)); return d?'<div class="list">'+devRow(d)+'</div>':'<p class="muted">Ce store ne répond plus.</p>'; }
-  const devs=roomDevs(id);
+  const devs=roomDevs(id), pd=id==='Piscine'&&poolDev();
+  if(pd) return '<div class="pool-panel">'+poolBits(pd,false,true)+'</div>'+poolSpeedHtml(pd)+poolHydHtml(pd)+(devs.length>1?'<div class="list">'+devs.filter(d=>d!==pd).map(devRow).join('')+'</div>':'');
   if(!devs.length) return '<p class="muted">Rien de relié à Homey dans cette pièce. Ce qui s’y trouve se pilote dans l’appli Maison.</p>';
   return '<div class="list">'+devs.map(devRow).join('')+'</div>';
 }
@@ -1144,7 +1431,7 @@ function renderRooms(){
   const all=roomsView();
   const pv=store.get('roomsView','plan')!=='list';
   const seg='<div class="view-seg" role="group" aria-label="Affichage"><button type="button" data-rview="plan" aria-pressed="'+pv+'">Plan</button><button type="button" data-rview="list" aria-pressed="'+(!pv)+'">Liste</button></div>';
-  if(pv) return '<div class="sec-row" style="margin-top:4px"><h3 class="sec">Le Nid</h3><div class="sec-tools"><button class="btn small wall-go" type="button" id="wall-go">Plein écran</button>'+seg+'</div></div>'+planHtml();
+  if(pv) return '<div class="sec-row" style="margin-top:4px"><h3 class="sec">Le Nid</h3><div class="sec-tools">'+seg+'</div></div>'+planHtml();
   if(!all.length) return '<div class="sec-row" style="margin-top:4px"><h3 class="sec">Pièces</h3>'+seg+'</div><p class="muted">Aucun appareil pour l’instant.</p>';
   const rv=all.filter(r=>!r.off).map(r=>({id:r.id,name:r.name,devs:r.devs.filter(x=>!x.off).map(x=>x.dev)})).filter(r=>r.devs.length);
   if(room!=='all'&&!rv.some(r=>r.id===room)) room='all';
@@ -1166,6 +1453,61 @@ function renderWall(){
     +'<div class="wall-state"><b>'+esc(st)+'</b>'+esc(lit.length?'Allumé : '+lit.join(', '):'Tout est éteint')+'</div>'
     +'<button class="btn small" type="button" id="wall-exit">Quitter</button></div>'
     +'<div class="wall-plan">'+planHtml()+'</div>';
+}
+// Accueil : l'heure, la météo, les points à regarder, puis le grand plan qui pilote tout
+let wx=store.get('wx',null), wxBusy=false;
+const WMO=c=>c===0?'Ensoleillé':c<=2?'Éclaircies':c===3?'Nuageux':c<=48?'Brouillard':c<=57?'Bruine':c<=67?'Pluie':c<=77?'Neige':c<=82?'Averses':'Orage';
+async function wxLoad(force){
+  const g=store.get('geo',null); if(!g||wxBusy) return;
+  if(!force&&wx&&wx.lat===g.lat&&wx.lon===g.lon&&Date.now()-wx.at<30*60000) return;
+  wxBusy=true;
+  try{
+    const u='https://api.open-meteo.com/v1/forecast?latitude='+g.lat+'&longitude='+g.lon+'&current=temperature_2m,weather_code&hourly=temperature_2m,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,weather_code&forecast_days=2&timezone=auto';
+    const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error('meteo');
+    wx={at:Date.now(),lat:g.lat,lon:g.lon,j:await r.json()}; store.set('wx',wx); render();
+  }catch(e){} finally{ wxBusy=false; }
+}
+function outTemp(){
+  const d=Object.values(data.devices||{}).find(x=>x.available!==false&&/terrasse nord|ext[ée]rieur|dehors/i.test(x.name)&&x.capabilitiesObj&&x.capabilitiesObj.measure_temperature&&typeof x.capabilitiesObj.measure_temperature.value==='number');
+  return d?d.capabilitiesObj.measure_temperature.value:null;
+}
+function wxHtml(){
+  const g=store.get('geo',null), j=wx&&wx.j, t0=outTemp();
+  const cur=t0!==null?t0:(j&&j.current&&typeof j.current.temperature_2m==='number'?j.current.temperature_2m:null);
+  let line='';
+  try{ if(j&&j.hourly&&j.daily){
+    const H=new Date().getHours(), today=j.daily.time[0];
+    if(H>=19&&j.daily.time.length>1) line='Demain : '+WMO(j.daily.weather_code[1]).toLowerCase()+', '+nf0.format(j.daily.temperature_2m_min[1])+'° → '+nf0.format(j.daily.temperature_2m_max[1])+'°';
+    else{
+      const idx=[]; j.hourly.time.forEach((t,i)=>{ if(t.slice(0,10)===today&&+t.slice(11,13)>=H) idx.push(i); });
+      const temps=idx.map(i=>j.hourly.temperature_2m[i]); let trend='';
+      if(temps.length){ const mx=Math.max(...temps), mn=Math.min(...temps), c=cur!==null?cur:temps[0];
+        if(mx>c+1) trend='↗ '+nf0.format(mx)+'° vers '+(+j.hourly.time[idx[temps.indexOf(mx)]].slice(11,13))+' h';
+        else if(mn<c-1) trend='↘ '+nf0.format(mn)+'° ce soir'; else trend='→ stable'; }
+      const rain=idx.find(i=>(j.hourly.precipitation_probability[i]||0)>=50);
+      line=WMO(j.daily.weather_code[0])+(trend?' · '+trend:'')+(rain!==undefined?' · pluie vers '+(+j.hourly.time[rain].slice(11,13))+' h':'');
+    }
+  } }catch(e){ line=''; }
+  return '<b>'+(cur!==null?nf0.format(cur)+'°':'–')+'</b><small>'+esc(line||(g?'Dehors · prévisions en cours…':'Dehors'))+'</small>'
+    +(!g?'<button class="linkbtn" type="button" id="wx-on">Afficher la tendance du jour</button>':'');
+}
+function renderHomeBig(wall){
+  const tm=wallTime(), it=watchItems(), n=it.length;
+  let h='';
+  if(mode==='demo') h+='<div class="note"><span>Démo avec des appareils d’exemple.</span><button class="btn small" type="button" id="open-settings">Connecter mon Homey</button></div>';
+  h+='<div class="hb-top"><div class="hb-clock"><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div></div>'
+    +'<div class="hb-wx">'+wxHtml()+'</div>'
+    +'<button class="hb-watch'+(n?' warn':'')+'" type="button" id="watch"><b>'+(n?n+(n>1?' points à regarder':' point à regarder'):'Tout va bien à la maison')+'</b><small>'+esc(n?it.slice(0,2).map(i=>i.txt).join(' · ')+(n>2?'…':''):summary())+'</small></button></div>';
+  h+='<div class="hb-plan">'+planHtml()+'</div>';
+  h+='<div class="hb-tools">'+(isWide()?'<button class="btn small" type="button" id="'+(wall?'wall-exit':'wall-go')+'">'+(wall?'Quitter le plein écran':'Plein écran')+'</button>':'')
+    +'<button class="btn small'+(pinEdit?' primary':'')+'" type="button" id="pin-edit">'+(pinEdit?I('check')+'Terminé':'Déplacer les boutons')+'</button>'
+    +(pinEdit?'<button class="btn small" type="button" id="pin-reset">Remettre en place</button>':'<button class="btn small" type="button" id="plan-small">Réduire le plan</button>')+'</div>';
+  h+='<nav class="hb-nav" aria-label="Rubriques"><button type="button" data-go="rooms">'+I('rooms')+'Pièces</button><button type="button" data-go="share">'+I('share')+'Partager</button><button type="button" data-go="apps">'+I('apps')+'Applis</button></nav>';
+  let fl=homeFlows(); const now=nowScene(fl); if(now) fl=[now].concat(fl.filter(f=>f!==now));
+  h+='<div class="hb-more">'+nightBtn()
+    +(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3><button class="linkbtn" type="button" id="arrange">Ranger</button></div><div class="scenes">'+fl.map(f=>sceneBtn(f,f===now)).join('')+'</div>':'')
+    +camsHtml()+'</div>';
+  return h;
 }
 function getShares(){
   let s=store.get('shares'+sfx(),null);
@@ -1239,9 +1581,12 @@ function renderGuest(g,isPrev){
   return h+'</p>';
 }
 function render(){
+  if(pinDrag) return;
   const g=mode==='guest'?guest:preview;
-  const wall=!g&&tab==='rooms'&&store.get('roomsView','plan')!=='list'&&store.get('wall',false)===true&&isWide();
+  const big=store.get('homePlan','big')!=='small', hb=!g&&tab==='home'&&big;
+  const wall=hb&&store.get('wall',false)===true&&isWide();
   document.body.classList.toggle('wall',wall);
+  document.body.classList.toggle('homebig',hb);
   $('#hello').textContent=g?'Bonjour '+g.n.replace(/\s*\(exemple\)$/,''):'Le Nid';
   const pill=$('#conn');
   const PL={demo:['','Démo'],loading:['','Connexion…'],local:['ok','À la maison'],remote:['ok','À distance'],off:['bad','Hors ligne']};
@@ -1252,12 +1597,14 @@ function render(){
   document.querySelectorAll('.tab').forEach(b=>{ if(b.dataset.tab===tab) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
   const v=$('#view');
   if(g){ v.innerHTML=renderGuest(g,!!preview); return; }
+  if(mode==='live'&&(conn==='loading'||(conn==='off'&&tab!=='share'))) document.body.classList.remove('homebig','wall');
   if(mode==='live'&&conn==='loading'){ v.innerHTML='<p class="loading">Connexion à Homey…</p>'; return; }
   if(mode==='live'&&conn==='off'&&tab!=='share'){
     v.innerHTML='<section class="status bad"><div class="status-dot" aria-hidden="true">!</div><div class="status-txt"><h2>Homey ne répond pas</h2><p>'+esc(lastErr)+'</p><div class="row-btns"><button class="btn small" type="button" id="retry">Réessayer</button><button class="btn small" type="button" id="open-settings">Réglages</button></div></div></section>';
     return;
   }
-  v.innerHTML=tab==='home'?renderHome():tab==='rooms'?(wall?renderWall():renderRooms()):tab==='share'?renderShare():renderApps();
+  v.innerHTML=tab==='home'?(big?renderHomeBig(wall):renderHome()):tab==='rooms'?renderRooms():tab==='share'?renderShare():renderApps();
+  if(watchSheet&&!$('#sheet').hidden) $('#sheet-body').innerHTML=watchHtml();
   if(planRoom&&!$('#sheet').hidden) $('#sheet-body').innerHTML=planSheetHtml(planRoom);
   if(nightSheet&&!$('#sheet').hidden) $('#sheet-body').innerHTML=nightHtml();
 }
@@ -1267,7 +1614,7 @@ function openSheet(title,html,actions){
   $('#sheet-title').textContent=title; $('#sheet-body').innerHTML=html; sheetActions=actions||{};
   $('#sheet').hidden=false; $('#sheet-card').scrollTop=0; document.body.style.overflow='hidden';
 }
-function closeSheet(){ $('#sheet').hidden=true; document.body.style.overflow=''; sheetActions={}; planRoom=null; nightSheet=false; }
+function closeSheet(){ $('#sheet').hidden=true; document.body.style.overflow=''; sheetActions={}; planRoom=null; nightSheet=false; watchSheet=false; }
 function setMsg(id,txt,cls){ const el=$('#'+id); if(el){ el.textContent=txt; el.className='form-msg'+(cls?' '+cls:''); } }
 async function copyText(text,fallbackId){
   try{ await navigator.clipboard.writeText(text); return true; }
@@ -1446,13 +1793,14 @@ function openSettings(){
   ['local','remote'].forEach(k=>{ const i=$('#cf-'+k); i.addEventListener('input',()=>{ $('#cf-'+k+'-h').textContent=normAddr(i.value); }); });
 }
 // Lien de branchement pour un autre appareil : adresses + clé, lus au démarrage (#setup=…)
-function setupLink(){ return location.href.split('#')[0]+'#setup='+b64e(JSON.stringify({l:cfg.localRaw||'',r:cfg.remoteRaw||'',k:cfg.key})); }
+function setupLink(){ return location.href.split('#')[0]+'#setup='+b64e(JSON.stringify({l:cfg.localRaw||'',r:cfg.remoteRaw||'',k:cfg.key,p:store.get('pins',null)})); }
 let setupGot=false;
 function readSetup(){
   const m=location.hash.match(/^#setup=([A-Za-z0-9_-]+)$/); if(!m) return;
   try{
     const p=JSON.parse(b64d(m[1]));
     if(typeof p.k!=='string'||!p.k||p.k.length>300||typeof p.l!=='string'||typeof p.r!=='string') throw new Error('bad');
+    if(p.p&&typeof p.p==='object'&&!store.get('pins',null)) store.set('pins',cleanPins(p.p));
     if(cfg&&cfg.key===p.k) return;
     cfg={localRaw:p.l,remoteRaw:p.r,local:normAddr(p.l),remote:normAddr(p.r),key:p.k}; store.set('cfg',cfg);
     if(mode!=='guest'){ mode='live'; conn='loading'; base=''; }
@@ -1460,7 +1808,7 @@ function readSetup(){
   }catch(e){ setTimeout(()=>toast('Ce lien de branchement est illisible. Renvoie-le depuis l’iPhone.','bad'),300); }
 }
 function exportCode(){
-  return 'MAMAISON1.'+b64e(JSON.stringify({l:cfg.localRaw||'',r:cfg.remoteRaw||'',k:cfg.key,h:store.get('home',null),s:store.get('shares',[]),y:store.get('layout',null)}));
+  return 'MAMAISON1.'+b64e(JSON.stringify({l:cfg.localRaw||'',r:cfg.remoteRaw||'',k:cfg.key,h:store.get('home',null),s:store.get('shares',[]),y:store.get('layout',null),q:store.get('pins',null)}));
 }
 async function importSettings(){
   const raw=($('#cf-import').value||'').replace(/\s+/g,'');
@@ -1475,6 +1823,7 @@ async function importSettings(){
   if(Array.isArray(p.h)) store.set('home',p.h.filter(x=>typeof x==='string'));
   if(Array.isArray(p.s)) store.set('shares',p.s.filter(s=>s&&typeof s.id==='string'&&typeof s.n==='string'&&typeof s.k==='string'&&Array.isArray(s.b)&&s.b.every(x=>x&&typeof x.i==='string'&&typeof x.n==='string'&&(x.t==='flow'||x.t==='advancedflow'))));
   if(p.y&&Array.isArray(p.y.rooms)) store.set('layout',p.y);
+  if(p.q&&typeof p.q==='object') store.set('pins',cleanPins(p.q));
   render(); toast('Réglages importés');
 }
 async function saveSettings(b){
@@ -1574,6 +1923,10 @@ function devClick(b){
 }
 $('#view').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b) return;
+  if(b.dataset.pin){ if(!pinEdit) pinTap(b.dataset.pin); return; }
+  if(b.dataset.tree){ treeTap(+b.dataset.tree-1); return; }
+  if(b.dataset.pcap){ poolTap(b.dataset.pcap); return; }
+  if(b.dataset.go){ tab=b.dataset.go; store.set('tab',tab); pinEdit=false; render(); window.scrollTo(0,0); return; }
   if(b.dataset.flow){ runScene(b); return; }
   if(b.dataset.plan){ openRoom(b.dataset.plan); return; }
   if(b.dataset.bay){ toggleBay(b.dataset.bay); return; }
@@ -1584,7 +1937,15 @@ $('#view').addEventListener('click',e=>{
   switch(b.id){
     case 'allclose': closeAll(b); return;
     case 'night': openNight(); return;
-    case 'go-plan': tab='rooms'; store.set('tab',tab); store.set('roomsView','plan'); render(); window.scrollTo(0,0); return;
+    case 'go-plan': store.set('homePlan','big'); render(); window.scrollTo(0,0); return;
+    case 'plan-small': store.set('homePlan','small'); pinEdit=false; render(); window.scrollTo(0,0); return;
+    case 'watch': openWatch(); return;
+    case 'pin-edit': pinEdit=!pinEdit; render(); toast(pinEdit?'Fais glisser les boutons dans les pièces, puis touche « Terminé ».':'Boutons rangés'); return;
+    case 'pin-reset': if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Toucher encore pour confirmer'; return; } store.del('pins'+sfx()); render(); toast('Boutons remis à leur place'); return;
+    case 'wx-on':
+      if(!navigator.geolocation){ toast('Position indisponible sur cet appareil.','bad'); return; }
+      navigator.geolocation.getCurrentPosition(pos=>{ store.set('geo',{lat:+pos.coords.latitude.toFixed(2),lon:+pos.coords.longitude.toFixed(2)}); wxLoad(true); toast('Météo du jour activée'); },()=>toast('Position refusée : pas de tendance météo.','bad'),{timeout:15000,maximumAge:86400000});
+      return;
     case 'wall-go': store.set('wall',true); render(); window.scrollTo(0,0); return;
     case 'wall-exit': store.set('wall',false); render(); return;
     case 'ask': openAsk(); return;
@@ -1611,6 +1972,33 @@ $('#view').addEventListener('click',e=>{
     toast(mode==='demo'?'Retiré de la liste.':'Retiré. Supprime aussi sa clé dans Homey.');
   }
 });
+// Déplacer les boutons sur le plan (mode « Déplacer les boutons »)
+$('#view').addEventListener('pointerdown',e=>{
+  if(!pinEdit) return; const b=e.target.closest('.pin'); if(!b) return;
+  pinDrag={b,plan:b.closest('.plan'),id:b.dataset.pin,pid:e.pointerId,moved:false};
+  try{ b.setPointerCapture(e.pointerId); }catch(_){}
+  b.classList.add('drag'); e.preventDefault();
+});
+$('#view').addEventListener('pointermove',e=>{
+  const g=pinDrag; if(!g||e.pointerId!==g.pid) return;
+  const r=g.plan.getBoundingClientRect();
+  g.lx=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)); g.ly=Math.max(0,Math.min(1,(e.clientY-r.top)/r.height));
+  g.b.style.left=(g.lx*100)+'%'; g.b.style.top=(g.ly*100)+'%'; g.moved=true;
+});
+function pinEnd(){
+  const g=pinDrag; if(!g) return; pinDrag=null; g.b.classList.remove('drag');
+  if(g.moved){
+    const tall=g.plan.classList.contains('tall'), X=tall?PLAN_W*(1-g.ly):PLAN_W*g.lx, Y=tall?PLAN_H*(1-g.lx):PLAN_H*(1-g.ly);
+    let room=null; for(const o of PLAN) if(X>=o.x&&X<=o.x+o.w&&Y>=o.y&&Y<=o.y+o.h) room=o;
+    if(room){
+      const m=store.get('pins'+sfx(),{})||{}; m[g.id]={r:room.n,fx:+((X-room.x)/room.w).toFixed(3),fy:+((Y-room.y)/room.h).toFixed(3)}; store.set('pins'+sfx(),m);
+      const d=data.devices[g.id]; toast((d?devName(d):'Bouton')+' → '+(room.t||room.s||room.n));
+    } else toast('Pose le bouton dans une pièce.','bad');
+  }
+  render();
+}
+$('#view').addEventListener('pointerup',pinEnd);
+$('#view').addEventListener('pointercancel',pinEnd);
 $('#photo-input').addEventListener('change',async e=>{
   const f=e.target.files&&e.target.files[0], z=photoZone; e.target.value=''; photoZone=null;
   if(!f||!z) return;
@@ -1623,6 +2011,11 @@ $('#photo-input').addEventListener('change',async e=>{
 });
 $('#sheet').addEventListener('click',e=>{
   if(e.target.closest('[data-close]')){ closeSheet(); return; }
+  const ig=e.target.closest('button[data-ign]'); if(ig){ const m=store.get('ign'+sfx(),{})||{}; m[ig.dataset.ign]=Date.now()+7*864e5; store.set('ign'+sfx(),m); render(); toast('Masqué pour 7 jours'); return; }
+  if(e.target.closest('[data-ign-reset]')){ store.del('ign'+sfx()); render(); return; }
+  const pc=e.target.closest('button[data-pcap]'); if(pc){ poolTap(pc.dataset.pcap); return; }
+  const ps=e.target.closest('button[data-pspeed]'); if(ps){ poolSpeed(ps.dataset.pspeed); return; }
+  const ph=e.target.closest('button[data-phyd]'); if(ph){ poolHyd(ph.dataset.phyd); return; }
   const db=e.target.closest('button[data-dev]'); if(db&&devClick(db)) return;
   const b=e.target.closest('button[id]'); if(b&&sheetActions[b.id]) sheetActions[b.id](b);
 });
@@ -1645,6 +2038,8 @@ if(setupGot) setTimeout(()=>toast('Réglages reçus de ton iPhone : connexion à
 if(mode==='demo'){ data=makeDemo(); conn='demo'; }
 render();
 if(mode==='live') refresh();
+wxLoad();
+setInterval(()=>wxLoad(),10*60000);
 if(SETUP&&mode==='demo') setTimeout(openSettings,400);
 })();
 </script>
