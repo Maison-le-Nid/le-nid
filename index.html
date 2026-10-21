@@ -80,6 +80,7 @@ h1{font-family:var(--serif);font-size:24px;line-height:1.1;margin:0;color:var(--
 .allclose small{display:block;color:var(--ink-2);font-size:13px}
 .allclose.busy{opacity:.55;pointer-events:none}
 a.allclose{color:inherit;text-decoration:none}
+a.btn{text-decoration:none}
 .cams{margin-top:22px}
 .cams .sec{margin-bottom:0}
 
@@ -160,6 +161,8 @@ a.allclose{color:inherit;text-decoration:none}
 .bay::before{content:"";position:absolute;inset:-9px}
 .bay i{position:absolute;left:0;top:0;width:100%;height:100%;background:var(--ink);opacity:.72;pointer-events:none}
 .bay.bad{border-color:var(--bad);border-style:dashed}
+.bay.fixe{cursor:default;pointer-events:none}
+.bay.fixe::before{display:none}
 .miniplan{display:block;width:100%;margin-top:12px;padding:0;border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--bg);text-align:left;cursor:pointer;overflow:hidden}
 .miniplan .plan{border:0;border-radius:0;pointer-events:none}
 .miniplan .pr{border-width:1px}
@@ -549,6 +552,7 @@ let base='', lastErr='';
 let data={zones:{},devices:{},flows:[],apps:null};
 let tab=store.get('tab','home'); if(!['home','rooms','share','apps'].includes(tab)) tab='home';
 let room='all', preview=null, flash={id:'',until:0}, sheetActions={}, photoZone=null;
+const SETUP=((location.hash.match(/^#homey=([a-f0-9]{24})$/i)||[])[1]||'').toLowerCase();
 const sfx=()=>mode==='demo'?'Demo':'';
 
 /* ---------- Démo ---------- */
@@ -943,7 +947,7 @@ function devRow(d){
 }
 /* Le plan : x le long de la maison, y de l’arrière (0) vers la piscine, en mètres. Plan simplifié, pas à l’échelle exacte. */
 // D'après le plan de masse : à l'arrière (nord-ouest, en haut), le garage, l'allée en pente
-// (la descente) qui y mène, et l'escalier hachuré le long de la façade jusqu'à l'entrée.
+// (la descente) qui y mène.
 // Piscine devant (sud-est).
 // Bloc arrière d'environ 11 × 11 m coupé dans la longueur : buanderie (11 × 3) collée à la maison,
 // garage (11 × 8) derrière.
@@ -952,24 +956,27 @@ const PLAN=[
   {n:'Garage',x:2.4,y:0.3,w:12.9,h:5.66},
   {n:'Buanderie',s:'Buanderie · arrière-cuisine',t:'Buanderie et arrière-cuisine',also:['Arrière Cuisine'],x:2.4,y:5.96,w:12.9,h:2.14,v:1},
   {n:'Descente',s:'Descente du garage',dev:'lumière descente',x:15.3,y:0.3,w:19.7,h:3.5,k:'ramp'},
-  {n:'Chambre Artiste',s:'Ch. artiste',x:0,y:8.1,w:3.55,h:3.4},
-  {n:'Salle De Bain Artiste',s:'Bain artiste',x:3.55,y:8.1,w:2.2,h:3.4},
-  {n:'Bureau',x:5.75,y:8.1,w:3.55,h:3.4},
-  {n:'Chambre De Paul',s:'Ch. Paul',x:0,y:12.7,w:3.55,h:3.4},
-  {n:'Salle De Bain Paul',s:'Bain Paul',x:3.55,y:12.7,w:2.2,h:3.4},
-  {n:'Chambre Piscine',s:'Ch. piscine',x:5.75,y:12.7,w:3.55,h:3.4},
-  {n:'Cuisine',x:9.3,y:8.1,w:6.6,h:8,k:'zone'},
-  {n:'Entrée',x:15.9,y:8.1,w:4,h:8,k:'zone'},
-  {n:'Salon',x:19.9,y:8.1,w:8,h:8,k:'zone'},
-  {n:'Salle De Bain Ma Chambre',s:'Salle de bain',x:31,y:8.1,w:4,h:3.7},
-  {n:'Ma Chambre',x:27.9,y:8.1,w:7.1,h:8,notch:[4/7.1,3.7/8],nx:1},
+  // Ta suite côté garage ; sa salle de bain côté cuisine, à l'arrière
+  {n:'Ma Chambre',x:0,y:8.1,w:7.1,h:8,notch:[4/7.1,3.7/8],nx:1},
+  {n:'Salle De Bain Ma Chambre',s:'Salle de bain',x:3.1,y:8.1,w:4,h:3.7},
+  // Une seule grande pièce : le salon longe toute la piscine ; cuisine et entrée à l'arrière
+  {n:'Salon',x:7.1,y:8.1,w:18.6,h:8,k:'zone',notch:[11.4/18.6,4/8]},
+  {n:'Cuisine',x:7.1,y:8.1,w:6.95,h:4,k:'zone'},
+  {n:'Entrée',x:14.05,y:8.1,w:4.45,h:4,k:'zone'},
+  // Les chambres de Paul, piscine, artiste et le bureau, côté descente
+  {n:'Bureau',x:25.7,y:8.1,w:3.55,h:3.4},
+  {n:'Salle De Bain Artiste',s:'Bain artiste',x:29.25,y:8.1,w:2.2,h:3.4},
+  {n:'Chambre Artiste',s:'Ch. artiste',x:31.45,y:8.1,w:3.55,h:3.4},
+  {n:'Chambre Piscine',s:'Ch. piscine',x:25.7,y:12.7,w:3.55,h:3.4},
+  {n:'Salle De Bain Paul',s:'Bain Paul',x:29.25,y:12.7,w:2.2,h:3.4},
+  {n:'Chambre De Paul',s:'Ch. Paul',x:31.45,y:12.7,w:3.55,h:3.4},
   {n:'Piscine',x:2.6,y:16.8,w:22.9,h:3.5,k:'pool'},
   {n:'Extérieur',x:26.2,y:16.8,w:8.8,h:3.5,k:'out'}
 ];
-const PLAN_CORR={x:0,y:11.5,w:9.3,h:1.2};
-const PLAN_DECO=[{t:'Escalier vers l’entrée',x:15.3,y:6.4,w:19.7,h:1.7,v:1}];
+const PLAN_CORR={x:25.7,y:11.5,w:9.3,h:1.2};
+const PLAN_DECO=[];
 // Cuisine, entrée et salon : une seule grande pièce ouverte (murs extérieurs seulement)
-const PLAN_WALLS=[{x:9.3,y:8.1,w:18.6,h:8}];
+const PLAN_WALLS=[{x:7.1,y:8.1,w:18.6,h:8}];
 const tallPlan=()=>window.matchMedia('(max-width: 699px)').matches;
 let planRoom=null;
 function roomDevs(name){
@@ -992,15 +999,17 @@ function planBox(o,tall){
     else if(!tall) s+=';clip-path:polygon(0 0,100% 0,100% '+B+','+C+' '+B+','+C+' 100%,0 100%)';
     else if(!o.nx) s+=';clip-path:polygon(0 0,100% 0,100% '+B+','+C+' '+B+','+C+' 100%,0 100%)';
     else s+=';clip-path:polygon(0 0,'+C+' 0,'+C+' '+D+',100% '+D+',100% 100%,0 100%)';
-    s+=(tall&&o.nx)?';justify-content:flex-end;padding-bottom:12px':';justify-content:flex-start;padding-top:12px';
+    s+=(tall&&o.nx)?';justify-content:flex-end;padding-bottom:12px':';justify-content:flex-start;padding-top:'+(tall?'12px':'calc(1.6% + 10px)');
   }
   return s;
 }
-// Baies vitrées côté piscine, chacune avec son store (noms Homey)
+// Baies vitrées côté piscine (avec leur store ou rideau quand il y en a un, noms Homey)
 const PLAN_BAYS=[
-  {dev:'store baie gauche 1',x:20.2,w:1.75},{dev:'store baie gauche 2',x:22.1,w:1.75},
-  {dev:'store baie droite 1',x:24,w:1.75},{dev:'store baie droite 2',x:25.9,w:1.75},
-  {dev:'store chambre piscine',x:6.5,w:2},{dev:'store paul',x:0.8,w:2}
+  {x:1.5,w:3.5,dev:'rideau ma chambre'},
+  {x:8.9,w:3,dev:'store baie gauche 2'},{x:13.9,w:3,dev:'store baie gauche 1'},
+  {x:18.55,w:3,dev:'store baie droite 2'},{x:22.4,w:3,dev:'store baie droite 1'},
+  {x:26.5,w:2,dev:'store chambre piscine'},
+  {x:32.2,w:2,dev:'store paul'}
 ].map(b=>Object.assign({y:15.65,h:0.9},b));
 const bayDev=k=>Object.values(data.devices||{}).find(d=>nk(d.name)===k);
 function roomState(o){
@@ -1032,7 +1041,8 @@ function planHtml(mini){
   }
   for(const w of PLAN_WALLS) h+='<span class="pwall" aria-hidden="true" style="'+planBox(w,tall)+'"></span>';
   for(const b of PLAN_BAYS){
-    const d=bayDev(b.dev); if(!d) continue;
+    const d=b.dev?bayDev(b.dev):null;
+    if(!d){ h+='<span class="bay fixe" aria-hidden="true" style="'+planBox(b,tall)+'"></span>'; continue; }
     const s=bayState(d), cl=s.closed===null?'':s.closed>.95?' shut':s.closed>.05?' half':' open';
     const fill=s.closed===null?'':'<i style="'+(tall?'width':'height')+':'+Math.round(s.closed*100)+'%"></i>';
     const say=devName(d)+', '+stateText(d);
@@ -1040,7 +1050,7 @@ function planHtml(mini){
       :'<button class="bay'+cl+(s.bad?' bad':'')+(tall?' tv':'')+'" type="button" data-bay="'+esc(b.dev)+'" style="'+planBox(b,tall)+'" aria-label="'+esc(say)+'">'+fill+'</button>';
   }
   h+='</div>';
-  if(!mini) h+='<p class="plan-legend"><span><i></i>Lumière allumée</span><span><i class="dot"></i>Ne répond pas</span><span><i class="glass"></i>Baie et son store</span><span>Touche une pièce ou une baie</span></p>';
+  if(!mini) h+='<p class="plan-legend"><span><i></i>Lumière allumée</span><span><i class="dot"></i>Ne répond pas</span><span><i class="glass"></i>Baie vitrée</span><span>Touche une pièce ou une baie</span></p>';
   return h;
 }
 function miniPlan(){
@@ -1316,11 +1326,13 @@ function openPhoto(z){
 
 function openSettings(){
   const c=cfg||{}, trig=data.flows.filter(f=>f.trig), nDev=Object.keys(data.devices||{}).length;
+  const rr=c.remoteRaw||(c.key?'':SETUP);
   let h='';
+  if(SETUP&&mode!=='live') h+='<div class="note"><span><b>Il ne manque que ta clé.</b> Crée-la sur Homey, copie-la, puis reviens la coller ici.</span><a class="btn small primary" href="https://my.homey.app/homeys/'+SETUP+'/settings/system/api-keys" target="_blank" rel="noopener">Créer ma clé</a></div>';
   if(inClaude()) h+='<p class="note warn"><span>Ici, c’est l’aperçu dans Claude : il ne peut pas joindre ton Homey. La connexion marche depuis l’appli installée sur ton iPhone ou ton iPad.</span></p>';
   h+='<h3 class="sec">Connexion à Homey</h3>'
     +'<div class="field"><label for="cf-local">À la maison</label><input id="cf-local" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="IP du Homey, ex. 192.168.1.50" value="'+esc(c.localRaw||'')+'"><small id="cf-local-h">'+esc(c.local||'')+'</small></div>'
-    +'<div class="field"><label for="cf-remote">En déplacement</label><input id="cf-remote" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Identifiant Homey (24 caractères)" value="'+esc(c.remoteRaw||'')+'"><small id="cf-remote-h">'+esc(c.remote||'')+'</small></div>'
+    +'<div class="field"><label for="cf-remote">En déplacement</label><input id="cf-remote" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Identifiant Homey (24 caractères)" value="'+esc(rr)+'"><small id="cf-remote-h">'+esc(normAddr(rr))+'</small></div>'
     +'<div class="field"><label for="cf-key">Clé API</label><input id="cf-key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Colle la clé ici" value="'+esc(c.key||'')+'"><small>Elle reste sur cet appareil.</small></div>'
     +'<details class="help"><summary>Où trouver ces trois infos ?</summary><ol>'
     +'<li>Sur un ordinateur, ouvre <code>my.homey.app</code>, puis Réglages, Clés API, Nouvelle clé API. Appelle-la « Le Nid ».</li>'
@@ -1537,6 +1549,7 @@ readInvite();
 if(mode==='demo'){ data=makeDemo(); conn='demo'; }
 render();
 if(mode==='live') refresh();
+if(SETUP&&mode==='demo') setTimeout(openSettings,400);
 })();
 </script>
 </body></html>
