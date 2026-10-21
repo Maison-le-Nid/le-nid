@@ -584,6 +584,23 @@ body.homebig .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
 .pool-panel .pc.warn{background:var(--warn-bg);box-shadow:none}
 .pool-panel .pc.warn b{color:var(--warn)}
 .pool-speed>span{font-weight:500;color:var(--title)}
+/* Arbres : vert sauge plus soutenu */
+:root{--sage:#4f7343;--sage-ink:#2f4a27;--sage-bg:linear-gradient(180deg,#f4f8f0 0%,#e3ecdc 100%);--sage-line:rgba(79,115,67,.32)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--sage:#a9c99a;--sage-ink:#1f2d1b;--sage-bg:linear-gradient(180deg,#2c3a2a 0%,#223020 100%);--sage-line:rgba(169,201,154,.3)}}
+:root[data-theme="dark"]{--sage:#a9c99a;--sage-ink:#1f2d1b;--sage-bg:linear-gradient(180deg,#2c3a2a 0%,#223020 100%);--sage-line:rgba(169,201,154,.3)}
+.tree{background:var(--sage-bg);border-color:var(--sage-line)}
+.tree .i{stroke-width:2.2}
+/* iPad : boutons du plan plus grands ; petites pièces : nom en haut, boutons dessous */
+@media (min-width:700px){
+  .pin{width:38px;height:38px;margin:-19px 0 0 -19px}.pin .i{width:20px;height:20px}
+  .pin.sm{width:34px;height:34px;margin:-17px 0 0 -17px}.pin.sm .i{width:18px;height:18px}
+  .pin .pt{font-size:12.5px}
+  .tree{width:36px;height:36px;margin:-18px 0 0 -18px}.tree .i{width:21px;height:21px}
+  .plan .pr.pinned{justify-content:flex-start;padding-top:9px}
+  .plan .pr.pinned small,.plan .pr.pinned::after{display:none}
+  .plan .pr.pinned.strip{padding-top:4px}
+  .plan .pr.pinned.baytop{padding-top:22px}
+}
 /* Barre sous le plan : icônes en laiton */
 .hb-nav button .i{color:var(--title)}
 </style>
@@ -1257,18 +1274,21 @@ function cleanPins(o){ const out={}; if(!o||typeof o!=='object') return out;
   for(const [id,v] of Object.entries(o)) if(v&&typeof v.r==='string'&&PLAN.some(p=>p.n===v.r)&&isFinite(v.fx)&&isFinite(v.fy)) out[id]={r:v.r,fx:Math.max(0,Math.min(1,+v.fx)),fy:Math.max(0,Math.min(1,+v.fy))};
   return out; }
 // Place libre dans une pièce, loin de son nom (qui est au centre, ou en haut/bas pour les pièces en L)
-const smallRoom=(o,tall)=>tall&&!o.k&&!o.v&&o.w<5&&o.h<5;
+const smallRoom=(o,tall)=>!o.k&&!o.v&&o.w<5&&o.h<5;
+const stripRoom=(o,tall)=>!tall&&!o.k&&o.h<3; // bande étroite sur l'iPad (buanderie) : nom en haut, boutons en rang dessous
+const bayTop=o=>PLAN_BAYS.some(b=>b.x>=o.x&&b.x<o.x+o.w&&Math.abs(b.y+b.h/2-(o.y+o.h))<1);
 function spots(o,n,tall){
   if(smallRoom(o,tall)){ // iPhone : nom en haut, petits boutons en bas, deux par rang
     const cols=Math.min(n,2), out=[];
-    for(let i=0;i<n;i++){ const r=Math.floor(i/cols), c=i%cols, nc=Math.min(cols,n-r*cols); out.push({fx:.2+r*.34,fy:nc===1?.5:(c===0?.72:.28)}); }
+    for(let i=0;i<n;i++){ const r=Math.floor(i/cols), c=i%cols, nc=Math.min(cols,n-r*cols);
+      out.push(tall?{fx:.2+r*.34,fy:nc===1?.5:(c===0?.72:.28)}:{fx:nc===1?.5:(c===0?.3:.7),fy:.21+r*.34}); }
     return out;
   }
   let fx0=.1,fx1=.9,fy0=.1,fy1=.38;
   if(o.notch){ if(tall){ fx0=o.nx?.32:.08; fx1=o.nx?.92:.8; fy0=.56; fy1=.94; } else { fx0=.06; fx1=.94; fy0=.55; fy1=.74; } }
   else if(tall&&o.v){ fx0=.08; fx1=.62; fy0=.5; fy1=.5; }
   else if(tall){ fx0=.1; fx1=.38; fy0=.12; fy1=.88; }
-  else if(o.h<3){ fy0=.06; fy1=.26; }
+  else if(o.h<3){ fy0=fy1=.3; }
   else if(o.h<4){ fy0=.05; fy1=.2; }
   const W=tall?(fy1-fy0)*o.h:(fx1-fx0)*o.w, H=tall?(fx1-fx0)*o.w:(fy1-fy0)*o.h;
   const cols=Math.max(1,Math.min(n,Math.ceil(Math.sqrt(n*W/Math.max(H,.01))))), rows=Math.ceil(n/cols), out=[];
@@ -1287,7 +1307,7 @@ function pinList(tall){
   }
   for(const o of PLAN){
     const all=byRoom[o.n]||[]; if(!all.length) continue;
-    const sm=smallRoom(o,tall), auto=all.filter(x=>!x.sv), sp=spots(o,auto.length,tall);
+    const sm=smallRoom(o,tall)||stripRoom(o,tall), auto=all.filter(x=>!x.sv), sp=spots(o,auto.length,tall);
     auto.forEach((x,i)=>out.push({d:x.d,o,fx:sp[i].fx,fy:sp[i].fy,sm}));
     for(const x of all) if(!auto.includes(x)) out.push({d:x.d,o,fx:+x.sv.fx,fy:+x.sv.fy,sm});
   }
@@ -1420,7 +1440,7 @@ function planHtml(mini){
   for(const o of PLAN){
     const st=roomState(o);
     const hud=!mini&&o.k==='pool'&&poolDev();
-    const cls='pr'+(o.k?' '+o.k:'')+(hud?' hud':'')+(st.lit?' lit':'')+(st.bad?' bad':'')+(!st.devs.length&&!o.k?' none':'')+(tall&&o.v?' vt':'')+(tall&&pinned.has(o.n)&&(o.v||smallRoom(o,tall))?' pinned':'');
+    const cls='pr'+(o.k?' '+o.k:'')+(hud?' hud':'')+(st.lit?' lit':'')+(st.bad?' bad':'')+(!st.devs.length&&!o.k?' none':'')+(tall&&o.v?' vt':'')+(pinned.has(o.n)&&((tall&&o.v)||smallRoom(o,tall)||stripRoom(o,tall))?' pinned'+(stripRoom(o,tall)?' strip':'')+(!tall&&smallRoom(o,tall)&&bayTop(o)?' baytop':''):'');
     if(mini){ h+='<span class="'+cls+'" style="'+planBox(o,false)+'"></span>'; continue; }
     const say=o.n+(st.sub?', '+st.sub:'')+(st.bad?', un appareil ne répond pas':'')+(st.devs.length?'':', rien de relié à Homey');
     h+='<button class="'+cls+'" type="button" data-plan="'+esc(o.n)+'" style="'+planBox(o,tall)+'" aria-label="'+esc(say)+'"><b>'+esc(tall&&o.ts||o.s||o.n)+'</b>'+(st.temp&&!hud?'<small>'+esc(st.temp)+'</small>':'')+'</button>';
