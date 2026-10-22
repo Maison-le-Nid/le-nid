@@ -614,6 +614,10 @@ body.homebig .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tree{background:radial-gradient(circle at 40% 35%,#7f9f70,#3c5a34);color:#0f1c0c}}
 :root[data-theme="dark"] .tree{background:radial-gradient(circle at 40% 35%,#7f9f70,#3c5a34);color:#0f1c0c}
 @media (prefers-reduced-motion: reduce){.ignite,.dim,.bay .mv,.pin.moving .i{animation:none}.bay i{transition:none}}
+/* Plein écran au mur : le plan seul */
+body.wall.visit .plan-legend,body.wall.visit .foot,body.wall.visit .hb-more{display:none}
+body.wall.visit .hb-plan{width:min(100%,calc((100vh - 175px) * 35 / 22.5))}
+body.wall.visit .hb-top{margin-bottom:8px}
 /* Le mot de la maison */
 .word{max-width:720px;margin:4px auto 16px;padding:14px 18px 16px;border-radius:22px;background:var(--face);box-shadow:var(--float-lo)}
 .word .sec{margin:0 0 6px}
@@ -1717,7 +1721,7 @@ const needName=(g,isPrev)=>!isPrev&&!!g.q&&!g.u;
 const isStandalone=()=>{ try{ return window.navigator.standalone===true||window.matchMedia('(display-mode: standalone)').matches; }catch(_){ return false; } };
 const packPins=o=>Object.entries(cleanPins(o||{})).map(([id,v])=>[id,v.r,Math.round(v.fx*1000)/1000,Math.round(v.fy*1000)/1000]);
 function unpackPins(a){ const o={}; if(Array.isArray(a)) for(const x of a.slice(0,80)) if(Array.isArray(x)&&typeof x[0]==='string'&&x[0].length<=64&&typeof x[1]==='string') o[x[0]]={r:x[1],fx:+x[2],fy:+x[3]}; return cleanPins(o); }
-function guestHash(g){ return '#invite='+b64e(JSON.stringify(Object.assign({v:1,n:g.n,a:g.a,k:g.k,g:g.g?1:0,b:g.b},g.m==='nid'?{m:'nid'}:{},g.q?{q:1}:{},g.w?{w:g.w}:{},g.p&&Object.keys(g.p).length?{p:packPins(g.p)}:{},g.u?{u:g.u}:{}))); }
+function guestHash(g){ return '#invite='+b64e(JSON.stringify(Object.assign({v:1,n:g.n,a:g.a,k:g.k,g:g.g?1:0,b:g.b},g.t?{t:g.t}:{},g.m==='nid'?{m:'nid'}:{},g.q?{q:1}:{},g.w?{w:g.w}:{},g.p&&Object.keys(g.p).length?{p:packPins(g.p)}:{},g.u?{u:g.u}:{}))); }
 const wordHtml=g=>g.w?'<section class="word"><h3 class="sec">Le mot de la maison</h3><p>'+esc(g.w)+'</p></section>':'';
 function welcomeHtml(g){
   return '<section class="welcome"><span class="logo welcome-logo" aria-hidden="true">'+((document.querySelector('.top .logo')||{}).innerHTML||'')+'</span><h2>Bienvenue au Nid</h2>'
@@ -1732,9 +1736,9 @@ function installTip(isPrev){
 function renderVisit(g,isPrev){
   let h='';
   if(isPrev) h+='<div class="note"><span>Aperçu de ce que voit '+esc(g.q?'ton invité':g.n)+'. Rien n’est lancé.</span><button class="btn small" type="button" id="preview-close">Fermer l’aperçu</button></div>';
-  const foot='<p class="foot">Le Nid a été partagé avec toi.'+(isPrev?'':(g.q?'<br><button class="linkbtn" type="button" id="guest-rename">Changer de prénom</button>':'')+'<br><button class="linkbtn" type="button" id="guest-quit">Retirer Le Nid de cet appareil</button>')+'</p>';
+  const foot='<p class="foot">Le Nid a été partagé avec toi.'+(isPrev?'':(g.q?'<br><button class="linkbtn" type="button" id="guest-rename">Changer de prénom</button>':'')+'<br><button class="linkbtn" type="button" id="guest-update">Mettre à jour Le Nid</button><br><button class="linkbtn" type="button" id="guest-quit">Retirer Le Nid de cet appareil</button>')+'</p>';
   if(needName(g,isPrev)) return h+welcomeHtml(g);
-  h+=installTip(isPrev);
+  if(!document.body.classList.contains('wall')) h+=installTip(isPrev);
   const word=wordHtml(g);
   if(!isPrev&&conn==='loading') return h+'<p class="loading">Connexion au Nid…</p>';
   if(!isPrev&&conn==='off') return h+'<section class="status bad"><div class="status-dot" aria-hidden="true">!</div><div class="status-txt"><h2>Le Nid ne répond pas</h2><p>'+esc(lastErr)+'</p><div class="row-btns"><button class="btn small" type="button" id="retry">Réessayer</button></div></div></section>'+foot;
@@ -1742,6 +1746,7 @@ function renderVisit(g,isPrev){
   h+='<div class="hb-top"><div class="hb-clock"><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div></div><div class="hb-wx">'+wxHtml()+'</div></div>';
   h+=word;
   h+='<div class="hb-plan">'+planHtml()+'</div>';
+  if(!isPrev&&isWide()){ const wall=document.body.classList.contains('wall'); h+='<div class="hb-tools"><button class="btn small" type="button" id="'+(wall?'wall-exit':'wall-go')+'">'+(wall?'Quitter le plein écran':'Plein écran')+'</button></div>'; }
   h+='<div class="hb-more">'+nightBtn()+(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3></div><div class="scenes">'+fl.map(f=>sceneBtn(f,false)).join('')+'</div>':'')+'</div>';
   return h+foot;
 }
@@ -1749,8 +1754,9 @@ function render(){
   if(pinDrag) return;
   const g=mode==='guest'?guest:preview;
   const big=store.get('homePlan','big')!=='small', hb=(!g&&tab==='home'&&big)||!!(g&&g.m==='nid');
-  const wall=hb&&store.get('wall',false)===true&&isWide();
+  const wall=hb&&store.get('wall',false)===true&&isWide()&&!preview;
   document.body.classList.toggle('wall',wall);
+  document.body.classList.toggle('visit',!!(g&&g.m==='nid'));
   document.body.classList.toggle('homebig',hb);
   $('#hello').textContent=g?(guestName(g,!!preview)?'Bonjour '+guestName(g,!!preview):'Bienvenue au Nid'):'Le Nid';
   const pill=$('#conn');
@@ -2026,7 +2032,7 @@ function openAsk(){
 }
 function inviteLink(s){
   const addr=mode==='demo'?'demo':((cfg&&(cfg.remote||cfg.local))||'');
-  return location.href.split('#')[0]+'#invite='+b64e(JSON.stringify(Object.assign({v:1,n:s.n,a:addr,k:s.k,g:s.g?1:0,b:s.b},s.m==='nid'?{m:'nid'}:{},s.q?{q:1}:{},s.w?{w:s.w}:{},s.m==='nid'&&Object.keys(store.get('pins'+sfx(),{})||{}).length?{p:packPins(store.get('pins'+sfx(),{}))}:{})));
+  return location.href.split('#')[0]+'#invite='+b64e(JSON.stringify(Object.assign({v:1,t:Date.now(),n:s.n,a:addr,k:s.k,g:s.g?1:0,b:s.b},s.m==='nid'?{m:'nid'}:{},s.q?{q:1}:{},s.w?{w:s.w}:{},s.m==='nid'&&Object.keys(store.get('pins'+sfx(),{})||{}).length?{p:packPins(store.get('pins'+sfx(),{}))}:{})));
 }
 const KEY_HELP={nid:'Sur my.homey.app : Réglages, Clés API, nouvelle clé à son nom. Coche seulement : voir et piloter les appareils, voir les zones, lancer les Flows.',
   btn:'Sur my.homey.app : Réglages, Clés API. Crée une clé à son nom en cochant uniquement le droit de lancer les Flows.'};
@@ -2067,11 +2073,8 @@ function openShareForm(){
 
 /* ---------- Invitation ----------
    Le lien reste dans l'adresse : ajouté à l'écran d'accueil, il garde les boutons. */
-function readInvite(){
-  const m=location.hash.match(/^#invite=([A-Za-z0-9_-]+)$/);
-  if(!m) return;
-  try{
-    const p=JSON.parse(b64d(m[1]));
+function parseInvite(code){
+    const p=JSON.parse(b64d(code));
     const nid=p.m==='nid';
     const okB=Array.isArray(p.b)&&(nid||p.b.length>0)&&p.b.length<=24&&p.b.every(x=>x&&/^[\w-]{1,64}$/.test(x.i)&&(x.t==='flow'||x.t==='advancedflow')&&typeof x.n==='string'&&x.n.length<=80);
     if(typeof p.n!=='string'||p.n.length>40||typeof p.k!=='string'||p.k.length>300||!okB||!(p.a==='demo'||/^https:\/\/[^\s/]+$/.test(p.a))) throw new Error('bad');
@@ -2080,11 +2083,40 @@ function readInvite(){
     if(p.q===1) g.q=1;
     if(typeof p.w==='string'&&p.w.trim()) g.w=p.w.trim().slice(0,300);
     if(nid&&Array.isArray(p.p)) g.p=unpackPins(p.p);
-    const u=typeof p.u==='string'&&p.u.trim().length<=40?p.u.trim():'', old=store.get('guest',null);
-    if(u) g.u=u; else if(g.q&&old&&old.k===g.k&&old.u) g.u=old.u;
-    if(!guest||guest.k!==g.k||JSON.stringify(guest.b)!==JSON.stringify(g.b)) store.del('guestBig');
-    guest=g; store.set('guest',guest); mode='guest';
+    if(typeof p.u==='string'&&p.u.trim()&&p.u.trim().length<=40) g.u=p.u.trim();
+    if(typeof p.t==='number'&&isFinite(p.t)) g.t=p.t;
+    return g;
+}
+// Le lien reste dans l'adresse : ajouté à l'écran d'accueil, il garde les boutons.
+// Une version plus récente collée sur cet appareil (« Mettre à jour Le Nid ») passe avant.
+function readInvite(){
+  const m=location.hash.match(/^#invite=([A-Za-z0-9_-]+)$/);
+  if(!m) return;
+  try{
+    const g=parseInvite(m[1]), old=store.get('guest',null);
+    let use=g;
+    if(old&&old.k===g.k&&(old.t||0)>(g.t||0)) use=old;
+    else if(!g.u&&g.q&&old&&old.k===g.k&&old.u) g.u=old.u;
+    if(!guest||guest.k!==use.k||JSON.stringify(guest.b)!==JSON.stringify(use.b)) store.del('guestBig');
+    guest=use; store.set('guest',guest); mode='guest';
   }catch(e){ setTimeout(()=>toast('Ce lien de partage est illisible. Demande-en un nouveau.','bad'),300); }
+}
+function openGuestUpdate(){
+  openSheet('Mettre à jour Le Nid','<p class="muted" style="margin-top:0">Sur ton iPhone : Partager, « Copier le lien », puis envoie-le sur cet appareil. Copie-le, colle-le ici et touche « Mettre à jour ».</p>'
+    +'<div class="field"><textarea id="gu-link" rows="4" autocapitalize="off" spellcheck="false" placeholder="Colle le lien ici" aria-label="Nouveau lien"></textarea></div>'
+    +'<p class="form-msg" id="gu-msg" role="status"></p><button class="btn primary block" type="button" id="gu-apply">Mettre à jour</button>',{'gu-apply':()=>{
+      const m=($('#gu-link').value||'').match(/#invite=([A-Za-z0-9_-]+)/);
+      let g=null; try{ if(m) g=parseInvite(m[1]); }catch(_){}
+      if(!g){ setMsg('gu-msg','Lien non reconnu. Recopie-le en entier.','bad'); return; }
+      if(!g.u&&guest&&guest.u) g.u=guest.u;
+      if(!g.t) g.t=Date.now();
+      const moved=!guest||guest.k!==g.k||guest.a!==g.a;
+      guest=g; store.set('guest',guest);
+      try{ history.replaceState(null,'',location.href.split('#')[0]+guestHash(guest)); }catch(_){}
+      closeSheet(); toast('Le Nid est à jour');
+      if(moved&&isVisitLive()){ conn='loading'; base=''; }
+      render(); if(isVisitLive()) refresh();
+  }});
 }
 
 /* ---------- Message ---------- */
@@ -2148,6 +2180,7 @@ $('#view').addEventListener('click',e=>{
       render(); window.scrollTo(0,0); toast('Bienvenue, '+nm+' !'); return; }
     case 'guest-rename': delete guest.u; store.set('guest',guest); try{ history.replaceState(null,'',location.href.split('#')[0]+guestHash(guest)); }catch(_){} render(); window.scrollTo(0,0); return;
     case 'tip-ok': store.set('tipInstall',true); render(); return;
+    case 'guest-update': openGuestUpdate(); return;
     case 'guest-size': store.set('guestBig',!guestBig(guest,false)); render(); return;
     case 'guest-quit':
       if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Toucher encore pour confirmer'; return; }
