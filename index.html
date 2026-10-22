@@ -614,6 +614,17 @@ body.homebig .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tree{background:radial-gradient(circle at 40% 35%,#7f9f70,#3c5a34);color:#0f1c0c}}
 :root[data-theme="dark"] .tree{background:radial-gradient(circle at 40% 35%,#7f9f70,#3c5a34);color:#0f1c0c}
 @media (prefers-reduced-motion: reduce){.ignite,.dim,.bay .mv,.pin.moving .i{animation:none}.bay i{transition:none}}
+/* Le mot de la maison */
+.word{max-width:720px;margin:4px auto 16px;padding:14px 18px 16px;border-radius:22px;background:var(--face);box-shadow:var(--float-lo)}
+.word .sec{margin:0 0 6px}
+.word p{margin:0;white-space:pre-line;font-size:15.5px;line-height:1.45;color:var(--ink)}
+/* Premier lancement chez l'invité */
+.welcome{max-width:440px;margin:28px auto 0;padding:28px 22px 24px;border-radius:28px;background:var(--face);box-shadow:var(--float);text-align:center}
+.welcome-logo{display:grid;width:64px;height:64px;margin:0 auto 14px}.welcome-logo svg{width:38px;height:38px}
+.welcome h2{margin:0 0 6px;font-size:24px;font-weight:500;color:var(--title)}
+.welcome p{margin:0 0 18px;color:var(--ink-2);font-size:15px}
+.welcome .field{text-align:left}
+.welcome input{font-size:18px}
 /* Barre sous le plan : icônes en laiton */
 .hb-nav button .i{color:var(--title)}
 </style>
@@ -712,6 +723,10 @@ let mode=guest?'guest':(cfg&&cfg.key?'live':'demo');
 let conn=mode==='demo'?'demo':'loading';
 let base='', lastErr='';
 let data={zones:{},devices:{},flows:[],apps:null};
+// Invité « Le Nid » : le plan et ses commandes, sans caméras ni réglages
+const isVisit=()=>!!((mode==='guest'&&guest&&guest.m==='nid')||(preview&&preview.m==='nid'));
+const isVisitLive=()=>mode==='guest'&&!!guest&&guest.m==='nid'&&guest.a!=='demo';
+const isDemoData=()=>mode==='demo'||(mode==='guest'&&!!guest&&guest.a==='demo');
 let tab=store.get('tab','home'); if(!['home','rooms','share','apps'].includes(tab)) tab='home';
 let room='all', preview=null, flash={id:'',until:0}, sheetActions={}, photoZone=null, nightSheet=false, watchSheet=false, pinEdit=false, pinDrag=null;
 const SETUP=((location.hash.match(/^#homey=([a-f0-9]{24})$/i)||[])[1]||'').toLowerCase();
@@ -775,7 +790,7 @@ function normAddr(s){
 }
 async function req(path,o){
   o=o||{};
-  const b=o.base||base, k=o.key||(cfg&&cfg.key)||'';
+  const b=o.base||base, k=o.key||(mode==='guest'&&guest?guest.k:(cfg&&cfg.key))||'';
   const ctl=new AbortController(); const t=setTimeout(()=>ctl.abort(),o.timeout||9000);
   try{
     const h={'Authorization':'Bearer '+k};
@@ -808,12 +823,18 @@ async function loadLive(){
   const dd=d||{}; for(const k of Object.keys(dd)) if(isHidden(dd[k])) delete dd[k];
   data={zones:z||{},devices:dd,flows:normFlows(f,'flow').concat(normFlows(af,'advancedflow')),apps:ap};
 }
+async function loadVisit(){
+  const [z,d]=await Promise.all([req('/api/manager/zones/zone/'),req('/api/manager/devices/device/')]);
+  const dd=d||{}; for(const k of Object.keys(dd)) if(isHidden(dd[k])) delete dd[k];
+  data={zones:z||{},devices:dd,flows:(guest.b||[]).map(f=>({id:f.i,type:f.t,name:f.n,trig:true})),apps:null};
+}
 async function refresh(){
-  if(mode!=='live') return;
+  const vis=isVisitLive();
+  if(mode!=='live'&&!vis) return;
   try{
-    if(!base){ const r=await tryConnect(cfg); if(!r.ok) throw r.err; base=r.base; conn=r.mode; }
-    await loadLive();
-  }catch(e){ conn='off'; base=''; lastErr=errMsg(e); }
+    if(vis){ base=guest.a; await loadVisit(); conn='remote'; }
+    else { if(!base){ const r=await tryConnect(cfg); if(!r.ok) throw r.err; base=r.base; conn=r.mode; } await loadLive(); }
+  }catch(e){ conn='off'; if(!vis) base=''; const st=e&&e.status; lastErr=vis&&(st===401||st===403)?'Ce lien ne marche plus. Demande-en un nouveau.':errMsg(e); }
   render();
 }
 function errMsg(e){
@@ -1045,7 +1066,8 @@ async function setCap(id,cap,val){
     else if(to!==null&&!(coverMove[id]&&Date.now()-coverMove[id].at<1500)) noteMove(d,to);
   }
   const c=d.capabilitiesObj&&d.capabilitiesObj[cap]; const old=c?c.value:undefined;
-  if(mode==='demo'){ demoSet(d,cap,val); render(); return; }
+  if(preview){ toast('Aperçu : rien n’est lancé.'); return false; }
+  if(isDemoData()){ demoSet(d,cap,val); render(); return; }
   if(c) c.value=val; render();
   try{
     await req('/api/manager/devices/device/'+encodeURIComponent(id)+'/capability/'+encodeURIComponent(cap),{method:'PUT',body:{value:val}});
@@ -1091,7 +1113,7 @@ async function runScene(btn){
     flash={id:f.id,until:Date.now()+1800};
     toast('« '+f.name+' » lancé');
     render(); setTimeout(render,1900);
-    if(mode==='live') setTimeout(refresh,2500);
+    if(mode==='live'||isVisitLive()) setTimeout(refresh,2500);
   }catch(e){
     btn.classList.remove('busy');
     const s=e&&e.status;
@@ -1109,7 +1131,7 @@ const isOpenCover=d=>{ if(!/^cover/.test(ctrlKind(d))) return false; const c=d.c
   if(c.windowcoverings_closed&&typeof c.windowcoverings_closed.value==='boolean') return !c.windowcoverings_closed.value;
   const s=c.windowcoverings_set; return !!(s&&typeof s.value==='number'&&s.value>.05); };
 function nightList(){
-  const devs=Object.values(data.devices||{}).filter(d=>d.available!==false), by=(a,b)=>devName(a).localeCompare(devName(b),'fr');
+  const devs=Object.values(data.devices||{}).filter(d=>d.available!==false&&(!isVisit()||visitKeep(d))), by=(a,b)=>devName(a).localeCompare(devName(b),'fr');
   return {covers:devs.filter(isOpenCover).sort(by), lights:devs.filter(d=>isLightDev(d)&&d.capabilitiesObj.onoff.value===true).sort(by)};
 }
 function nightBtn(){
@@ -1258,6 +1280,11 @@ const PLAN_DECO=[];
 const PLAN_WALLS=[{x:7.1,y:8.1,w:18.6,h:8}];
 const tallPlan=()=>window.matchMedia('(max-width: 699px)').matches;
 let planRoom=null;
+function visitKeep(d){
+  if(d.available===false||/camera|doorbell|homealarm/.test(d.class||'')||/cam[ée]ra|sonnette|eufy|alarme/i.test(d.name||'')) return false;
+  const k=ctrlKind(d);
+  return isLightDev(d)||/^cover/.test(k)||k==='thermo'||k==='toggle'||d===poolDev();
+}
 function roomDevs(name){
   const o=PLAN.find(p=>p.n===name);
   if(o&&o.dev) return Object.values(data.devices||{}).filter(d=>nk(d.name)===o.dev);
@@ -1333,9 +1360,9 @@ function spots(o,n,tall){
   return out;
 }
 function pinList(tall){
-  const saved=store.get('pins'+sfx(),{})||{}, byRoom={}, seen=new Set(), out=[], pd=poolDev();
+  const saved=(mode==='guest'&&guest&&guest.m==='nid'?guest.p:store.get('pins'+sfx(),{}))||{}, byRoom={}, seen=new Set(), out=[], pd=poolDev();
   for(const o of PLAN) for(const d of roomDevs(o.n)){
-    if(seen.has(d.id)||pinSkip(d)||d===pd) continue; seen.add(d.id);
+    if(seen.has(d.id)||pinSkip(d)||d===pd||(isVisit()&&!visitKeep(d))) continue; seen.add(d.id);
     const sv=saved[d.id], so=sv&&PLAN.find(p=>p.n===sv.r);
     ((byRoom[(so||o).n])=byRoom[(so||o).n]||[]).push({d,sv:so?sv:null});
   }
@@ -1453,7 +1480,7 @@ async function poolTap(v){
 function roomState(o){
   const devs=roomDevs(o.n), live=devs.filter(d=>d.available!==false);
   const lit=live.filter(d=>(d.class==='light'||/lumi[eè]re/i.test(d.name))&&d.capabilitiesObj&&d.capabilitiesObj.onoff&&d.capabilitiesObj.onoff.value).length;
-  const bad=devs.some(d=>d.available===false);
+  const bad=!isVisit()&&devs.some(d=>d.available===false);
   const th=live.find(d=>d.capabilitiesObj&&d.capabilitiesObj.measure_temperature&&typeof d.capabilitiesObj.measure_temperature.value==='number'&&!/piscine|pool/i.test(d.name));
   let sub='';
   if(o.n==='Piscine'){ const p=live.find(d=>d.capabilitiesObj&&d.capabilitiesObj.measure_temperature&&typeof d.capabilitiesObj.measure_temperature.value==='number'); if(p) sub=nf1.format(p.capabilitiesObj.measure_temperature.value)+'°'; }
@@ -1495,7 +1522,7 @@ function planHtml(mini){
   if(!mini) h+=poolHud(PLAN.find(o=>o.k==='pool'),tall);
   if(!mini) h+=pinsHtml(tall,pins);
   h+='</div>';
-  if(!mini) h+='<p class="plan-legend"><span><i></i>Lumière allumée</span><span><i class="dot"></i>Ne répond pas</span><span><i class="glass"></i>Baie vitrée</span><span>Touche un bouton ou une baie pour allumer, ouvrir ou fermer</span></p>';
+  if(!mini) h+='<p class="plan-legend"><span><i></i>Lumière allumée</span>'+(isVisit()?'':'<span><i class="dot"></i>Ne répond pas</span>')+'<span><i class="glass"></i>Baie vitrée</span><span>Touche un bouton ou une baie pour allumer, ouvrir ou fermer</span></p>';
   return h;
 }
 function miniPlan(){
@@ -1507,9 +1534,9 @@ function miniPlan(){
 function planSheetHtml(id){
   if(String(id).indexOf('dev:')===0){ const d=data.devices[id.slice(4)]; return d?'<div class="list">'+devRow(d)+'</div>':'<p class="muted">Cet appareil n’est plus dans Homey.</p>'; }
   if(String(id).indexOf('bay:')===0){ const d=bayDev(id.slice(4)); return d?'<div class="list">'+devRow(d)+'</div>':'<p class="muted">Ce store ne répond plus.</p>'; }
-  const devs=roomDevs(id), pd=id==='Piscine'&&poolDev();
-  if(pd) return '<div class="pool-panel">'+poolBits(pd,false,true)+'</div>'+poolSpeedHtml(pd)+poolHydHtml(pd)+(devs.length>1?'<div class="list">'+devs.filter(d=>d!==pd).map(devRow).join('')+'</div>':'');
-  if(!devs.length) return '<p class="muted">Rien de relié à Homey dans cette pièce. Ce qui s’y trouve se pilote dans l’appli Maison.</p>';
+  const vis=isVisit(), devs=roomDevs(id).filter(d=>!vis||visitKeep(d)), pd=id==='Piscine'&&poolDev();
+  if(pd) return '<div class="pool-panel">'+poolBits(pd,false,true)+'</div>'+(vis?'':poolSpeedHtml(pd)+poolHydHtml(pd))+(devs.length>1?'<div class="list">'+devs.filter(d=>d!==pd).map(devRow).join('')+'</div>':'');
+  if(!devs.length) return '<p class="muted">'+(vis?'Rien à commander dans cette pièce.':'Rien de relié à Homey dans cette pièce. Ce qui s’y trouve se pilote dans l’appli Maison.')+'</p>';
   return '<div class="list">'+devs.map(devRow).join('')+'</div>';
 }
 function openRoom(name){ const o=PLAN.find(p=>p.n===name); planRoom=name; openSheet((o&&o.t)||name,planSheetHtml(name),{}); }
@@ -1618,17 +1645,18 @@ function getShares(){
 }
 function renderShare(){
   const sh=getShares();
-  let h='<div class="share-top"><p class="lead">Donne des boutons à quelqu’un, sans accès au reste de la maison.</p>'
-    +'<button class="btn primary block" type="button" id="share-new">'+I('plus')+'Partager des boutons</button></div>';
+  let h='<div class="share-top"><p class="lead">Donne Le Nid à tes invités, sans caméras ni réglages. Ou seulement quelques boutons.</p>'
+    +'<button class="btn primary block" type="button" id="share-new">'+I('plus')+'Partager avec quelqu’un</button></div>';
   h+='<h3 class="sec">Personnes</h3>';
   if(!sh.length) h+='<p class="muted">Personne pour l’instant.</p>';
   else h+='<div class="cards">'+sh.map(s=>
-    '<div class="card"><div class="row"><span class="avatar" aria-hidden="true">'+esc((s.n||'?').trim().charAt(0).toUpperCase())+'</span><div class="row-txt"><b>'+esc(s.n)+'</b><small>'+s.b.length+' bouton'+(s.b.length>1?'s':'')+(s.g?' · très gros':'')+' · '+esc(s.b.map(x=>x.n).join(', '))+'</small></div></div>'
+    '<div class="card"><div class="row"><span class="avatar" aria-hidden="true">'+esc((s.n||'?').trim().charAt(0).toUpperCase())+'</span><div class="row-txt"><b>'+esc(s.n)+'</b><small>'+(s.m==='nid'?'Le Nid sans caméras'+(s.w?' · mot d’accueil':'')+(s.b.length?' · '+esc(s.b.map(x=>x.n).join(', ')):''):s.b.length+' bouton'+(s.b.length>1?'s':'')+(s.g?' · très gros':'')+' · '+esc(s.b.map(x=>x.n).join(', ')))+'</small></div></div>'
     +'<div class="row-btns"><button class="btn small" type="button" data-copy-share="'+esc(s.id)+'">'+I('copy')+'Copier le lien</button>'
     +'<button class="btn small" type="button" data-preview="'+esc(s.id)+'">'+I('eye')+'Aperçu</button>'
     +'<button class="btn small danger" type="button" data-remove="'+esc(s.id)+'">Retirer</button></div></div>'
   ).join('')+'</div>';
-  h+='<details class="help"><summary>Couper l’accès de quelqu’un</summary><p>Sur my.homey.app, ouvre Réglages puis Clés API, et supprime la clé de cette personne. Ses boutons ne marchent plus.</p></details>';
+  h+='<details class="help"><summary>Couper l’accès de quelqu’un</summary><p>Sur my.homey.app, ouvre Réglages puis Clés API, et supprime la clé de cette personne : son lien ne marche plus. Pense à le faire à la fin du séjour de tes invités.</p></details>';
+  h+='<details class="help"><summary>La place des boutons chez tes invités</summary><p>Le lien emporte les boutons placés comme sur cet appareil. Si tu les déplaces ensuite, touche « Copier le lien » et renvoie-le.</p></details>';
   return h;
 }
 const RECO=[
@@ -1675,30 +1703,65 @@ function guestBig(g,isPrev){
 function renderGuest(g,isPrev){
   const big=guestBig(g,isPrev);
   let h='';
-  if(isPrev) h+='<div class="note"><span>Aperçu de ce que voit '+esc(g.n)+'. Rien n’est lancé.</span><button class="btn small" type="button" id="preview-close">Fermer l’aperçu</button></div>';
+  if(needName(g,isPrev)) return welcomeHtml(g);
+  h+=installTip(isPrev)+wordHtml(g);
+  if(isPrev) h+='<div class="note"><span>Aperçu de ce que voit '+esc(g.q?'ton invité':g.n)+'. Rien n’est lancé.</span><button class="btn small" type="button" id="preview-close">Fermer l’aperçu</button></div>';
   h+='<div class="scenes'+(big?' big':'')+'">'+g.b.map(f=>sceneBtn({id:f.i,type:f.t,name:f.n},false)).join('')+'</div>';
   h+='<p class="foot">Ces boutons ont été partagés avec toi.';
-  if(!isPrev) h+='<br><button class="linkbtn" type="button" id="guest-size">'+(big?'Boutons plus petits':'Boutons plus grands')+'</button>'
+  if(!isPrev) h+=(g.q?'<br><button class="linkbtn" type="button" id="guest-rename">Changer de prénom</button>':'')+'<br><button class="linkbtn" type="button" id="guest-size">'+(big?'Boutons plus petits':'Boutons plus grands')+'</button>'
     +'<br><button class="linkbtn" type="button" id="guest-quit">Retirer ces boutons de cet appareil</button>';
   return h+'</p>';
+}
+const guestName=(g,isPrev)=>isPrev?(g.q?'ton invité':g.n.replace(/\s*\(exemple\)$/,'')):(g.u||(!g.q?g.n:''));
+const needName=(g,isPrev)=>!isPrev&&!!g.q&&!g.u;
+const isStandalone=()=>{ try{ return window.navigator.standalone===true||window.matchMedia('(display-mode: standalone)').matches; }catch(_){ return false; } };
+const packPins=o=>Object.entries(cleanPins(o||{})).map(([id,v])=>[id,v.r,Math.round(v.fx*1000)/1000,Math.round(v.fy*1000)/1000]);
+function unpackPins(a){ const o={}; if(Array.isArray(a)) for(const x of a.slice(0,80)) if(Array.isArray(x)&&typeof x[0]==='string'&&x[0].length<=64&&typeof x[1]==='string') o[x[0]]={r:x[1],fx:+x[2],fy:+x[3]}; return cleanPins(o); }
+function guestHash(g){ return '#invite='+b64e(JSON.stringify(Object.assign({v:1,n:g.n,a:g.a,k:g.k,g:g.g?1:0,b:g.b},g.m==='nid'?{m:'nid'}:{},g.q?{q:1}:{},g.w?{w:g.w}:{},g.p&&Object.keys(g.p).length?{p:packPins(g.p)}:{},g.u?{u:g.u}:{}))); }
+const wordHtml=g=>g.w?'<section class="word"><h3 class="sec">Le mot de la maison</h3><p>'+esc(g.w)+'</p></section>':'';
+function welcomeHtml(g){
+  return '<section class="welcome"><span class="logo welcome-logo" aria-hidden="true">'+((document.querySelector('.top .logo')||{}).innerHTML||'')+'</span><h2>Bienvenue au Nid</h2>'
+    +'<p>'+(g.m==='nid'?'Tu pourras allumer, ouvrir les stores et régler la clim depuis ton téléphone.':'Tu vas recevoir quelques boutons pour la maison.')+'</p>'
+    +'<div class="field"><label for="gu-name">Ton prénom</label><input id="gu-name" maxlength="40" autocomplete="given-name" autocapitalize="words" placeholder="Ex. : Marie"></div>'
+    +'<button class="btn primary block" type="button" id="gu-ok">C’est parti</button></section>';
+}
+function installTip(isPrev){
+  if(isPrev||isStandalone()||store.get('tipInstall',false)) return '';
+  return '<div class="note"><span>Pour l’avoir comme une appli : touche Partager, puis « Sur l’écran d’accueil ».</span><button class="btn small" type="button" id="tip-ok">Compris</button></div>';
+}
+function renderVisit(g,isPrev){
+  let h='';
+  if(isPrev) h+='<div class="note"><span>Aperçu de ce que voit '+esc(g.q?'ton invité':g.n)+'. Rien n’est lancé.</span><button class="btn small" type="button" id="preview-close">Fermer l’aperçu</button></div>';
+  const foot='<p class="foot">Le Nid a été partagé avec toi.'+(isPrev?'':(g.q?'<br><button class="linkbtn" type="button" id="guest-rename">Changer de prénom</button>':'')+'<br><button class="linkbtn" type="button" id="guest-quit">Retirer Le Nid de cet appareil</button>')+'</p>';
+  if(needName(g,isPrev)) return h+welcomeHtml(g);
+  h+=installTip(isPrev);
+  const word=wordHtml(g);
+  if(!isPrev&&conn==='loading') return h+'<p class="loading">Connexion au Nid…</p>';
+  if(!isPrev&&conn==='off') return h+'<section class="status bad"><div class="status-dot" aria-hidden="true">!</div><div class="status-txt"><h2>Le Nid ne répond pas</h2><p>'+esc(lastErr)+'</p><div class="row-btns"><button class="btn small" type="button" id="retry">Réessayer</button></div></div></section>'+foot;
+  const tm=wallTime(), fl=(g.b||[]).map(f=>({id:f.i,type:f.t,name:f.n}));
+  h+='<div class="hb-top"><div class="hb-clock"><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div></div><div class="hb-wx">'+wxHtml()+'</div></div>';
+  h+=word;
+  h+='<div class="hb-plan">'+planHtml()+'</div>';
+  h+='<div class="hb-more">'+nightBtn()+(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3></div><div class="scenes">'+fl.map(f=>sceneBtn(f,false)).join('')+'</div>':'')+'</div>';
+  return h+foot;
 }
 function render(){
   if(pinDrag) return;
   const g=mode==='guest'?guest:preview;
-  const big=store.get('homePlan','big')!=='small', hb=!g&&tab==='home'&&big;
+  const big=store.get('homePlan','big')!=='small', hb=(!g&&tab==='home'&&big)||!!(g&&g.m==='nid');
   const wall=hb&&store.get('wall',false)===true&&isWide();
   document.body.classList.toggle('wall',wall);
   document.body.classList.toggle('homebig',hb);
-  $('#hello').textContent=g?'Bonjour '+g.n.replace(/\s*\(exemple\)$/,''):'Le Nid';
+  $('#hello').textContent=g?(guestName(g,!!preview)?'Bonjour '+guestName(g,!!preview):'Bienvenue au Nid'):'Le Nid';
   const pill=$('#conn');
   const PL={demo:['','Démo'],loading:['','Connexion…'],local:['ok','À la maison'],remote:['ok','À distance'],off:['bad','Hors ligne']};
-  if(g){ pill.className='pill ok'; pill.textContent=preview?'Aperçu invité':'Boutons partagés'; }
+  if(g){ pill.className='pill ok'; pill.textContent=preview?'Aperçu invité':g.m==='nid'?'Invité':'Boutons partagés'; }
   else { const p=PL[conn]||PL.off; pill.className='pill '+p[0]; pill.textContent=p[1]; }
   $('#gear').hidden=mode==='guest'||!!preview;
   $('#tabs').hidden=!!g;
   document.querySelectorAll('.tab').forEach(b=>{ if(b.dataset.tab===tab) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
   const v=$('#view');
-  if(g){ v.innerHTML=renderGuest(g,!!preview); return; }
+  if(g){ v.innerHTML=g.m==='nid'?renderVisit(g,!!preview):renderGuest(g,!!preview); return; }
   if(mode==='live'&&(conn==='loading'||(conn==='off'&&tab!=='share'))) document.body.classList.remove('homebig','wall');
   if(mode==='live'&&conn==='loading'){ v.innerHTML='<p class="loading">Connexion à Homey…</p>'; return; }
   if(mode==='live'&&conn==='off'&&tab!=='share'){
@@ -1963,28 +2026,41 @@ function openAsk(){
 }
 function inviteLink(s){
   const addr=mode==='demo'?'demo':((cfg&&(cfg.remote||cfg.local))||'');
-  return location.href.split('#')[0]+'#invite='+b64e(JSON.stringify({v:1,n:s.n,a:addr,k:s.k,g:s.g?1:0,b:s.b}));
+  return location.href.split('#')[0]+'#invite='+b64e(JSON.stringify(Object.assign({v:1,n:s.n,a:addr,k:s.k,g:s.g?1:0,b:s.b},s.m==='nid'?{m:'nid'}:{},s.q?{q:1}:{},s.w?{w:s.w}:{},s.m==='nid'&&Object.keys(store.get('pins'+sfx(),{})||{}).length?{p:packPins(store.get('pins'+sfx(),{}))}:{})));
 }
+const KEY_HELP={nid:'Sur my.homey.app : Réglages, Clés API, nouvelle clé à son nom. Coche seulement : voir et piloter les appareils, voir les zones, lancer les Flows.',
+  btn:'Sur my.homey.app : Réglages, Clés API. Crée une clé à son nom en cochant uniquement le droit de lancer les Flows.'};
+document.addEventListener('change',e=>{
+  if(!e.target||e.target.name!=='sh-kind') return;
+  const nid=e.target.value==='nid', kh=$('#sh-key-help'), lg=$('#sh-f-legend'), br=$('#sh-big-row');
+  if(kh) kh.textContent=KEY_HELP[nid?'nid':'btn']; if(lg) lg.textContent=nid?'Ses scènes (si tu veux)':'Ses boutons'; if(br) br.hidden=nid;
+});
 function openShareForm(){
   const trig=data.flows.filter(f=>f.trig);
   let h='';
   if(mode==='live'&&cfg&&!cfg.remote) h+='<p class="note warn"><span>Sans adresse « En déplacement » dans Réglages, le lien ne marchera que sur le Wi-Fi de la maison.</span></p>';
-  h+='<div class="field"><label for="sh-name">Prénom</label><input id="sh-name" maxlength="40" autocomplete="off" placeholder="Ex. : Marie"></div>'
+  h+='<fieldset class="checks sh-kind"><legend>Ce que la personne voit</legend>'
+    +'<label class="opt" for="sh-k-nid"><input type="radio" name="sh-kind" id="sh-k-nid" value="nid" checked><span><b>Le Nid, sans caméras</b><small>Le plan pour allumer, ouvrir les stores, régler la clim et la lumière de la piscine. Ni caméras, ni réglages.</small></span></label>'
+    +'<label class="opt" for="sh-k-btn"><input type="radio" name="sh-kind" id="sh-k-btn" value="btn"><span><b>Quelques boutons</b><small>Seulement les scènes que tu choisis.</small></span></label></fieldset>';
+  h+='<div class="field"><label for="sh-name">Pour qui ?</label><input id="sh-name" maxlength="40" autocomplete="off" placeholder="Ex. : Invités de l’été"><small>Pour t’y retrouver. Chaque invité écrira son prénom en ouvrant le lien sur son téléphone.</small></div>'
     +'<div class="field"><label for="sh-key">Clé Homey de cette personne</label><input id="sh-key" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="'+(mode==='demo'?'Pas besoin en démo':'Colle sa clé ici')+'">'
-    +'<small>Sur my.homey.app : Réglages, Clés API. Crée une clé à son nom en cochant uniquement le droit de lancer les Flows.</small></div>';
-  h+=trig.length?'<fieldset class="checks"><legend>Ses boutons</legend>'+flowChecks('sh-f-',[])+'</fieldset>':'<p class="muted">Aucune scène à partager pour l’instant.</p>';
-  h+='<label class="opt" for="sh-big"><input type="checkbox" id="sh-big"><span><b>Très gros boutons</b><small>Un bouton par ligne, en grand. Pour une personne moins à l’aise avec le téléphone.</small></span></label>';
+    +'<small id="sh-key-help">'+KEY_HELP.nid+'</small></div>';
+  h+='<div class="field"><label for="sh-word">Mot d’accueil (si tu veux)</label><textarea id="sh-word" maxlength="300" rows="3" placeholder="Ex. : Le code Wi-Fi est sur le frigo. Petit-déjeuner à 9 h."></textarea><small>Tes invités le verront en haut de leur écran.</small></div>';
+  h+=trig.length?'<fieldset class="checks"><legend id="sh-f-legend">Ses scènes (si tu veux)</legend>'+flowChecks('sh-f-',[])+'</fieldset>':'<p class="muted">Aucune scène à partager pour l’instant.</p>';
+  h+='<label class="opt" for="sh-big" id="sh-big-row" hidden><input type="checkbox" id="sh-big"><span><b>Très gros boutons</b><small>Un bouton par ligne, en grand. Pour une personne moins à l’aise avec le téléphone.</small></span></label>';
   h+='<p class="form-msg" id="sh-msg" role="status"></p><button class="btn primary block" type="button" id="sh-create">Créer le lien</button>'
     +'<div class="field mt"><textarea id="sh-out" readonly hidden aria-label="Lien à copier"></textarea></div>';
-  openSheet('Partager des boutons',h,{'sh-create':async()=>{
-    const n=$('#sh-name').value.trim(), k=$('#sh-key').value.trim()||(mode==='demo'?'demo':''), ids=checkedIds('sh-f-');
-    if(!n){ setMsg('sh-msg','Indique un prénom.','bad'); return; }
+  openSheet('Partager',h,{'sh-create':async()=>{
+    const nid=$('#sh-k-nid').checked, n=$('#sh-name').value.trim()||'Invités', k=$('#sh-key').value.trim()||(mode==='demo'?'demo':''), ids=checkedIds('sh-f-');
     if(!k){ setMsg('sh-msg','Colle la clé de cette personne.','bad'); return; }
-    if(!ids.length){ setMsg('sh-msg','Coche au moins un bouton.','bad'); return; }
-    const s={id:'s'+Date.now(),n,k,g:$('#sh-big').checked?1:0,b:ids.map(id=>{const f=trig.find(x=>x.id===id);return {i:f.id,t:f.type,n:f.name};}),at:Date.now()};
+    if(!nid&&!ids.length){ setMsg('sh-msg','Coche au moins un bouton.','bad'); return; }
+    const s={id:'s'+Date.now(),n,k,g:!nid&&$('#sh-big').checked?1:0,b:ids.map(id=>{const f=trig.find(x=>x.id===id);return {i:f.id,t:f.type,n:f.name};}),at:Date.now()};
+    if(nid) s.m='nid';
+    s.q=1;
+    const w=($('#sh-word').value||'').trim().slice(0,300); if(w) s.w=w;
     const all=getShares(); all.push(s); store.set('shares'+sfx(),all);
     const ok=await copyText(inviteLink(s),'sh-out');
-    if(ok){ closeSheet(); render(); toast('Lien copié : envoie-le à '+n+' par message.'); }
+    if(ok){ closeSheet(); render(); toast('Lien copié : envoie-le par message.'); }
     else { render(); setMsg('sh-msg','Lien créé. Sélectionne-le ci-dessous et copie-le.','ok'); }
   }});
 }
@@ -1996,10 +2072,17 @@ function readInvite(){
   if(!m) return;
   try{
     const p=JSON.parse(b64d(m[1]));
-    const okB=Array.isArray(p.b)&&p.b.length>0&&p.b.length<=24&&p.b.every(x=>x&&/^[\w-]{1,64}$/.test(x.i)&&(x.t==='flow'||x.t==='advancedflow')&&typeof x.n==='string'&&x.n.length<=80);
+    const nid=p.m==='nid';
+    const okB=Array.isArray(p.b)&&(nid||p.b.length>0)&&p.b.length<=24&&p.b.every(x=>x&&/^[\w-]{1,64}$/.test(x.i)&&(x.t==='flow'||x.t==='advancedflow')&&typeof x.n==='string'&&x.n.length<=80);
     if(typeof p.n!=='string'||p.n.length>40||typeof p.k!=='string'||p.k.length>300||!okB||!(p.a==='demo'||/^https:\/\/[^\s/]+$/.test(p.a))) throw new Error('bad');
     const g={n:p.n,a:p.a,k:p.k,g:p.g===1?1:0,b:p.b.map(x=>({i:x.i,t:x.t,n:x.n}))};
-    if(!guest||JSON.stringify(guest)!==JSON.stringify(g)) store.del('guestBig');
+    if(nid) g.m='nid';
+    if(p.q===1) g.q=1;
+    if(typeof p.w==='string'&&p.w.trim()) g.w=p.w.trim().slice(0,300);
+    if(nid&&Array.isArray(p.p)) g.p=unpackPins(p.p);
+    const u=typeof p.u==='string'&&p.u.trim().length<=40?p.u.trim():'', old=store.get('guest',null);
+    if(u) g.u=u; else if(g.q&&old&&old.k===g.k&&old.u) g.u=old.u;
+    if(!guest||guest.k!==g.k||JSON.stringify(guest.b)!==JSON.stringify(g.b)) store.del('guestBig');
     guest=g; store.set('guest',guest); mode='guest';
   }catch(e){ setTimeout(()=>toast('Ce lien de partage est illisible. Demande-en un nouveau.','bad'),300); }
 }
@@ -2057,6 +2140,14 @@ $('#view').addEventListener('click',e=>{
     case 'retry': conn='loading'; render(); refresh(); return;
     case 'share-new': openShareForm(); return;
     case 'preview-close': preview=null; render(); return;
+    case 'gu-ok': {
+      const nm=($('#gu-name').value||'').trim().replace(/\s+/g,' ').slice(0,40);
+      if(!nm){ toast('Écris ton prénom.','bad'); $('#gu-name').focus(); return; }
+      guest.u=nm; store.set('guest',guest);
+      try{ history.replaceState(null,'',location.href.split('#')[0]+guestHash(guest)); }catch(_){}
+      render(); window.scrollTo(0,0); toast('Bienvenue, '+nm+' !'); return; }
+    case 'guest-rename': delete guest.u; store.set('guest',guest); try{ history.replaceState(null,'',location.href.split('#')[0]+guestHash(guest)); }catch(_){} render(); window.scrollTo(0,0); return;
+    case 'tip-ok': store.set('tipInstall',true); render(); return;
     case 'guest-size': store.set('guestBig',!guestBig(guest,false)); render(); return;
     case 'guest-quit':
       if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Toucher encore pour confirmer'; return; }
@@ -2066,7 +2157,7 @@ $('#view').addEventListener('click',e=>{
   const sid=b.dataset.copyShare||b.dataset.preview||b.dataset.remove;
   const s=sid&&getShares().find(x=>x.id===sid);
   if(!s) return;
-  if(b.dataset.copyShare){ copyText(inviteLink(s)).then(ok=>toast(ok?'Lien copié : envoie-le à '+s.n+' par message.':'Copie impossible ici. Utilise « Aperçu » pour vérifier.',ok?'':'bad')); return; }
+  if(b.dataset.copyShare){ copyText(inviteLink(s)).then(ok=>toast(ok?'Lien copié : envoie-le par message.':'Copie impossible ici. Utilise « Aperçu » pour vérifier.',ok?'':'bad')); return; }
   if(b.dataset.preview){ preview=s; render(); window.scrollTo(0,0); return; }
   if(b.dataset.remove){
     if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Confirmer'; return; }
@@ -2129,11 +2220,12 @@ $('#sheet').addEventListener('click',e=>{
   const db=e.target.closest('button[data-dev]'); if(db&&devClick(db)) return;
   const b=e.target.closest('button[id]'); if(b&&sheetActions[b.id]) sheetActions[b.id](b);
 });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('#sheet').hidden) closeSheet(); });
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&mode==='live') refresh(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!$('#sheet').hidden) closeSheet(); if(e.key==='Enter'&&e.target&&e.target.id==='gu-name'){ e.preventDefault(); const b=$('#gu-ok'); if(b) b.click(); } });
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&(mode==='live'||isVisitLive())) refresh(); });
 setInterval(()=>{
-  if(document.hidden||!$('#sheet').hidden||(tab!=='home'&&tab!=='rooms')) return;
-  if(mode==='live'&&conn!=='off'&&conn!=='loading') refresh();
+  const vis=isVisitLive();
+  if(document.hidden||!$('#sheet').hidden||(!vis&&tab!=='home'&&tab!=='rooms')) return;
+  if((mode==='live'||vis)&&conn!=='off'&&conn!=='loading') refresh();
   else if(mode==='demo'&&tab==='home') render();
 },15000);
 
@@ -2146,8 +2238,9 @@ readInvite();
 readSetup();
 if(setupGot) setTimeout(()=>toast('Réglages reçus de ton iPhone : connexion à Homey…'),400);
 if(mode==='demo'){ data=makeDemo(); conn='demo'; }
+if(mode==='guest'&&guest&&guest.m==='nid'){ if(guest.a==='demo'){ data=makeDemo(); conn='demo'; } else conn='loading'; }
 render();
-if(mode==='live') refresh();
+if(mode==='live'||isVisitLive()) refresh();
 wxLoad();
 setInterval(()=>wxLoad(),10*60000);
 if(SETUP&&mode==='demo') setTimeout(openSettings,400);
