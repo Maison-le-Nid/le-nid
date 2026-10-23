@@ -184,6 +184,7 @@ body.wall .wrap{max-width:none;padding-block:max(14px,env(safe-area-inset-top,0p
 .mp-cap b{display:block;font-weight:600;font-size:15px}
 .mp-cap small{display:block;color:var(--ink-2);font-size:13px}
 .mp-cap small.mp-bad{color:var(--bad);margin-top:2px}
+.allclose small.night-roof{color:var(--bad);font-weight:600;margin-top:2px}
 .mp-go{flex:none;color:var(--brand);font-weight:600;font-size:14px}
 
 /* Commandes */
@@ -734,6 +735,7 @@ const P={
   bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>',
   plug:'<path d="M9 3v5M15 3v5"/><path d="M6 8h12v3a6 6 0 0 1-12 0z"/><path d="M12 17v4"/>',
   blinds:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M4 7h16M4 11h16M4 15h16"/>',
+  roof:'<path d="M2.5 11.5L12 4l9.5 7.5"/><rect x="7" y="10" width="10" height="10" rx="1"/><path d="M12 10v10M7 15h10"/>',
   camera:'<rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 11l5-3v8l-5-3"/>',
   sensor:'<circle cx="12" cy="12" r="2.5"/><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 7.5a6.4 6.4 0 0 1 0 9"/>',
   lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
@@ -952,8 +954,11 @@ function ctrlKind(d){
   if(can('onoff')) return 'toggle';
   return 'read';
 }
+// Fenêtre de toit (Velux) : pas ses stores ni ses volets
+const isRoof=d=>/velux|fen[eê]tre de toit/i.test(d.name||'')&&!/store|volet|rideau|occult|brise/i.test(d.name||'');
 function devIcon(d){
   const cl=d.class||'';
+  if(isRoof(d)) return 'roof';
   if(/thermostat|heater|airconditioning|fan/.test(cl)) return 'thermo';
   if(/piscine|pool/i.test(d.name)&&cl!=='light') return 'wave';
   if(cl==='homealarm'||/^base\b/i.test(d.name||'')) return 'shield';
@@ -1190,18 +1195,21 @@ const isOpenCover=d=>{ if(!/^cover/.test(ctrlKind(d))) return false; const c=d.c
   const s=c.windowcoverings_set; return !!(s&&typeof s.value==='number'&&s.value>.05); };
 function nightList(){
   const devs=Object.values(data.devices||{}).filter(d=>d.available!==false&&(!isVisit()||visitKeep(d))), by=(a,b)=>devName(a).localeCompare(devName(b),'fr');
-  return {covers:devs.filter(isOpenCover).sort(by), lights:devs.filter(d=>isLightDev(d)&&d.capabilitiesObj.onoff.value===true).sort(by)};
+  const open=devs.filter(isOpenCover);
+  return {roofs:open.filter(isRoof).sort(by), covers:open.filter(d=>!isRoof(d)).sort(by), lights:devs.filter(d=>isLightDev(d)&&d.capabilitiesObj.onoff.value===true).sort(by)};
 }
 function nightBtn(){
-  const n=nightList(), t=n.covers.length+n.lights.length;
+  const n=nightList(), t=n.roofs.length+n.covers.length+n.lights.length, r=n.roofs.length;
   return '<button class="allclose" type="button" id="night"><span class="row-ic">'+I('moon')+'</span><span class="row-txt"><b>Avant de dormir</b><small>'
-    +(t?t+(t>1?' choses encore ouvertes ou allumées':' chose encore ouverte ou allumée'):'Tout est fermé et éteint')+'</small></span></button>';
+    +(t?t+(t>1?' choses encore ouvertes ou allumées':' chose encore ouverte ou allumée'):'Tout est fermé et éteint')+'</small>'
+    +(r?'<small class="night-roof">'+(r>1?r+' Velux ouverts':'1 Velux ouvert')+'</small>':'')+'</span></button>';
 }
 function nightHtml(){
-  const n=nightList(), t=n.covers.length+n.lights.length;
+  const n=nightList(), t=n.roofs.length+n.covers.length+n.lights.length;
   let h='';
   if(!t) h+='<section class="status ok"><div class="status-dot" aria-hidden="true">'+I('check')+'</div><div class="status-txt"><h2>Tout est fermé et éteint</h2><p>Bonne nuit.</p></div></section>';
   else{
+    if(n.roofs.length) h+='<h3 class="sec">Velux ouverts</h3><div class="list">'+n.roofs.map(d=>devRow(d,true)).join('')+'</div>';
     if(n.covers.length) h+='<h3 class="sec">Encore ouverts</h3><div class="list">'+n.covers.map(d=>devRow(d,true)).join('')+'</div>';
     if(n.lights.length) h+='<h3 class="sec">Encore allumées</h3><div class="list">'+n.lights.map(d=>devRow(d,true)).join('')+'</div>';
     h+='<button class="btn primary block mt" type="button" id="night-all">'+I('moon')+'Tout fermer et éteindre</button>';
@@ -1212,7 +1220,7 @@ function nightHtml(){
 function openNight(){ nightSheet=true; openSheet('Avant de dormir',nightHtml(),{'night-all':nightAll}); }
 async function nightAll(btn){
   const n=nightList(), jobs=[];
-  n.covers.forEach(d=>jobs.push(ctrlKind(d)==='cover'?[d,'windowcoverings_state','down']:[d,'windowcoverings_set',0]));
+  n.roofs.concat(n.covers).forEach(d=>jobs.push(ctrlKind(d)==='cover'?[d,'windowcoverings_state','down']:[d,'windowcoverings_set',0]));
   n.lights.forEach(d=>jobs.push([d,'onoff',false]));
   if(!jobs.length) return;
   btn.classList.add('busy'); btn.disabled=true;
@@ -1388,7 +1396,8 @@ const treeNum=d=>{ const m=nk(d.name).match(TREE_RE); return m&&m[3]?+m[3]:0; };
 const treeDev=()=>treeDevs().find(d=>!treeNum(d))||null;
 const treeDevAt=i=>treeDevs().find(d=>treeNum(d)===i+1)||treeDev();
 const isOn=d=>!!(d&&d.capabilitiesObj&&d.capabilitiesObj.onoff&&d.capabilitiesObj.onoff.value===true);
-const pinSkip=d=>d.class==='sunshade'||/^store\b/.test(nk(d.name))||TREE_RE.test(nk(d.name));
+// les stores des baies vitrées sont déjà sur les baies ; ceux des Velux ont leur bouton dans la pièce
+const pinSkip=d=>{ const n=nk(d.name); return (d.class==='sunshade'||/^store\b/.test(n))&&!/velux/.test(n)||TREE_RE.test(n); };
 function cleanPins(o){ const out={}; if(!o||typeof o!=='object') return out;
   for(const [id,v] of Object.entries(o)) if(v&&typeof v.r==='string'&&PLAN.some(p=>p.n===v.r)&&isFinite(v.fx)&&isFinite(v.fy)) out[id]={r:v.r,fx:Math.max(0,Math.min(1,+v.fx)),fy:Math.max(0,Math.min(1,+v.fy))};
   return out; }
@@ -1397,10 +1406,11 @@ const smallRoom=(o,tall)=>!o.k&&!o.v&&o.w<5&&o.h<5;
 const stripRoom=(o,tall)=>!tall&&!o.k&&o.h<3; // bande étroite sur l'iPad (buanderie) : nom en haut, boutons en rang dessous
 const bayTop=o=>PLAN_BAYS.some(b=>b.x>=o.x&&b.x<o.x+o.w&&Math.abs(b.y+b.h/2-(o.y+o.h))<1);
 function spots(o,n,tall){
-  if(smallRoom(o,tall)){ // iPhone : nom en haut, petits boutons en bas, deux par rang
-    const cols=Math.min(n,2), out=[];
-    for(let i=0;i<n;i++){ const r=Math.floor(i/cols), c=i%cols, nc=Math.min(cols,n-r*cols);
-      out.push(tall?{fx:.2+r*.34,fy:nc===1?.5:(c===0?.72:.28)}:{fx:nc===1?.5:(c===0?.3:.7),fy:.21+r*.34}); }
+  if(smallRoom(o,tall)){ // petite pièce : nom en haut, boutons dessous, deux ou trois par rang
+    const cols=n<=2?n:n<=4?2:n<=9?3:4, rows=Math.ceil(n/cols), out=[];
+    const ys=rows===1?[.21]:rows===2?[.21,.55]:Array.from({length:rows},(_,r)=>.15+r*(.44/(rows-1)));
+    for(let i=0;i<n;i++){ const r=Math.floor(i/cols), c=i%cols, nc=Math.min(cols,n-r*cols), u=nc===1?.5:nc===2?(c===0?(tall?.28:.3):(tall?.72:.7)):.14+.72*(c+.5)/nc;
+      out.push(tall?{fx:ys[r]+(rows>2?0:-.01),fy:1-u}:{fx:u,fy:ys[r]}); }
     return out;
   }
   // Place d'un bouton une fois la pièce agrandie : taille à l'écran, nom dessous sur iPad
@@ -1930,8 +1940,17 @@ const guestName=(g,isPrev)=>isPrev?(g.q?'ton invité':g.n.replace(/\s*\(exemple\
 const needName=(g,isPrev)=>!isPrev&&!!g.q&&!g.u;
 const isStandalone=()=>{ try{ return window.navigator.standalone===true||window.matchMedia('(display-mode: standalone)').matches; }catch(_){ return false; } };
 const packPins=o=>Object.entries(cleanPins(o||{})).map(([id,v])=>[id.length>12?id.slice(0,8):id,v.r,Math.round(v.fx*1000)/1000,Math.round(v.fy*1000)/1000]);
-function unpackPins(a){ const o={}; if(Array.isArray(a)) for(const x of a.slice(0,80)) if(Array.isArray(x)&&typeof x[0]==='string'&&x[0].length<=64&&typeof x[1]==='string') o[x[0]]={r:x[1],fx:+x[2],fy:+x[3]}; return cleanPins(o); }
-function guestHash(g){ return '#invite='+b64e(JSON.stringify(Object.assign({v:1,n:g.n,a:g.a,k:g.k,g:g.g?1:0,b:g.b},g.t?{t:g.t}:{},g.m==='nid'?{m:'nid'}:{},g.q?{q:1}:{},g.w?{w:g.w}:{},g.p&&Object.keys(g.p).length?{p:packPins(g.p)}:{},g.u?{u:g.u}:{}))); }
+// Disposition compacte pour un lien court : « Salon:1a2b3c4d.0k2f,… | Bureau:… »
+const b36=v=>Math.max(0,Math.min(1295,Math.round(v*1295))).toString(36).padStart(2,'0');
+function packPinsC(o){ const g={};
+  for(const [id,v] of Object.entries(cleanPins(o||{}))){ const k=id.length>12?id.slice(0,8):id; if(/[:,|.]/.test(k)) continue; (g[v.r]=g[v.r]||[]).push(k+'.'+b36(v.fx)+b36(v.fy)); }
+  return Object.entries(g).map(([r,l])=>r+':'+l.join(',')).join('|'); }
+function unpackPinsC(t){ const o={}; if(typeof t!=='string'||t.length>6000) return o;
+  for(const part of t.split('|')){ const i=part.indexOf(':'); if(i<1) continue; const r=part.slice(0,i);
+    for(const e of part.slice(i+1).split(',')){ const m=e.match(/^([^.]{1,64})\.([0-9a-z]{2})([0-9a-z]{2})$/); if(m) o[m[1]]={r,fx:parseInt(m[2],36)/1295,fy:parseInt(m[3],36)/1295}; } }
+  return cleanPins(o); }
+function unpackPins(a){ if(typeof a==='string') return unpackPinsC(a); const o={}; if(Array.isArray(a)) for(const x of a.slice(0,80)) if(Array.isArray(x)&&typeof x[0]==='string'&&x[0].length<=64&&typeof x[1]==='string') o[x[0]]={r:x[1],fx:+x[2],fy:+x[3]}; return cleanPins(o); }
+function guestHash(g){ return '#i.'+b64e(JSON.stringify(Object.assign({v:1,n:g.n,a:g.a,k:g.k,g:g.g?1:0,b:g.b},g.t?{t:g.t}:{},g.m==='nid'?{m:'nid'}:{},g.q?{q:1}:{},g.w?{w:g.w}:{},g.p&&Object.keys(g.p).length?{p:packPinsC(g.p)}:{},g.u?{u:g.u}:{}))); }
 const wordHtml=g=>g.w?'<section class="word"><h3 class="sec">Le mot de la maison</h3><p>'+esc(g.w)+'</p></section>':'';
 function welcomeHtml(g){
   return '<section class="welcome"><span class="logo welcome-logo" aria-hidden="true">'+((document.querySelector('.top .logo')||{}).innerHTML||'')+'</span><h2>Bienvenue au Nid</h2>'
@@ -2281,7 +2300,7 @@ function openAsk(){
 }
 function inviteLink(s){
   const addr=mode==='demo'?'demo':((cfg&&(cfg.remote||cfg.local))||'');
-  return location.href.split('#')[0]+'#invite='+b64e(JSON.stringify(Object.assign({v:1,t:Date.now(),n:s.n,a:addr,k:s.k,g:s.g?1:0,b:s.b},s.m==='nid'?{m:'nid'}:{},s.q?{q:1}:{},s.w?{w:s.w}:{},s.m==='nid'&&Object.keys(store.get('pins'+sfx(),{})||{}).length?{p:packPins(store.get('pins'+sfx(),{}))}:{})));
+  return location.href.split('#')[0]+'#i.'+b64e(JSON.stringify(Object.assign({v:1,t:Date.now(),n:s.n,a:addr,k:s.k,g:s.g?1:0,b:s.b},s.m==='nid'?{m:'nid'}:{},s.q?{q:1}:{},s.w?{w:s.w}:{},s.m==='nid'&&Object.keys(store.get('pins'+sfx(),{})||{}).length?{p:packPinsC(store.get('pins'+sfx(),{}))}:{})));
 }
 const KEY_HELP={nid:'Sur my.homey.app : Réglages, Clés API, nouvelle clé à son nom. Coche seulement : voir et piloter les appareils, voir les zones, lancer les Flows.',
   btn:'Sur my.homey.app : Réglages, Clés API. Crée une clé à son nom en cochant uniquement le droit de lancer les Flows.'};
@@ -2334,7 +2353,7 @@ function parseInvite(code){
     if(nid) g.m='nid';
     if(p.q===1) g.q=1;
     if(typeof p.w==='string'&&p.w.trim()) g.w=p.w.trim().slice(0,300);
-    if(nid&&Array.isArray(p.p)) g.p=unpackPins(p.p);
+    if(nid&&(Array.isArray(p.p)||typeof p.p==='string')) g.p=unpackPins(p.p);
     if(typeof p.u==='string'&&p.u.trim()&&p.u.trim().length<=40) g.u=p.u.trim();
     if(typeof p.t==='number'&&isFinite(p.t)) g.t=p.t;
     return g;
@@ -2342,8 +2361,9 @@ function parseInvite(code){
 // Le lien reste dans l'adresse : ajouté à l'écran d'accueil, il garde les boutons.
 // Une version plus récente collée sur cet appareil (« Mettre à jour Le Nid ») passe avant.
 function readInvite(){
-  const m=location.hash.match(/^#invite=([A-Za-z0-9_-]+)$/);
-  if(!m){ if(/^#invite/.test(location.hash)) setTimeout(()=>toast('Ce lien est incomplet : il a été coupé. Demande qu’on te le renvoie avec le bouton « Envoyer ».','bad'),300); return; }
+  let h=location.hash; try{ h=decodeURIComponent(h); }catch(_){}
+  const m=h.match(/^#(?:invite=|i\.)([A-Za-z0-9_-]{20,})/);
+  if(!m){ if(/^#(invite|i\.)/.test(h)) setTimeout(()=>toast('Ce lien est incomplet : il a été coupé. Demande qu’on te le renvoie avec le bouton « Envoyer ».','bad'),300); return; }
   try{
     const g=parseInvite(m[1]), old=store.get('guest',null);
     let use=g;
@@ -2357,7 +2377,7 @@ function openGuestUpdate(){
   openSheet('Mettre à jour Le Nid','<p class="muted" style="margin-top:0">Sur ton iPhone : Partager, « Envoyer » sur la carte de cet appareil (AirDrop ou Messages). Copie le lien reçu, colle-le ici et touche « Mettre à jour ».</p>'
     +'<div class="field"><textarea id="gu-link" rows="4" autocapitalize="off" spellcheck="false" placeholder="Colle le lien ici" aria-label="Nouveau lien"></textarea></div>'
     +'<p class="form-msg" id="gu-msg" role="status"></p><button class="btn primary block" type="button" id="gu-apply">Mettre à jour</button>',{'gu-apply':()=>{
-      const m=($('#gu-link').value||'').match(/#invite=([A-Za-z0-9_-]+)/);
+      const m=($('#gu-link').value||'').match(/#(?:invite=|i\.)([A-Za-z0-9_-]{20,})/);
       let g=null; try{ if(m) g=parseInvite(m[1]); }catch(_){}
       if(!g){ setMsg('gu-msg','Lien non reconnu. Recopie-le en entier.','bad'); return; }
       if(!g.u&&guest&&guest.u) g.u=guest.u;
