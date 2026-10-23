@@ -742,6 +742,7 @@ const P={
   bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>',
   plug:'<path d="M9 3v5M15 3v5"/><path d="M6 8h12v3a6 6 0 0 1-12 0z"/><path d="M12 17v4"/>',
   blinds:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M4 7h16M4 11h16M4 15h16"/>',
+  garage:'<path d="M3 10.5L12 4l9 6.5V20H3z"/><path d="M7 20v-7.5h10V20M7 15h10M7 17.5h10"/>',
   roof:'<path d="M2.5 11.5L12 4l9.5 7.5"/><rect x="7" y="10" width="10" height="10" rx="1"/><path d="M12 10v10M7 15h10"/>',
   camera:'<rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 11l5-3v8l-5-3"/>',
   sensor:'<circle cx="12" cy="12" r="2.5"/><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 7.5a6.4 6.4 0 0 1 0 9"/>',
@@ -955,6 +956,7 @@ const isPh=(k,v)=>k==='measure_ph'||(/^measure_/.test(k)&&v&&/\bph\b/i.test(v.ti
 const ALARM={alarm_smoke:'fumée détectée',alarm_co:'monoxyde de carbone détecté',alarm_co2:'CO₂ élevé',alarm_water:'fuite d’eau',alarm_fire:'incendie détecté',alarm_heat:'chaleur anormale',alarm_tamper:'sabotage détecté',alarm_generic:'alerte'};
 function ctrlKind(d){
   const c=d.capabilitiesObj||{}, can=k=>c[k]&&c[k].setable!==false;
+  if(can('garagedoor_closed')) return 'garage';
   if(can('windowcoverings_state')) return 'cover';
   if(can('windowcoverings_set')) return 'coverset';
   if(can('target_temperature')) return 'thermo';
@@ -966,6 +968,7 @@ const isRoof=d=>/velux|fen[eê]tre de toit/i.test(d.name||'')&&!/store|volet|rid
 function devIcon(d){
   const cl=d.class||'';
   if(isRoof(d)) return 'roof';
+  if(cl==='garagedoor'||(d.capabilitiesObj&&d.capabilitiesObj.garagedoor_closed)) return 'garage';
   if(/thermostat|heater|airconditioning|fan/.test(cl)) return 'thermo';
   if(/piscine|pool/i.test(d.name)&&cl!=='light') return 'wave';
   if(cl==='homealarm'||/^base\b/i.test(d.name||'')) return 'shield';
@@ -990,6 +993,7 @@ function fmtMeasure(k,v){
 function stateText(d){
   const c=d.capabilitiesObj||{}, parts=[];
   if(d.available===false) return d.unavailableMessage||'Ne répond plus';
+  if(c.garagedoor_closed&&typeof c.garagedoor_closed.value==='boolean') parts.push(c.garagedoor_closed.value?'Fermée':'Ouverte');
   if(c.windowcoverings_set&&typeof c.windowcoverings_set.value==='number'){
     const p=Math.round(c.windowcoverings_set.value*100);
     parts.push(p>=99?'Ouvert':p<=1?'Fermé':'Ouvert à '+p+' %');
@@ -1197,12 +1201,13 @@ async function runScene(btn){
 /* ---------- Avant de dormir : ce qui est encore ouvert ou allumé ---------- */
 const isLightDev=d=>{ const c=d.capabilitiesObj||{}; if(!c.onoff||c.onoff.setable===false||/d[ée]clencheur/i.test(d.name)) return false;
   return d.class==='light'||(/^(socket|other)$/.test(d.class||'')&&/lumi[eè]re|lampe|lampadaire|dressing|terrasse|arbre|descente|guirlande/i.test(d.name)); };
+const isGarageOpen=d=>{ const c=(d.capabilitiesObj||{}).garagedoor_closed; return ctrlKind(d)==='garage'&&!!c&&c.value===false; };
 const isOpenCover=d=>{ if(!/^cover/.test(ctrlKind(d))) return false; const c=d.capabilitiesObj||{};
   if(c.windowcoverings_closed&&typeof c.windowcoverings_closed.value==='boolean') return !c.windowcoverings_closed.value;
   const s=c.windowcoverings_set; return !!(s&&typeof s.value==='number'&&s.value>.05); };
 function nightList(){
   const devs=Object.values(data.devices||{}).filter(d=>d.available!==false&&(!isVisit()||visitKeep(d))), by=(a,b)=>devName(a).localeCompare(devName(b),'fr');
-  const open=devs.filter(isOpenCover);
+  const open=devs.filter(d=>isOpenCover(d)||isGarageOpen(d));
   return {roofs:open.filter(isRoof).sort(by), covers:open.filter(d=>!isRoof(d)).sort(by), lights:devs.filter(d=>isLightDev(d)&&d.capabilitiesObj.onoff.value===true).sort(by)};
 }
 function nightBtn(){
@@ -1227,7 +1232,7 @@ function nightHtml(){
 function openNight(){ nightSheet=true; openSheet('Avant de dormir',nightHtml(),{'night-all':nightAll}); }
 async function nightAll(btn){
   const n=nightList(), jobs=[];
-  n.roofs.concat(n.covers).forEach(d=>jobs.push(ctrlKind(d)==='cover'?[d,'windowcoverings_state','down']:[d,'windowcoverings_set',0]));
+  n.roofs.concat(n.covers).forEach(d=>{ const k=ctrlKind(d); jobs.push(k==='garage'?[d,'garagedoor_closed',true]:k==='cover'?[d,'windowcoverings_state','down']:[d,'windowcoverings_set',0]); });
   n.lights.forEach(d=>jobs.push([d,'onoff',false]));
   if(!jobs.length) return;
   btn.classList.add('busy'); btn.disabled=true;
@@ -1317,6 +1322,9 @@ function devRow(d,withRoom){
   else if(k==='coverset') ctrl='<div class="seg" role="group" aria-label="'+nm+'">'
     +'<button type="button" data-dev="'+id+'" data-cap="windowcoverings_set" data-num="1" aria-label="Ouvrir">'+I('up')+'</button>'
     +'<button type="button" data-dev="'+id+'" data-cap="windowcoverings_set" data-num="0" aria-label="Fermer">'+I('down')+'</button></div>';
+  else if(k==='garage') ctrl='<div class="seg" role="group" aria-label="'+nm+'">'
+    +'<button type="button" data-dev="'+id+'" data-gar="open" aria-label="Ouvrir">'+I('up')+'</button>'
+    +'<button type="button" data-dev="'+id+'" data-gar="close" aria-label="Fermer">'+I('down')+'</button></div>';
   else if(k==='thermo'){ const v=c.target_temperature.value; ctrl='<div class="stepper"><button type="button" data-dev="'+id+'" data-step="-0.5" aria-label="Baisser">−</button><b>'+(typeof v==='number'?nf1.format(v)+'°':'–')+'</b><button type="button" data-dev="'+id+'" data-step="0.5" aria-label="Monter">+</button></div>'; }
   else if(k==='toggle') ctrl='<button class="switch" type="button" role="switch" aria-checked="'+(!!c.onoff.value)+'" data-dev="'+id+'" data-toggle aria-label="'+nm+'"><span></span></button>';
   return '<div class="row'+(off?' is-off':'')+'"><span class="row-ic">'+I(devIcon(d))+'</span><div class="row-txt"><b>'+nm+'</b><small>'+esc(stateText(d))+(withRoom===true?' · '+esc(roomLabel(d)):'')+'</small></div>'+ctrl+'</div>';
@@ -1358,7 +1366,7 @@ let planRoom=null;
 function visitKeep(d){
   if(d.available===false||/camera|doorbell|homealarm/.test(d.class||'')||/cam[ée]ra|sonnette|eufy|alarme/i.test(d.name||'')) return false;
   const k=ctrlKind(d);
-  return isLightDev(d)||/^cover/.test(k)||k==='thermo'||k==='toggle'||d===poolDev();
+  return isLightDev(d)||/^cover/.test(k)||k==='garage'||k==='thermo'||k==='toggle'||d===poolDev();
 }
 function roomDevs(name){
   const o=PLAN.find(p=>p.n===name);
@@ -1591,8 +1599,8 @@ function pinsHtml(tall,list){
   let h='';
   for(const p of list||pinList(tall)){
     const d=p.d, k=ctrlKind(d), light=isLightDev(d), cov=/^cover/.test(k);
-    const on=light&&isOn(d), open=cov&&isOpenCover(d), off=d.available===false, mv=cov&&moving(d), an=light?litAnim('p:'+d.id,on):'';
-    const act=off?'ne répond pas':light?(on?'touche pour éteindre':'touche pour allumer'):cov?(open?'touche pour fermer':'touche pour ouvrir'):'touche pour régler';
+    const on=light&&isOn(d), open=(cov&&isOpenCover(d))||isGarageOpen(d), off=d.available===false, mv=cov&&moving(d), an=light?litAnim('p:'+d.id,on):'';
+    const act=off?'ne répond pas':light?(on?'touche pour éteindre':'touche pour allumer'):(cov||k==='garage')?(open?'touche pour fermer':'touche pour ouvrir'):'touche pour régler';
     const mt=d.capabilitiesObj&&d.capabilitiesObj.measure_temperature, deg=p.sm&&devIcon(d)==='thermo'&&mt&&typeof mt.value==='number'?Math.round(mt.value)+'°':'';
     h+='<button class="pin'+(p.o.n===planZoom?' in':'')+(p.sm?' sm':'')+(on?' on':'')+(open?' open':'')+(off?' bad':'')+(mv?' moving':'')+an+'" type="button" data-pin="'+esc(d.id)+'" data-room="'+esc(p.o.n)+'" style="'+ptPos(p.o.x+p.fx*p.o.w,p.o.y+p.fy*p.o.h,tall)+'" title="'+esc(devName(d))+'" aria-label="'+esc(devName(d)+', '+stateText(d)+', '+act)+'">'+(deg?'<span class="pt">'+deg+'</span>':I(mv?(mv.to>mv.from?'up':'down'):light?'bulb':devIcon(d)))+'<span class="pl" aria-hidden="true">'+esc(pinLabel(d,p.o))+'</span></button>';
   }
@@ -1611,6 +1619,7 @@ async function pinTap(id){
   if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
   const k=ctrlKind(d);
   if(d.available!==false&&isLightDev(d)){ const on=!isOn(d); toast((on?'J’allume : ':'J’éteins : ')+devName(d)); await setCap(d.id,'onoff',on); return; }
+  if(k==='garage'){ garageAsk(d,!isGarageOpen(d)); return; }
   if(d.available!==false&&/^cover/.test(k)){
     const open=!isOpenCover(d), c=d.capabilitiesObj||{};
     noteMove(d,open?1:0);
@@ -1620,6 +1629,16 @@ async function pinTap(id){
     return;
   }
   openDev(d);
+}
+// Porte de garage : toujours une confirmation avant d'ouvrir ou de fermer
+function garageAsk(d,open){
+  if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
+  if(d.available===false){ toast(devName(d)+' ne répond pas.','bad'); return; }
+  const nm=devName(d);
+  openSheet(nm,'<p class="muted" style="margin-top:0">'+(open?'Ouvrir':'Fermer')+' « '+esc(nm)+' » ?</p>'
+    +'<button class="btn primary block" type="button" id="gar-yes">'+I(open?'up':'down')+(open?'Ouvrir':'Fermer')+'</button>'
+    +'<button class="btn block" type="button" id="gar-no" style="margin-top:8px">Annuler</button>',
+    {'gar-yes':async()=>{ closeSheet(); toast(nm+(open?' s’ouvre':' se ferme')); await setCap(d.id,'garagedoor_closed',!open); },'gar-no':()=>closeSheet()});
 }
 function openDev(d){ planRoom='dev:'+d.id; const nm=devName(d), r=roomLabel(d); openSheet(nk(nm).indexOf(nk(r))>=0?nm:nm+' · '+r,planSheetHtml(planRoom),{}); }
 async function treeTap(i){
@@ -2412,6 +2431,7 @@ $('#gear').addEventListener('click',openSettings);
 $('#theme-btn').addEventListener('click',()=>{ const t=store.get('theme','auto'), n=THEMES[(THEMES.indexOf(t)+1)%THEMES.length]; store.set('theme',n); applyTheme(); toast('Ambiance : '+TH_LABEL[n]); });
 function devClick(b){
   const d=b.dataset.dev&&data.devices[b.dataset.dev]; if(!d) return false;
+  if(b.dataset.gar){ garageAsk(d,b.dataset.gar==='open'); return true; }
   if(b.hasAttribute('data-toggle')){ setCap(d.id,'onoff',!d.capabilitiesObj.onoff.value); return true; }
   if(b.dataset.cap){ setCap(d.id,b.dataset.cap,b.dataset.num!==undefined?Number(b.dataset.num):b.dataset.val); return true; }
   if(b.dataset.step){
