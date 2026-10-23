@@ -183,6 +183,7 @@ body.wall .wrap{max-width:none;padding-block:max(14px,env(safe-area-inset-top,0p
 .mp-cap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-top:1px solid var(--line)}
 .mp-cap b{display:block;font-weight:600;font-size:15px}
 .mp-cap small{display:block;color:var(--ink-2);font-size:13px}
+.mp-cap small.mp-bad{color:var(--bad);margin-top:2px}
 .mp-go{flex:none;color:var(--brand);font-weight:600;font-size:14px}
 
 /* Commandes */
@@ -1740,8 +1741,9 @@ function planHtml(mini){
 function miniPlan(){
   const lit=PLAN.filter(o=>roomState(o).lit).map(o=>o.n);
   const txt=lit.length?'Allumé : '+lit.join(', '):'Tout est éteint';
-  return '<button class="miniplan" type="button" id="go-plan" aria-label="Le Nid, '+esc(txt)+'. Ouvrir le plan">'+planHtml(true)
-    +'<span class="mp-cap"><span><b>Le Nid</b><small>'+esc(txt)+'</small></span><span class="mp-go">Agrandir ›</span></span></button>';
+  const bad=PLAN.filter(o=>roomState(o).bad).map(o=>o.ts||o.n), btx=bad.length?'Ne répond pas : '+bad.join(', '):'';
+  return '<button class="miniplan" type="button" id="go-plan" aria-label="Le Nid, '+esc(txt+(btx?'. '+btx:''))+'. Ouvrir le plan">'+planHtml(true)
+    +'<span class="mp-cap"><span><b>Le Nid</b><small>'+esc(txt)+'</small>'+(btx?'<small class="mp-bad">'+esc(btx)+'</small>':'')+'</span><span class="mp-go">Agrandir ›</span></span></button>';
 }
 function planSheetHtml(id){
   if(String(id).indexOf('dev:')===0){ const d=data.devices[id.slice(4)]; return d?'<div class="list">'+devRow(d)+'</div>':'<p class="muted">Cet appareil n’est plus dans Homey.</p>'; }
@@ -2382,7 +2384,8 @@ $('#view').addEventListener('click',e=>{
   switch(b.id){
     case 'allclose': closeAll(b); return;
     case 'night': openNight(); return;
-    case 'go-plan': store.set('homePlan','big'); render(); window.scrollTo(0,0); return;
+    case 'go-plan': if([...b.querySelectorAll('.pin.bad')].some(p=>{ const q=p.getBoundingClientRect(); return Math.hypot(q.left+q.width/2-e.clientX,q.top+q.height/2-e.clientY)<=16; })){ openWatch(); return; }
+      store.set('homePlan','big'); render(); window.scrollTo(0,0); return;
     case 'plan-small': store.set('homePlan','small'); pinEdit=false; render(); window.scrollTo(0,0); return;
     case 'watch': openWatch(); return;
     case 'pin-edit': if(pinEdit){ pinDone(); return; } pinEdit=true; alignUndo=null; alignAsked=false; pinTouched=new Set(); render(); toast(pinEdit?(planZoom?'Fais glisser les boutons où tu veux dans la pièce, puis touche « Terminé ».':'Touche une pièce, puis fais glisser ses boutons. Touche « Terminé » à la fin.'):'Boutons rangés'); return;
