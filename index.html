@@ -1555,7 +1555,7 @@ function pinList(tall){
   const saved=(mode==='guest'&&guest&&guest.m==='nid'?guest.p:store.get('pins'+sfx(),{}))||{}, byRoom={}, seen=new Set(), out=[], pd=poolDev();
   for(const o of PLAN) for(const d of roomDevs(o.n)){
     if(seen.has(d.id)||pinSkip(d)||d===pd||(isVisit()&&!visitKeep(d))) continue; seen.add(d.id);
-    const sv=saved[d.id], so=sv&&PLAN.find(p=>p.n===sv.r);
+    const sv=saved[d.id]||saved[String(d.id).slice(0,8)], so=sv&&PLAN.find(p=>p.n===sv.r);
     ((byRoom[(so||o).n])=byRoom[(so||o).n]||[]).push({d,sv:so?sv:null});
   }
   for(const o of PLAN){
@@ -1865,12 +1865,12 @@ function renderShare(){
   if(!sh.length) h+='<p class="muted">Personne pour l’instant.</p>';
   else h+='<div class="cards">'+sh.map(s=>
     '<div class="card"><div class="row"><span class="avatar" aria-hidden="true">'+esc((s.n||'?').trim().charAt(0).toUpperCase())+'</span><div class="row-txt"><b>'+esc(s.n)+'</b><small>'+(s.m==='nid'?'Le Nid'+(s.w?' · mot d’accueil':'')+(s.b.length?' · '+esc(s.b.map(x=>x.n).join(', ')):''):s.b.length+' bouton'+(s.b.length>1?'s':'')+(s.g?' · très gros':'')+' · '+esc(s.b.map(x=>x.n).join(', ')))+'</small></div></div>'
-    +'<div class="row-btns"><button class="btn small" type="button" data-copy-share="'+esc(s.id)+'">'+I('copy')+'Copier le lien</button>'
+    +'<div class="row-btns"><button class="btn small" type="button" data-copy-share="'+esc(s.id)+'">'+I('share')+'Envoyer</button>'
     +'<button class="btn small" type="button" data-preview="'+esc(s.id)+'">'+I('eye')+'Aperçu</button>'
     +'<button class="btn small danger" type="button" data-remove="'+esc(s.id)+'">Retirer</button></div></div>'
   ).join('')+'</div>';
   h+='<details class="help"><summary>Couper l’accès de quelqu’un</summary><p>Sur my.homey.app, ouvre Réglages puis Clés API, et supprime la clé de cette personne : son lien ne marche plus. Pense à le faire à la fin du séjour de tes invités.</p></details>';
-  h+='<details class="help"><summary>La place des boutons chez tes invités</summary><p>Le lien emporte les boutons placés comme sur cet appareil. Si tu les déplaces ensuite, touche « Copier le lien » et renvoie-le.</p></details>';
+  h+='<details class="help"><summary>La place des boutons chez tes invités</summary><p>Le lien emporte les boutons placés comme sur cet appareil. Si tu les déplaces ensuite, touche « Envoyer » sur sa carte pour lui renvoyer le lien.</p></details>';
   return h;
 }
 const RECO=[
@@ -1929,7 +1929,7 @@ function renderGuest(g,isPrev){
 const guestName=(g,isPrev)=>isPrev?(g.q?'ton invité':g.n.replace(/\s*\(exemple\)$/,'')):(g.u||(!g.q?g.n:''));
 const needName=(g,isPrev)=>!isPrev&&!!g.q&&!g.u;
 const isStandalone=()=>{ try{ return window.navigator.standalone===true||window.matchMedia('(display-mode: standalone)').matches; }catch(_){ return false; } };
-const packPins=o=>Object.entries(cleanPins(o||{})).map(([id,v])=>[id,v.r,Math.round(v.fx*1000)/1000,Math.round(v.fy*1000)/1000]);
+const packPins=o=>Object.entries(cleanPins(o||{})).map(([id,v])=>[id.length>12?id.slice(0,8):id,v.r,Math.round(v.fx*1000)/1000,Math.round(v.fy*1000)/1000]);
 function unpackPins(a){ const o={}; if(Array.isArray(a)) for(const x of a.slice(0,80)) if(Array.isArray(x)&&typeof x[0]==='string'&&x[0].length<=64&&typeof x[1]==='string') o[x[0]]={r:x[1],fx:+x[2],fy:+x[3]}; return cleanPins(o); }
 function guestHash(g){ return '#invite='+b64e(JSON.stringify(Object.assign({v:1,n:g.n,a:g.a,k:g.k,g:g.g?1:0,b:g.b},g.t?{t:g.t}:{},g.m==='nid'?{m:'nid'}:{},g.q?{q:1}:{},g.w?{w:g.w}:{},g.p&&Object.keys(g.p).length?{p:packPins(g.p)}:{},g.u?{u:g.u}:{}))); }
 const wordHtml=g=>g.w?'<section class="word"><h3 class="sec">Le mot de la maison</h3><p>'+esc(g.w)+'</p></section>':'';
@@ -2013,6 +2013,29 @@ function openSheet(title,html,actions){
 }
 function closeSheet(){ $('#sheet').hidden=true; document.body.style.overflow=''; sheetActions={}; planRoom=null; nightSheet=false; watchSheet=false; }
 function setMsg(id,txt,cls){ const el=$('#'+id); if(el){ el.textContent=txt; el.className='form-msg'+(cls?' '+cls:''); } }
+// Vérifie la clé d'un invité auprès de Homey : est-ce bien une clé, et a-t-elle les droits du Nid ?
+const NEED=[['homey.device.readonly','Afficher les appareils'],['homey.device.control','Contrôler les appareils'],['homey.flow.start','Lancer les Flows'],['homey.zone.readonly','Afficher les zones']];
+async function checkGuestKey(k,nid){
+  if(/:\/\/|#|invite|\s/i.test(k)||k.length>300) return 'Ce n’est pas une clé : on dirait un lien. Copie la clé sur my.homey.app (Réglages, Clés API).';
+  if(mode==='demo') return '';
+  const need=nid?NEED:[NEED[2]];
+  let me=null;
+  try{ me=await req('/api/manager/sessions/session/me',{key:k,timeout:8000}); }
+  catch(e){ const st=e&&e.status; if(st===401||st===403) return 'Homey ne reconnaît pas cette clé. Recopie-la depuis my.homey.app.'; return 'Impossible de vérifier la clé : Homey ne répond pas. Réessaie dans un instant.'; }
+  const sc=me&&Array.isArray(me.scopes)?me.scopes:null;
+  if(sc){ const has=r=>sc.some(x=>x==='homey'||x===r||r.indexOf(x+'.')===0); const miss=need.filter(([r])=>!has(r)).map(x=>x[1]);
+    return miss.length?'Il manque à cette clé : '+miss.join(', ')+'. Recrée-la sur my.homey.app avec ces droits.':''; }
+  // sans la liste des droits : on essaie de lire les pièces et les appareils
+  if(nid) for(const [path,lab] of [['/api/manager/zones/zone/','Afficher les zones'],['/api/manager/devices/device/','Afficher les appareils']]){
+    try{ await req(path,{key:k,timeout:8000}); }catch(e){ if(e&&(e.status===401||e.status===403)) return 'Il manque à cette clé : '+lab+'. Recrée-la sur my.homey.app avec ce droit.'; }
+  }
+  return '';
+}
+// Envoyer un lien d'un seul bloc (Messages, AirDrop…) ; sinon le copier
+async function sendLink(url,who){
+  try{ if(navigator.share){ await navigator.share({title:'Le Nid',url}); return true; } }catch(e){ if(e&&e.name==='AbortError') return true; }
+  const ok=await copyText(url); toast(ok?'Lien copié : colle-le dans un message à '+who+'.':'Copie impossible ici.',ok?'':'bad'); return ok;
+}
 async function copyText(text,fallbackId){
   try{ await navigator.clipboard.writeText(text); return true; }
   catch(e){ const t=fallbackId&&$('#'+fallbackId); if(t){ t.hidden=false; t.value=text; t.focus(); t.select(); } return false; }
@@ -2285,15 +2308,18 @@ function openShareForm(){
   openSheet('Partager',h,{'sh-create':async()=>{
     const nid=$('#sh-k-nid').checked, n=$('#sh-name').value.trim()||'Invités', k=$('#sh-key').value.trim()||(mode==='demo'?'demo':''), ids=checkedIds('sh-f-');
     if(!k){ setMsg('sh-msg','Colle la clé de cette personne.','bad'); return; }
+    const cb=$('#sh-create'); cb.disabled=true; setMsg('sh-msg','Vérification de la clé…');
+    const bad=await checkGuestKey(k,nid); cb.disabled=false;
+    if(bad){ setMsg('sh-msg',bad,'bad'); return; }
     if(!nid&&!ids.length){ setMsg('sh-msg','Coche au moins un bouton.','bad'); return; }
     const s={id:'s'+Date.now(),n,k,g:!nid&&$('#sh-big').checked?1:0,b:ids.map(id=>{const f=trig.find(x=>x.id===id);return {i:f.id,t:f.type,n:f.name};}),at:Date.now()};
     if(nid) s.m='nid';
     s.q=1;
     const w=($('#sh-word').value||'').trim().slice(0,300); if(w) s.w=w;
-    const all=getShares(); all.push(s); store.set('shares'+sfx(),all);
-    const ok=await copyText(inviteLink(s),'sh-out');
-    if(ok){ closeSheet(); render(); toast('Lien copié : envoie-le par message.'); }
-    else { render(); setMsg('sh-msg','Lien créé. Sélectionne-le ci-dessous et copie-le.','ok'); }
+    const all=getShares(); all.push(s); store.set('shares'+sfx(),all); render();
+    // le lien est prêt : un bouton pour l'envoyer d'un seul bloc
+    openSheet('Lien prêt','<p class="muted" style="margin-top:0">La clé est bonne. Envoie maintenant le lien à '+esc(n)+' : choisis Messages ou AirDrop.</p>'
+      +'<button class="btn primary block" type="button" id="sh-send">'+I('share')+'Envoyer à '+esc(n)+'</button>',{'sh-send':async()=>{ await sendLink(inviteLink(s),n); closeSheet(); }});
   }});
 }
 
@@ -2317,7 +2343,7 @@ function parseInvite(code){
 // Une version plus récente collée sur cet appareil (« Mettre à jour Le Nid ») passe avant.
 function readInvite(){
   const m=location.hash.match(/^#invite=([A-Za-z0-9_-]+)$/);
-  if(!m) return;
+  if(!m){ if(/^#invite/.test(location.hash)) setTimeout(()=>toast('Ce lien est incomplet : il a été coupé. Demande qu’on te le renvoie avec le bouton « Envoyer ».','bad'),300); return; }
   try{
     const g=parseInvite(m[1]), old=store.get('guest',null);
     let use=g;
@@ -2328,7 +2354,7 @@ function readInvite(){
   }catch(e){ setTimeout(()=>toast('Ce lien de partage est illisible. Demande-en un nouveau.','bad'),300); }
 }
 function openGuestUpdate(){
-  openSheet('Mettre à jour Le Nid','<p class="muted" style="margin-top:0">Sur ton iPhone : Partager, « Copier le lien », puis envoie-le sur cet appareil. Copie-le, colle-le ici et touche « Mettre à jour ».</p>'
+  openSheet('Mettre à jour Le Nid','<p class="muted" style="margin-top:0">Sur ton iPhone : Partager, « Envoyer » sur la carte de cet appareil (AirDrop ou Messages). Copie le lien reçu, colle-le ici et touche « Mettre à jour ».</p>'
     +'<div class="field"><textarea id="gu-link" rows="4" autocapitalize="off" spellcheck="false" placeholder="Colle le lien ici" aria-label="Nouveau lien"></textarea></div>'
     +'<p class="form-msg" id="gu-msg" role="status"></p><button class="btn primary block" type="button" id="gu-apply">Mettre à jour</button>',{'gu-apply':()=>{
       const m=($('#gu-link').value||'').match(/#invite=([A-Za-z0-9_-]+)/);
@@ -2426,7 +2452,7 @@ $('#view').addEventListener('click',e=>{
   const sid=b.dataset.copyShare||b.dataset.preview||b.dataset.remove;
   const s=sid&&getShares().find(x=>x.id===sid);
   if(!s) return;
-  if(b.dataset.copyShare){ copyText(inviteLink(s)).then(ok=>toast(ok?'Lien copié : envoie-le par message.':'Copie impossible ici. Utilise « Aperçu » pour vérifier.',ok?'':'bad')); return; }
+  if(b.dataset.copyShare){ sendLink(inviteLink(s),s.n); return; }
   if(b.dataset.preview){ preview=s; render(); window.scrollTo(0,0); return; }
   if(b.dataset.remove){
     if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Confirmer'; return; }
