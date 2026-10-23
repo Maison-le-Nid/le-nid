@@ -627,6 +627,9 @@ body.homebig .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
 .plan:not(.zoomed) .pin>*{display:none}
 .plan:not(.zoomed) .pin.bad{width:10px;height:10px;margin:-5px 0 0 -5px;background:var(--bad)}
 .plan:not(.zoomed) .pr.bad.pbad::after{display:none}
+.plan.mini .pin{width:5px;height:5px;margin:-2.5px 0 0 -2.5px;box-shadow:0 0 0 1px var(--surface)}
+.plan.mini .pin.bad{width:6px;height:6px;margin:-3px 0 0 -3px}
+.plan.mini .pin.on{box-shadow:0 0 0 1px var(--surface),0 0 6px 2px rgba(241,189,87,.75)}
 .plan:not(.zoomed) .pin.on{background:#f1bd57;box-shadow:0 0 0 1.5px var(--face),0 0 9px 3px rgba(241,189,87,.75)}
 .plan:not(.zoomed) .pin.moving{animation:dot-beat 1.1s ease-in-out infinite}
 @keyframes dot-beat{50%{transform:scale(1.7);opacity:.55}}
@@ -1701,7 +1704,7 @@ function setZoom(name){
 }
 function planHtml(mini){
   const tall=!mini&&tallPlan(), tag=mini?'span':'button';
-  const pins=mini?[]:pinList(tall), pinned=new Set(pins.map(p=>p.o.n));
+  const pins=mini?[]:pinList(tall), pinned=new Set(pins.map(p=>p.o.n)), dots=mini?pinList(false):pins;
   const zt=mini?{t:'none',z:1}:zoomTf(planZoom,tall), zoom=zt.z>1;
   let h='<div class="plan'+(mini?' mini':'')+(tall?' tall':'')+(!mini&&pinEdit?' edit':'')+(zoom?' zoomed':'')+'" style="aspect-ratio:'+(tall?PLAN_H+' / '+PLAN_W:PLAN_W+' / '+PLAN_H)+';--z:'+zt.z+'"><div class="plan-in" style="transform:'+zt.t+'">';
   h+='<span class="corr" aria-hidden="true" style="'+planBox(PLAN_CORR,tall)+'"></span>';
@@ -1709,7 +1712,7 @@ function planHtml(mini){
   for(const o of PLAN){
     const st=roomState(o);
     const hud=!mini&&o.k==='pool'&&poolDev();
-    const cls='pr'+(o.k?' '+o.k:'')+(hud?' hud':'')+(st.lit?' lit':'')+(mini?'':litAnim('r:'+o.n,!!st.lit))+(st.bad?' bad'+(st.devs.every(d=>d.available!==false||pins.some(p=>p.d===d&&p.o===o))?' pbad':''):'')+(!st.devs.length&&!o.k?' none':'')+(tall&&o.v?' vt':'')+(pinned.has(o.n)&&((tall&&o.v)||smallRoom(o,tall)||stripRoom(o,tall))?' pinned'+(stripRoom(o,tall)?' strip':'')+(!tall&&smallRoom(o,tall)&&bayTop(o)?' baytop':''):'');
+    const cls='pr'+(o.k?' '+o.k:'')+(hud?' hud':'')+(st.lit?' lit':'')+(mini?'':litAnim('r:'+o.n,!!st.lit))+(st.bad?' bad'+(st.devs.every(d=>d.available!==false||dots.some(p=>p.d===d&&p.o===o))?' pbad':''):'')+(!st.devs.length&&!o.k?' none':'')+(tall&&o.v?' vt':'')+(pinned.has(o.n)&&((tall&&o.v)||smallRoom(o,tall)||stripRoom(o,tall))?' pinned'+(stripRoom(o,tall)?' strip':'')+(!tall&&smallRoom(o,tall)&&bayTop(o)?' baytop':''):'');
     if(mini){ h+='<span class="'+cls+'" style="'+planBox(o,false)+'"></span>'; continue; }
     const say=o.n+(st.sub?', '+st.sub:'')+(st.bad?', un appareil ne répond pas':'')+(st.devs.length?'':', rien de relié à Homey');
     h+='<button class="'+cls+'" type="button" data-plan="'+esc(o.n)+'" style="'+planBox(o,tall)+'" aria-label="'+esc(say)+'"><b>'+esc(tall&&o.ts||o.s||o.n)+'</b>'+(st.temp&&!hud?'<small>'+esc(st.temp)+'</small>':'')+'</button>';
@@ -1728,6 +1731,8 @@ function planHtml(mini){
   h+=treesHtml(tall,mini);
   if(!mini) h+=poolHud(PLAN.find(o=>o.k==='pool'),tall);
   if(!mini) h+=pinsHtml(tall,pins);
+  else h+=dots.map(p=>{ const d=p.d, off=d.available===false, on=!off&&isLightDev(d)&&isOn(d);
+    return '<i class="pin'+(on?' on':'')+(off?' bad':'')+'" aria-hidden="true" style="'+ptPos(p.o.x+p.fx*p.o.w,p.o.y+p.fy*p.o.h,false)+'"></i>'; }).join('');
   h+='</div>'+(zoom?'<button class="zoom-out" type="button" id="zoom-out">‹ Tout le plan</button>'+(pinEdit?'':'<button class="zoom-out zoom-list" type="button" id="zoom-list">Liste ›</button>'):'')+'</div>';
   if(!mini) h+='<p class="plan-legend">'+(zoom?'':'<span><i class="pt"></i>Un bouton</span>')+'<span><i></i>Lumière allumée</span>'+(isVisit()?'':'<span><i class="dot"></i>Ne répond pas</span>')+'<span><i class="glass"></i>Baie vitrée</span><span>'+(zoom?'Touche un bouton pour allumer, ouvrir ou régler':'Touche une pièce pour l’agrandir, encore pour revenir. Appui long sur un point : allumer ou éteindre')+'</span></p>';
   return h;
