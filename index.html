@@ -1857,12 +1857,12 @@ function getShares(){
 }
 function renderShare(){
   const sh=getShares();
-  let h='<div class="share-top"><p class="lead">Donne Le Nid à tes invités, sans caméras ni réglages. Ou seulement quelques boutons.</p>'
+  let h='<div class="share-top"><p class="lead">Donne Le Nid à tes invités, ou seulement quelques boutons.</p>'
     +'<button class="btn primary block" type="button" id="share-new">'+I('plus')+'Partager avec quelqu’un</button></div>';
   h+='<h3 class="sec">Personnes</h3>';
   if(!sh.length) h+='<p class="muted">Personne pour l’instant.</p>';
   else h+='<div class="cards">'+sh.map(s=>
-    '<div class="card"><div class="row"><span class="avatar" aria-hidden="true">'+esc((s.n||'?').trim().charAt(0).toUpperCase())+'</span><div class="row-txt"><b>'+esc(s.n)+'</b><small>'+(s.m==='nid'?'Le Nid sans caméras'+(s.w?' · mot d’accueil':'')+(s.b.length?' · '+esc(s.b.map(x=>x.n).join(', ')):''):s.b.length+' bouton'+(s.b.length>1?'s':'')+(s.g?' · très gros':'')+' · '+esc(s.b.map(x=>x.n).join(', ')))+'</small></div></div>'
+    '<div class="card"><div class="row"><span class="avatar" aria-hidden="true">'+esc((s.n||'?').trim().charAt(0).toUpperCase())+'</span><div class="row-txt"><b>'+esc(s.n)+'</b><small>'+(s.m==='nid'?'Le Nid'+(s.w?' · mot d’accueil':'')+(s.b.length?' · '+esc(s.b.map(x=>x.n).join(', ')):''):s.b.length+' bouton'+(s.b.length>1?'s':'')+(s.g?' · très gros':'')+' · '+esc(s.b.map(x=>x.n).join(', ')))+'</small></div></div>'
     +'<div class="row-btns"><button class="btn small" type="button" data-copy-share="'+esc(s.id)+'">'+I('copy')+'Copier le lien</button>'
     +'<button class="btn small" type="button" data-preview="'+esc(s.id)+'">'+I('eye')+'Aperçu</button>'
     +'<button class="btn small danger" type="button" data-remove="'+esc(s.id)+'">Retirer</button></div></div>'
@@ -2270,7 +2270,7 @@ function openShareForm(){
   let h='';
   if(mode==='live'&&cfg&&!cfg.remote) h+='<p class="note warn"><span>Sans adresse « En déplacement » dans Réglages, le lien ne marchera que sur le Wi-Fi de la maison.</span></p>';
   h+='<fieldset class="checks sh-kind"><legend>Ce que la personne voit</legend>'
-    +'<label class="opt" for="sh-k-nid"><input type="radio" name="sh-kind" id="sh-k-nid" value="nid" checked><span><b>Le Nid, sans caméras</b><small>Le plan pour allumer, ouvrir les stores, régler la clim et la lumière de la piscine. Ni caméras, ni réglages.</small></span></label>'
+    +'<label class="opt" for="sh-k-nid"><input type="radio" name="sh-kind" id="sh-k-nid" value="nid" checked><span><b>Le Nid</b><small>Le plan pour allumer, ouvrir les stores, régler la clim et la lumière de la piscine.</small></span></label>'
     +'<label class="opt" for="sh-k-btn"><input type="radio" name="sh-kind" id="sh-k-btn" value="btn"><span><b>Quelques boutons</b><small>Seulement les scènes que tu choisis.</small></span></label></fieldset>';
   h+='<div class="field"><label for="sh-name">Pour qui ?</label><input id="sh-name" maxlength="40" autocomplete="off" placeholder="Ex. : Invités de l’été"><small>Pour t’y retrouver. Chaque invité écrira son prénom en ouvrant le lien sur son téléphone.</small></div>'
     +'<div class="field"><label for="sh-key">Clé Homey de cette personne</label><input id="sh-key" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="'+(mode==='demo'?'Pas besoin en démo':'Colle sa clé ici')+'">'
