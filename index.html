@@ -631,6 +631,21 @@ body.homebig .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
 .plan:not(.zoomed) .pin.moving{animation:dot-beat 1.1s ease-in-out infinite}
 @keyframes dot-beat{50%{transform:scale(1.7);opacity:.55}}
 @keyframes snap-pop{40%{scale:1.14}}
+/* Appui long sur un point du plan entier : allumer ou éteindre */
+.plan{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+@keyframes dot-pop{40%{scale:2.2}}
+.plan:not(.zoomed) .pin.pop{animation:dot-pop .35s ease-out}
+/* Nuit au mur (22 h – 7 h) : l'écran s'assombrit, seules les lumières allumées restent */
+body.wall.night{background:#0b0c0e}
+body.wall.night #view>*:not(.hb-top):not(.hb-plan),body.wall.night .hb-top>*:not(.hb-clock),body.wall.night .plan-legend,body.wall.night .zoom-out,body.wall.night #toast{visibility:hidden}
+body.wall.night .wall-clock{color:#8a7d60}
+body.wall.night .wall-date{color:#544c3e}
+body.wall.night .plan{background:transparent;border-color:transparent;box-shadow:none}
+body.wall.night .plan-in>*:not(.pin):not(.tree.on){opacity:.09;filter:grayscale(1)}
+body.wall.night .plan-in>.tree.on{opacity:1}
+body.wall.night .plan .pin{opacity:0}
+body.wall.night .plan .pin.on{opacity:1;box-shadow:0 0 0 1.5px #0b0c0e,0 0 12px 4px rgba(241,189,87,.8)}
+body.wall #view,body.wall .hb-plan,body.wall .plan{transition:background-color .8s,opacity .8s}
 .plan.edit .pin.pop{animation:snap-pop .18s ease-out}
 @media (prefers-reduced-motion: reduce){.plan.edit .pin.pop{animation:none}}
 .guide{position:absolute;z-index:3;pointer-events:none;background:var(--accent);opacity:.85}
@@ -1714,7 +1729,7 @@ function planHtml(mini){
   if(!mini) h+=poolHud(PLAN.find(o=>o.k==='pool'),tall);
   if(!mini) h+=pinsHtml(tall,pins);
   h+='</div>'+(zoom?'<button class="zoom-out" type="button" id="zoom-out">‹ Tout le plan</button>'+(pinEdit?'':'<button class="zoom-out zoom-list" type="button" id="zoom-list">Liste ›</button>'):'')+'</div>';
-  if(!mini) h+='<p class="plan-legend">'+(zoom?'':'<span><i class="pt"></i>Un bouton</span>')+'<span><i></i>Lumière allumée</span>'+(isVisit()?'':'<span><i class="dot"></i>Ne répond pas</span>')+'<span><i class="glass"></i>Baie vitrée</span><span>'+(zoom?'Touche un bouton pour allumer, ouvrir ou régler':'Touche une pièce pour l’agrandir et voir ses boutons ; touche-la encore pour revenir')+'</span></p>';
+  if(!mini) h+='<p class="plan-legend">'+(zoom?'':'<span><i class="pt"></i>Un bouton</span>')+'<span><i></i>Lumière allumée</span>'+(isVisit()?'':'<span><i class="dot"></i>Ne répond pas</span>')+'<span><i class="glass"></i>Baie vitrée</span><span>'+(zoom?'Touche un bouton pour allumer, ouvrir ou régler':'Touche une pièce pour l’agrandir, encore pour revenir. Appui long sur un point : allumer ou éteindre')+'</span></p>';
   return h;
 }
 function miniPlan(){
@@ -1938,7 +1953,22 @@ function renderVisit(g,isPrev){
   h+='<div class="hb-more">'+nightBtn()+(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3></div><div class="scenes">'+fl.map(f=>sceneBtn(f,false)).join('')+'</div>':'')+'</div>';
   return h+foot;
 }
-function render(){ renderView(); fitLabels(); fitDots(); }
+function render(){ renderView(); fitLabels(); fitDots(); nightCheck(); }
+// Nuit au mur : de 22 h à 7 h, l'écran au mur s'assombrit ; un toucher le réveille une minute (ce toucher ne lance rien)
+let wakeUntil=0, swallow=false;
+const nightHour=()=>{ const h=new Date().getHours(); return h>=22||h<7; };
+function nightCheck(){
+  const on=document.body.classList.contains('wall')&&nightHour()&&Date.now()>wakeUntil&&!pinEdit&&!pinDrag&&$('#sheet').hidden;
+  if(on&&planZoom){ setZoom(null); return; }
+  document.body.classList.toggle('night',on);
+}
+document.addEventListener('pointerdown',e=>{
+  if(!document.body.classList.contains('wall')||!nightHour()) return;
+  const was=document.body.classList.contains('night'); wakeUntil=Date.now()+60000;
+  if(was){ document.body.classList.remove('night'); swallow=true; e.preventDefault(); e.stopPropagation(); }
+},true);
+document.addEventListener('click',e=>{ if(swallow){ swallow=false; e.preventDefault(); e.stopPropagation(); } },true);
+setInterval(nightCheck,20000);
 function renderView(){
   if(pinDrag) return;
   const g=mode==='guest'?guest:preview;
@@ -2396,6 +2426,22 @@ $('#view').addEventListener('click',e=>{
     toast(mode==='demo'?'Retiré de la liste.':'Retiré. Supprime aussi sa clé dans Homey.');
   }
 });
+// Plan entier : un appui long sur un point allume ou éteint (ouvre / ferme) sans agrandir la pièce
+let lp=null, lpFired=false;
+$('#view').addEventListener('pointerdown',e=>{
+  lpFired=false; if(pinEdit||e.button>0) return; const pl=e.target.closest('.plan:not(.zoomed):not(.mini)'); if(!pl) return;
+  const x=e.clientX, y=e.clientY;
+  lp={x,y,t:setTimeout(()=>{ lp=null;
+    const near=[...pl.querySelectorAll('.pin')].filter(p=>getComputedStyle(p).visibility==='visible').map(p=>{ const r=p.getBoundingClientRect(); return {p,d:Math.hypot(r.left+r.width/2-x,r.top+r.height/2-y)}; }).sort((a,b)=>a.d-b.d)[0];
+    if(!near||near.d>26) return;
+    lpFired=true; setTimeout(()=>{ lpFired=false; },900); near.p.classList.remove('pop'); void near.p.offsetWidth; near.p.classList.add('pop');
+    try{ navigator.vibrate&&navigator.vibrate(12); }catch(_){}
+    pinTap(near.p.dataset.pin); },480)};
+});
+$('#view').addEventListener('pointermove',e=>{ if(lp&&Math.hypot(e.clientX-lp.x,e.clientY-lp.y)>10){ clearTimeout(lp.t); lp=null; } });
+['pointerup','pointercancel'].forEach(t=>$('#view').addEventListener(t,()=>{ if(lp){ clearTimeout(lp.t); lp=null; } }));
+$('#view').addEventListener('click',e=>{ if(lpFired){ lpFired=false; e.preventDefault(); e.stopPropagation(); } },true);
+$('#view').addEventListener('contextmenu',e=>{ if(e.target.closest('.plan')) e.preventDefault(); });
 // Déplacer les boutons sur le plan (mode « Déplacer les boutons »)
 $('#view').addEventListener('pointerdown',e=>{
   if(!pinEdit) return; const b=e.target.closest('.pin'); if(!b) return;
