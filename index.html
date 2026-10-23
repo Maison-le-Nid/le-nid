@@ -630,6 +630,9 @@ body.homebig .wrap{padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
 .plan:not(.zoomed) .pin.on{background:#f1bd57;box-shadow:0 0 0 1.5px var(--face),0 0 9px 3px rgba(241,189,87,.75)}
 .plan:not(.zoomed) .pin.moving{animation:dot-beat 1.1s ease-in-out infinite}
 @keyframes dot-beat{50%{transform:scale(1.7);opacity:.55}}
+@keyframes snap-pop{40%{scale:1.14}}
+.plan.edit .pin.pop{animation:snap-pop .18s ease-out}
+@media (prefers-reduced-motion: reduce){.plan.edit .pin.pop{animation:none}}
 .guide{position:absolute;z-index:3;pointer-events:none;background:var(--accent);opacity:.85}
 .guide.gx{width:calc(1.5px / var(--z));margin-left:calc(-.75px / var(--z))}
 .guide.gy{height:calc(1.5px / var(--z));margin-top:calc(-.75px / var(--z))}
@@ -1358,7 +1361,7 @@ const bayDev=k=>{ for(const n of String(k).split('|')){ const d=Object.values(da
 /* ---------- Plan : les arbres et les boutons d’appareils ---------- */
 // Les 6 arbres devant la piscine, répartis sur sa longueur
 const PLAN_TREES=[0,1,2,3,4,5].map(i=>({x:14.05+(i-2.5)*4,y:21.45}));
-function ptPos(X,Y,tall){ const p=v=>(Math.round(v*1000)/10)+'%'; return tall?'left:'+p((PLAN_H-Y)/PLAN_H)+';top:'+p((PLAN_W-X)/PLAN_W):'left:'+p(X/PLAN_W)+';top:'+p((PLAN_H-Y)/PLAN_H); }
+function ptPos(X,Y,tall){ const p=v=>(Math.round(v*100000)/1000)+'%'; return tall?'left:'+p((PLAN_H-Y)/PLAN_H)+';top:'+p((PLAN_W-X)/PLAN_W):'left:'+p(X/PLAN_W)+';top:'+p((PLAN_H-Y)/PLAN_H); }
 // Une prise pour tous les arbres (« Lumière Arbre »), ou une par arbre (« Lumière arbre 1 » … « Lumière arbre 6 », de gauche à droite)
 const TREE_RE=/^lumi[eè]re (des )?arbres?( ?n?°? ?(\d+))?$/;
 const treeDevs=()=>Object.values(data.devices||{}).filter(d=>TREE_RE.test(nk(d.name)));
@@ -1819,7 +1822,7 @@ function renderHomeBig(wall){
   h+='<div class="hb-plan">'+planHtml()+'</div>';
   h+='<div class="hb-tools">'+(isWide()?'<button class="btn small" type="button" id="'+(wall?'wall-exit':'wall-go')+'">'+(wall?'Quitter le plein écran':'Plein écran')+'</button>':'')
     +'<button class="btn small'+(pinEdit?' primary':'')+'" type="button" id="pin-edit">'+(pinEdit?I('check')+'Terminé':'Déplacer les boutons')+'</button>'
-    +(pinEdit?(alignUndo?'<button class="btn small" type="button" id="pin-undo">Annuler l’alignement</button>':'<button class="btn small" type="button" id="pin-align">Aligner</button>')+'<button class="btn small" type="button" id="pin-reset">Remettre en place</button>':'<button class="btn small" type="button" id="plan-small">Réduire le plan</button>')+'</div>';
+    +(pinEdit?(alignUndo?'<button class="btn small" type="button" id="pin-undo">Annuler l’alignement</button>':'<button class="btn small" type="button" id="pin-align">Aligner</button>')+'<button class="btn small" type="button" id="pin-guest">'+I('eye')+'Aperçu invité</button><button class="btn small" type="button" id="pin-reset">Remettre en place</button>':'<button class="btn small" type="button" id="plan-small">Réduire le plan</button>')+'</div>';
   h+='<nav class="hb-nav" aria-label="Rubriques"><button type="button" data-go="rooms">'+I('rooms')+'Pièces</button><button type="button" data-go="share">'+I('share')+'Partager</button><button type="button" data-go="apps">'+I('apps')+'Applis</button></nav>';
   let fl=homeFlows(); const now=nowScene(fl); if(now) fl=[now].concat(fl.filter(f=>f!==now));
   h+='<div class="hb-more">'+nightBtn()
@@ -2350,6 +2353,7 @@ $('#view').addEventListener('click',e=>{
     case 'pin-edit': if(pinEdit){ pinDone(); return; } pinEdit=true; alignUndo=null; alignAsked=false; pinTouched=new Set(); render(); toast(pinEdit?(planZoom?'Fais glisser les boutons où tu veux dans la pièce, puis touche « Terminé ».':'Touche une pièce, puis fais glisser ses boutons. Touche « Terminé » à la fin.'):'Boutons rangés'); return;
     case 'zoom-out': setZoom(null); return;
     case 'pin-align': alignPins(planZoom); return;
+    case 'pin-guest': preview=getShares().find(x=>x.m==='nid')||{id:'apercu',m:'nid',n:'Invités',q:1,b:[]}; render(); window.scrollTo(0,0); return;
     case 'pin-undo': if(alignUndo){ store.set('pins'+sfx(),alignUndo); alignUndo=null; render(); toast('Alignement annulé'); } return;
     case 'zoom-list': if(planZoom) openRoom(planZoom); return;
     case 'pin-reset': if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Toucher encore pour confirmer'; return; } store.del('pins'+sfx()); render(); toast('Boutons remis à leur place'); return;
@@ -2401,7 +2405,10 @@ $('#view').addEventListener('pointerdown',e=>{
     :{x0:o.x/PLAN_W,x1:(o.x+o.w)/PLAN_W,y0:(PLAN_H-o.y-o.h)/PLAN_H,y1:(PLAN_H-o.y)/PLAN_H};
   const area=b.closest('.plan-in')||plan, others=[...area.querySelectorAll('.pin')].filter(x=>x!==b&&x.dataset.room===b.dataset.room).map(x=>({x:parseFloat(x.style.left)/100,y:parseFloat(x.style.top)/100})).filter(q=>isFinite(q.x)&&isFinite(q.y));
   const gx=document.createElement('i'), gy=document.createElement('i'); gx.className='guide gx'; gy.className='guide gy'; gx.hidden=gy.hidden=true; area.append(gx,gy);
-  pinDrag={b,plan,area,o,box,others,gx,gy,id:b.dataset.pin,pid:e.pointerId,moved:false};
+  const midX=[], midY=[]; // milieu de deux boutons sur une même rangée (ou colonne)
+  for(let i=0;i<others.length;i++) for(let j=i+1;j<others.length;j++){ const p=others[i], q=others[j];
+    if(Math.abs(p.y-q.y)<.002) midX.push({x:(p.x+q.x)/2,y:p.y}); if(Math.abs(p.x-q.x)<.002) midY.push({y:(p.y+q.y)/2,x:p.x}); }
+  pinDrag={b,plan,area,o,box,others,midX,midY,snap:'',gx,gy,id:b.dataset.pin,pid:e.pointerId,moved:false};
   try{ b.setPointerCapture(e.pointerId); }catch(_){}
   b.classList.add('drag'); e.preventDefault();
 });
@@ -2414,8 +2421,13 @@ $('#view').addEventListener('pointermove',e=>{
     g.ly=Math.max(B.y0+Math.min(my,(B.y1-B.y0)/2),Math.min(B.y1-Math.min(my,(B.y1-B.y0)/2),g.ly)); }
   // aimant : à moins de 10 px de la colonne ou de la ligne d'un autre bouton, il s'y accroche (fine ligne laiton)
   const tx=10/r.width, ty=10/r.height; let sx=null, sy=null;
-  for(const q of g.others){ if(Math.abs(q.x-g.lx)<tx&&(sx===null||Math.abs(q.x-g.lx)<Math.abs(sx-g.lx))) sx=q.x; if(Math.abs(q.y-g.ly)<ty&&(sy===null||Math.abs(q.y-g.ly)<Math.abs(sy-g.ly))) sy=q.y; }
+  const cx=g.others.map(q=>q.x).concat(g.midX.filter(m=>Math.abs(m.y-g.ly)<ty*1.5).map(m=>m.x)), cy=g.others.map(q=>q.y).concat(g.midY.filter(m=>Math.abs(m.x-g.lx)<tx*1.5).map(m=>m.y));
+  for(const v of cx) if(Math.abs(v-g.lx)<tx&&(sx===null||Math.abs(v-g.lx)<Math.abs(sx-g.lx))) sx=v;
+  for(const v of cy) if(Math.abs(v-g.ly)<ty&&(sy===null||Math.abs(v-g.ly)<Math.abs(sy-g.ly))) sy=v;
   if(sx!==null) g.lx=sx; if(sy!==null) g.ly=sy;
+  // petit rebond (et vibration quand l'appareil sait le faire) au moment où il s'accroche
+  const key=(sx===null?'':sx.toFixed(4))+'|'+(sy===null?'':sy.toFixed(4));
+  if(key!==g.snap){ if(key!=='|'){ g.b.classList.remove('pop'); void g.b.offsetWidth; g.b.classList.add('pop'); try{ navigator.vibrate&&navigator.vibrate(8); }catch(_){} } g.snap=key; }
   const B=g.box||{x0:0,x1:1,y0:0,y1:1};
   g.gx.hidden=sx===null; if(sx!==null){ g.gx.style.left=(sx*100)+'%'; g.gx.style.top=(B.y0*100)+'%'; g.gx.style.height=((B.y1-B.y0)*100)+'%'; }
   g.gy.hidden=sy===null; if(sy!==null){ g.gy.style.top=(sy*100)+'%'; g.gy.style.left=(B.x0*100)+'%'; g.gy.style.width=((B.x1-B.x0)*100)+'%'; }
