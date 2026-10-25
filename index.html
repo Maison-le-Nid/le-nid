@@ -681,16 +681,16 @@ body.wall.visit .plan-legend,body.wall.visit .foot,body.wall.visit .hb-more{disp
 body.wall.visit .hb-plan{width:min(100%,calc((100vh - 175px) * 35 / 22.5))}
 body.wall.visit .hb-top{margin-bottom:8px}
 /* Plein écran : de vraies icônes à toucher à la place des points (taille selon la place dans la pièce) */
-body.wall .plan:not(.zoomed):not(.mini) .pin{pointer-events:auto;width:var(--ps,34px);height:var(--ps,34px);margin:calc(var(--ps,34px) / -2) 0 0 calc(var(--ps,34px) / -2);border:1px solid var(--hair);background:var(--face);color:var(--title);box-shadow:var(--float-lo)}
-body.wall .plan:not(.zoomed):not(.mini) .pin>.i{display:block;width:calc(var(--ps,34px) * .52);height:calc(var(--ps,34px) * .52)}
-body.wall .plan:not(.zoomed):not(.mini) .pin>.pt{display:block;font-size:calc(var(--ps,34px) * .34)}
-body.wall .plan:not(.zoomed):not(.mini) .pin.on{background:var(--lit-grad);color:var(--ink);box-shadow:var(--glow)}
-body.wall .plan:not(.zoomed):not(.mini) .pin.open{color:var(--accent)}
-body.wall .plan:not(.zoomed):not(.mini) .pin.bad{border:1.5px dashed var(--bad);background:var(--face);color:var(--bad)}
-body.wall .plan:not(.zoomed):not(.mini) .pin.moving{animation:none;box-shadow:0 0 0 2px var(--accent),var(--float-lo)}
-body.wall .plan:not(.zoomed):not(.mini) .pin.pop{animation:snap-pop .25s ease-out}
-body.wall .plan.edit:not(.zoomed) .pin{pointer-events:none}
-body.wall.night .plan:not(.zoomed) .pin.on{box-shadow:0 0 0 1.5px #0b0c0e,0 0 16px 5px rgba(241,189,87,.7)}
+body.wall .plan:not(.zoomed):not(.mini) .pin:not(.as-dot){pointer-events:auto;width:var(--ps,34px);height:var(--ps,34px);margin:calc(var(--ps,34px) / -2) 0 0 calc(var(--ps,34px) / -2);border:1px solid var(--hair);background:var(--face);color:var(--title);box-shadow:var(--float-lo)}
+body.wall .plan:not(.zoomed):not(.mini) .pin:not(.as-dot)>.i{display:block;width:calc(var(--ps,34px) * .52);height:calc(var(--ps,34px) * .52)}
+body.wall .plan:not(.zoomed):not(.mini) .pin:not(.as-dot)>.pt{display:block;font-size:calc(var(--ps,34px) * .34)}
+body.wall .plan:not(.zoomed):not(.mini) .pin:not(.as-dot).on{background:var(--lit-grad);color:var(--ink);box-shadow:var(--glow)}
+body.wall .plan:not(.zoomed):not(.mini) .pin:not(.as-dot).open{color:var(--accent)}
+body.wall .plan:not(.zoomed):not(.mini) .pin:not(.as-dot).bad{border:1.5px dashed var(--bad);background:var(--face);color:var(--bad)}
+body.wall .plan:not(.zoomed):not(.mini) .pin:not(.as-dot).moving{animation:none;box-shadow:0 0 0 2px var(--accent),var(--float-lo)}
+body.wall .plan:not(.zoomed):not(.mini) .pin:not(.as-dot).pop{animation:snap-pop .25s ease-out}
+body.wall .plan.edit:not(.zoomed) .pin:not(.as-dot){pointer-events:none}
+body.wall.night .plan:not(.zoomed) .pin:not(.as-dot).on{box-shadow:0 0 0 1.5px #0b0c0e,0 0 16px 5px rgba(241,189,87,.7)}
 /* Fiche d'un appareil : toutes ses commandes, comme dans Homey */
 .row-main{flex:1;min-width:0;display:flex;align-items:center;gap:12px;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .row-more{flex:none;width:18px;height:18px;margin-left:-6px;color:var(--ink-3)}
@@ -728,6 +728,16 @@ body.wall.night .plan:not(.zoomed) .pin.on{box-shadow:0 0 0 1.5px #0b0c0e,0 0 16
 .rng.t-temp{--trk:linear-gradient(90deg,#cfe2ff,#fff6e6 50%,#ffb05a)}
 .rng.t-hue{--trk:linear-gradient(90deg,#f33,#fc3,#3d6,#3cf,#36f,#c3f,#f33)}
 .rng:disabled{opacity:.45}
+/* Ambiances : celles réglées pour cette lampe portent un point laiton */
+.chip.amb{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.chip.mine::after{content:'';display:inline-block;width:6px;height:6px;margin-left:7px;border-radius:50%;background:var(--accent);vertical-align:middle}
+.amb-tip{margin:8px 0 0;font-size:13px;color:var(--ink-3)}
+.room-amb{margin:0 0 16px}
+/* Plein écran : la fiche s'ouvre dans une colonne à droite, le plan reste visible et se touche toujours */
+body.wall .sheet.side{left:auto;width:min(420px,38vw);padding:0;align-items:stretch;justify-content:stretch}
+body.wall .sheet.side .sheet-bg{display:none}
+body.wall .sheet.side .sheet-card{max-width:none;max-height:none;height:100%;border-radius:28px 0 0 28px;box-shadow:-12px 0 40px -18px rgba(40,30,15,.45)}
+body.wall.side-open .wrap{padding-right:calc(min(420px,38vw) + 16px);transition:padding-right .25s ease}
 /* Le mot de la maison */
 .word{max-width:720px;margin:4px auto 16px;padding:14px 18px 16px;border-radius:22px;background:var(--face);box-shadow:var(--float-lo)}
 .word .sec{margin:0 0 6px}
@@ -1403,14 +1413,35 @@ function rngHtml(d,k,c,cls,style){
 const satTrk=h=>'--trk:linear-gradient(90deg,#f4f1ec,hsl('+Math.round((typeof h==='number'?h:0)*360)+',90%,55%))';
 // Ambiances des lampes : intensité et blanc (0 = froid, 1 = chaud)
 const AMB={lecture:{t:'Lecture',dim:1,tp:.3},soiree:{t:'Soirée',dim:.5,tp:.85},veilleuse:{t:'Veilleuse',dim:.1,tp:1}};
-async function ambiance(d,a){
-  const p=AMB[a], c=d.capabilitiesObj||{}; if(!p) return;
-  if(capOk(c,'light_temperature')){
-    if(capOk(c,'light_mode')&&c.light_mode.value!=='temperature'){ if(await setCap(d.id,'light_mode','temperature')===false) return; }
-    if(await setCap(d.id,'light_temperature',p.tp)===false) return; }
-  if(await setCap(d.id,'dim',p.dim)===false) return;
+// Une ambiance peut être réglée lampe par lampe (appui long sur l'ambiance dans la fiche de la lampe)
+const ambMine=()=>store.get('amb'+sfx(),{})||{};
+function ambFor(d,a){ const m=(ambMine()[d.id]||{})[a]; return m&&typeof m.dim==='number'?m:AMB[a]; }
+async function ambiance(d,a,quiet){
+  const p=ambFor(d,a), c=d.capabilitiesObj||{}; if(!AMB[a]) return false;
+  if(capOk(c,'light_temperature')&&typeof p.tp==='number'){
+    if(capOk(c,'light_mode')&&c.light_mode.value!=='temperature'){ if(await setCap(d.id,'light_mode','temperature')===false) return false; }
+    if(await setCap(d.id,'light_temperature',p.tp)===false) return false; }
+  if(await setCap(d.id,'dim',p.dim)===false) return false;
   if(capOk(c,'onoff')&&c.onoff.value!==true) await setCap(d.id,'onoff',true);
-  toast(p.t+' : '+devName(d));
+  if(!quiet) toast(AMB[a].t+' : '+devName(d));
+  return true;
+}
+// Garde l'intensité et le blanc actuels de la lampe pour cette ambiance
+function ambSave(d,a){
+  const c=d.capabilitiesObj||{}; if(!AMB[a]||!c.dim||typeof c.dim.value!=='number') return;
+  const m=ambMine(), x=m[d.id]||{}; x[a]={dim:+c.dim.value.toFixed(2)};
+  if(c.light_temperature&&typeof c.light_temperature.value==='number') x[a].tp=+c.light_temperature.value.toFixed(2);
+  m[d.id]=x; store.set('amb'+sfx(),m); render();
+  toast(AMB[a].t+' enregistrée pour '+devName(d)); try{ navigator.vibrate&&navigator.vibrate(12); }catch(_){}
+}
+// Toutes les lampes à intensité d'une pièce
+const roomLamps=name=>roomDevs(name).filter(d=>d.available!==false&&capOk(d.capabilitiesObj||{},'dim')&&isLightDev(d));
+async function roomAmbiance(name,a){
+  const ls=roomLamps(name); if(!ls.length||!AMB[a]) return;
+  if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
+  const ok=await Promise.all(ls.map(d=>ambiance(d,a,true)));
+  const o=PLAN.find(p=>p.n===name), n=ok.filter(Boolean).length;
+  if(n) toast(AMB[a].t+' : '+((o&&(o.ts||o.t))||name)+(n>1?' ('+n+' lampes)':''));
 }
 function devCard(d){
   const c=d.capabilitiesObj||{}, id=esc(d.id), k=ctrlKind(d), off=d.available===false, done=new Set(['light_mode']), nm=esc(devName(d));
@@ -1431,7 +1462,9 @@ function devCard(d){
   else if(can('windowcoverings_closed')){ done.add('windowcoverings_closed'); quick='<div class="seg" role="group" aria-label="'+nm+'"><button type="button" data-dev="'+id+'" data-bcap="windowcoverings_closed" data-bval="0" aria-label="Ouvrir">'+I('up')+'</button><button type="button" data-dev="'+id+'" data-bcap="windowcoverings_closed" data-bval="1" aria-label="Fermer">'+I('down')+'</button></div>'; }
   if(can('onoff')&&!done.has('onoff')){ done.add('onoff'); ctl+='<div class="dv-line"><span>Marche</span><button class="switch" type="button" role="switch" aria-checked="'+(!!c.onoff.value)+'" data-dev="'+id+'" data-toggle aria-label="Marche"><span></span></button></div>'; }
   // Lumière : ambiances toutes prêtes, puis intensité, blanc, couleur
-  if(can('dim')){ done.add('dim'); ctl+='<div><div class="dv-h"><span>Ambiance</span></div><div class="dv-opts">'+Object.keys(AMB).map(a=>'<button class="chip" type="button" data-dev="'+id+'" data-amb="'+a+'">'+AMB[a].t+'</button>').join('')+'</div></div>'+rngHtml(d,'dim',c.dim,'t-dim'); }
+  if(can('dim')){ done.add('dim'); const mine=ambMine()[d.id]||{};
+    ctl+='<div><div class="dv-h"><span>Ambiance</span></div><div class="dv-opts">'+Object.keys(AMB).map(a=>'<button class="chip amb'+(mine[a]?' mine':'')+'" type="button" data-dev="'+id+'" data-amb="'+a+'">'+AMB[a].t+'</button>').join('')+'</div>'
+      +'<p class="amb-tip">Appui long sur une ambiance : elle garde les réglages actuels de cette lampe.</p></div>'+rngHtml(d,'dim',c.dim,'t-dim'); }
   if(can('light_temperature')){ done.add('light_temperature'); ctl+=rngHtml(d,'light_temperature',c.light_temperature,'t-temp'); }
   if(can('light_hue')){ done.add('light_hue'); ctl+=rngHtml(d,'light_hue',c.light_hue,'t-hue'); }
   if(can('light_saturation')){ done.add('light_saturation'); ctl+=rngHtml(d,'light_saturation',c.light_saturation,'',satTrk(c.light_hue&&c.light_hue.value)); }
@@ -1689,7 +1722,7 @@ function fitDots(){
   const rooms={}; pl.querySelectorAll('.pr[data-plan]').forEach(r=>{ rooms[r.dataset.plan]=r; if(r.dataset.pb) r.classList.add('pbad'); });
   // Plein écran : des icônes, de la même taille dans une pièce, aussi grandes que la place le permet
   const icons=document.body.classList.contains('wall'), byRoom={};
-  pl.querySelectorAll('.pin').forEach(p=>{ p.style.translate=''; p.style.visibility=''; p.style.removeProperty('--ps'); (byRoom[p.dataset.room]=byRoom[p.dataset.room]||[]).push(p); });
+  pl.querySelectorAll('.pin').forEach(p=>{ p.classList.remove('as-dot'); p.style.translate=''; p.style.visibility=''; p.style.removeProperty('--ps'); (byRoom[p.dataset.room]=byRoom[p.dataset.room]||[]).push(p); });
   const mid=p=>[p.offsetLeft+p.offsetWidth/2,p.offsetTop+p.offsetHeight/2];
   // Écarte un point (ou une icône) du nom de sa pièce ; renvoie le décalage, ou null s'il n'y a pas la place
   const avoid=(p,room)=>{
@@ -1704,9 +1737,11 @@ function fitDots(){
     return c?[c[0]-x,c[1]-y]:null;
   };
   const put=(p,d)=>{ p.style.translate=d[0]||d[1]?d[0].toFixed(1)+'px '+d[1].toFixed(1)+'px':''; };
+  // Des points : écartés du nom de la pièce, cachés s'il n'y a pas la place (la pièce reste alors rouge si besoin)
+  const asDots=(a,room)=>{ for(const p of a){ const d=avoid(p,room); if(d) put(p,d); else { p.style.visibility='hidden'; if(p.classList.contains('bad')&&room.classList.contains('pbad')){ room.classList.remove('pbad'); room.dataset.pb='1'; } } } };
   for(const k in byRoom){
     const a=byRoom[k], room=rooms[k]; if(!room) continue;
-    if(!icons){ for(const p of a){ const d=avoid(p,room); if(d) put(p,d); else { p.style.visibility='hidden'; if(p.classList.contains('bad')&&room.classList.contains('pbad')){ room.classList.remove('pbad'); room.dataset.pb='1'; } } } continue; }
+    if(!icons){ asDots(a,room); continue; }
     // Taille : l'écart entre les icônes de la pièce ; plus petit si le nom de la pièce gêne
     const c0=a.map(mid); let m=Infinity;
     for(let i=0;i<c0.length;i++) for(let j=i+1;j<c0.length;j++) m=Math.min(m,Math.hypot(c0[i][0]-c0[j][0],c0[i][1]-c0[j][1]));
@@ -1729,6 +1764,10 @@ function fitDots(){
         const ux=dd>.5?dx/dd:1, uy=dd>.5?dy/dd:0, push=(need-dd)/2;
         A.x-=ux*push; A.y-=uy*push; B.x+=ux*push; B.y+=uy*push; clamp(A); clamp(B); }
       if(!moved) break; }
+    // Pièce trop petite pour des icônes lisibles (le plan rétrécit quand la fiche est ouverte) : des points à la place
+    const onLabel=q=>lb&&!(q.x+h<=lb[0]+1||q.x-h>=lb[2]-1||q.y+h<=lb[1]+1||q.y-h>=lb[3]-1);
+    const tight=pt.some(onLabel)||pt.some((A,i)=>pt.some((B,j)=>j>i&&Math.hypot(B.x-A.x,B.y-A.y)<sz));
+    if(tight){ a.forEach(p=>{ p.classList.add('as-dot'); p.style.removeProperty('--ps'); }); asDots(a,room); continue; }
     pt.forEach(q=>put(q.p,[q.x-q.x0,q.y-q.y0]));
   }
 }
@@ -1801,18 +1840,18 @@ async function pinTap(id){
 function garageAsk(d,open){
   if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
   if(d.available===false){ toast(devName(d)+' ne répond pas.','bad'); return; }
-  const nm=devName(d);
+  const nm=devName(d); planRoom=null; devBack=null; nightSheet=false; watchSheet=false;
   openSheet(nm,'<p class="muted" style="margin-top:0">'+(open?'Ouvrir':'Fermer')+' « '+esc(nm)+' » ?</p>'
     +'<button class="btn primary block" type="button" id="gar-yes">'+I(open?'up':'down')+(open?'Ouvrir':'Fermer')+'</button>'
     +'<button class="btn block" type="button" id="gar-no" style="margin-top:8px">Annuler</button>',
-    {'gar-yes':async()=>{ closeSheet(); toast(nm+(open?' s’ouvre':' se ferme')); await setCap(d.id,'garagedoor_closed',!open); },'gar-no':()=>closeSheet()});
+    {'gar-yes':async()=>{ closeSheet(); toast(nm+(open?' s’ouvre':' se ferme')); await setCap(d.id,'garagedoor_closed',!open); },'gar-no':()=>closeSheet()},!$('#sheet').hidden&&$('#sheet').classList.contains('side'));
 }
 // Fiche d'un appareil ; depuis la fiche d'une pièce, un lien ramène à la pièce
 function openDev(d){
   if(d===poolDev()){ openRoom('Piscine'); return; }
   devBack=planRoom&&!/^(dev|bay):/.test(planRoom)&&!$('#sheet').hidden?planRoom:null;
   planRoom='dev:'+d.id; const nm=devName(d), r=roomLabel(d);
-  openSheet(nk(nm).indexOf(nk(r))>=0?nm:nm+' · '+r,planSheetHtml(planRoom),{'dv-back':()=>{ const b=devBack; devBack=null; if(b) openRoom(b); }});
+  openSheet(nk(nm).indexOf(nk(r))>=0?nm:nm+' · '+r,planSheetHtml(planRoom),{'dv-back':()=>{ const b=devBack; devBack=null; if(b) openRoom(b); }},true);
 }
 async function treeTap(i){
   const d=treeDevAt(i); if(!d) return;
@@ -1965,9 +2004,11 @@ function planSheetHtml(id){
   const vis=isVisit(), devs=roomDevs(id).filter(d=>!vis||visitKeep(d)), pd=id==='Piscine'&&poolDev();
   if(pd) return '<div class="pool-panel">'+poolBits(pd,false,true)+'</div>'+(vis?'':poolSpeedHtml(pd)+poolHydHtml(pd))+(devs.length>1?'<div class="list">'+devs.filter(d=>d!==pd).map(devRow).join('')+'</div>':'');
   if(!devs.length) return '<p class="muted">'+(vis?'Rien à commander dans cette pièce.':'Rien de relié à Homey dans cette pièce. Ce qui s’y trouve se pilote dans l’appli Maison.')+'</p>';
-  return '<div class="list">'+devs.map(devRow).join('')+'</div>';
+  // Ambiances de la pièce : toutes ses lampes réglées d'un coup
+  const amb=roomLamps(id).length?'<div class="room-amb"><div class="dv-h"><span>Ambiance de la pièce</span></div><div class="dv-opts">'+Object.keys(AMB).map(a=>'<button class="chip" type="button" data-ramb="'+a+'" data-room="'+esc(id)+'">'+AMB[a].t+'</button>').join('')+'</div></div>':'';
+  return amb+'<div class="list">'+devs.map(devRow).join('')+'</div>';
 }
-function openRoom(name){ const o=PLAN.find(p=>p.n===name); planRoom=name; openSheet((o&&o.t)||name,planSheetHtml(name),{}); }
+function openRoom(name){ const o=PLAN.find(p=>p.n===name); planRoom=name; openSheet((o&&o.t)||name,planSheetHtml(name),{},true); }
 // Une touche sur la baie : le store s'ouvre s'il est fermé, se ferme s'il est ouvert
 async function toggleBay(k){
   const d=bayDev(k); if(!d) return;
@@ -1983,7 +2024,7 @@ async function toggleBay(k){
   const ok=kind==='cover'?await setCap(d.id,'windowcoverings_state',open?'up':'down'):await setCap(d.id,'windowcoverings_set',open?1:0);
   if(ok===false){ sc.value=v; render(); }
 }
-function openBay(k){ const d=bayDev(k); if(!d) return; planRoom='bay:'+k; openSheet(devName(d),planSheetHtml(planRoom),{}); }
+function openBay(k){ const d=bayDev(k); if(!d) return; planRoom='bay:'+k; openSheet(devName(d),planSheetHtml(planRoom),{},true); }
 function renderRooms(){
   const all=roomsView();
   const pv=store.get('roomsView','plan')!=='list';
@@ -2230,11 +2271,19 @@ function renderView(){
 }
 
 /* ---------- Feuilles ---------- */
-function openSheet(title,html,actions){
+function openSheet(title,html,actions,side){
   $('#sheet-title').textContent=title; $('#sheet-body').innerHTML=html; sheetActions=actions||{};
-  $('#sheet').hidden=false; $('#sheet-card').scrollTop=0; document.body.style.overflow='hidden';
+  setSide(!!side&&document.body.classList.contains('wall'));
+  $('#sheet').hidden=false; $('#sheet-card').scrollTop=0;
 }
-function closeSheet(){ $('#sheet').hidden=true; document.body.style.overflow=''; sheetActions={}; planRoom=null; devBack=null; nightSheet=false; watchSheet=false; }
+// Fiche en colonne (plein écran) ou par-dessus ; le plan se recale quand la colonne s'ouvre ou se ferme
+function setSide(on){
+  const was=document.body.classList.contains('side-open');
+  $('#sheet').classList.toggle('side',on); document.body.classList.toggle('side-open',on);
+  $('#sheet-card').setAttribute('aria-modal',on?'false':'true'); document.body.style.overflow=on?'':'hidden';
+  if(was!==on) requestAnimationFrame(()=>{ fitLabels(); fitDots(); setTimeout(()=>{ fitLabels(); fitDots(); },300); });
+}
+function closeSheet(){ $('#sheet').hidden=true; document.body.style.overflow=''; sheetActions={}; planRoom=null; devBack=null; nightSheet=false; watchSheet=false; if(document.body.classList.contains('side-open')) setSide(false); document.body.style.overflow=''; }
 function setMsg(id,txt,cls){ const el=$('#'+id); if(el){ el.textContent=txt; el.className='form-msg'+(cls?' '+cls:''); } }
 // Vérifie la clé d'un invité auprès de Homey : est-ce bien une clé, et a-t-elle les droits du Nid ?
 const NEED=[['homey.device.readonly','Afficher les appareils'],['homey.device.control','Contrôler les appareils'],['homey.flow.start','Lancer les Flows'],['homey.zone.readonly','Afficher les zones']];
@@ -2656,7 +2705,7 @@ $('#view').addEventListener('click',e=>{
       navigator.geolocation.getCurrentPosition(pos=>{ store.set('geo',{lat:+pos.coords.latitude.toFixed(2),lon:+pos.coords.longitude.toFixed(2)}); wxLoad(true); toast('Météo du jour activée'); },()=>toast('Position refusée : pas de tendance météo.','bad'),{timeout:15000,maximumAge:86400000});
       return;
     case 'wall-go': store.set('wall',true); render(); window.scrollTo(0,0); return;
-    case 'wall-exit': store.set('wall',false); render(); return;
+    case 'wall-exit': if(!$('#sheet').hidden) closeSheet(); store.set('wall',false); render(); return;
     case 'ask': openAsk(); return;
     case 'arrange': openArrange(); return;
     case 'arrange-rooms': openArrangeRooms(); return;
@@ -2779,9 +2828,17 @@ $('#sheet').addEventListener('click',e=>{
   const ps=e.target.closest('button[data-pspeed]'); if(ps){ poolSpeed(ps.dataset.pspeed); return; }
   const ph=e.target.closest('button[data-phyd]'); if(ph){ poolHyd(ph.dataset.phyd); return; }
   const op=e.target.closest('button[data-open]'); if(op){ const d=data.devices[op.dataset.open]; if(d) openDev(d); return; }
+  const ra=e.target.closest('button[data-ramb]'); if(ra){ roomAmbiance(ra.dataset.room,ra.dataset.ramb); return; }
   const db=e.target.closest('button[data-dev]'); if(db&&devClick(db)) return;
   const b=e.target.closest('button[id]'); if(b&&sheetActions[b.id]) sheetActions[b.id](b);
 });
+// Appui long sur une ambiance : elle garde les réglages actuels de la lampe (le toucher qui suit est ignoré)
+let ambT=0, ambLong=false;
+$('#sheet').addEventListener('pointerdown',e=>{ ambLong=false; clearTimeout(ambT); const b=e.target.closest('button[data-amb]'); if(!b) return;
+  ambT=setTimeout(()=>{ ambLong=true; const d=data.devices[b.dataset.dev]; if(d) ambSave(d,b.dataset.amb); },600); });
+['pointerup','pointercancel'].forEach(t=>$('#sheet').addEventListener(t,()=>clearTimeout(ambT)));
+$('#sheet').addEventListener('click',e=>{ if(ambLong&&e.target.closest('button[data-amb]')){ ambLong=false; e.stopImmediatePropagation(); e.preventDefault(); } },true);
+$('#sheet').addEventListener('contextmenu',e=>{ if(e.target.closest('button[data-amb]')) e.preventDefault(); });
 // Curseurs de la fiche : la valeur suit le doigt, la commande part au lâcher
 $('#sheet').addEventListener('pointerdown',e=>{ if(e.target.closest('input.rng')) sliding=Date.now(); });
 $('#sheet').addEventListener('input',e=>{ const r=e.target.closest('input.rng'); if(!r) return; sliding=Date.now();
