@@ -1360,7 +1360,7 @@ function renderHome(){
     +(ok?'':'<ul>'+w.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><button class="linkbtn" type="button" id="watch">Voir et agir</button>')
     +'<p class="sum">'+esc(summary())+'</p></div></section>';
   const hr=new Date().getHours(), soir=hr>=19||hr<6;
-  if(soir) side+=nightBtn();
+  if(soir) side+=soireeBtn()+nightBtn();
   side+=miniPlan();
   if(nCov) side+='<button class="allclose" type="button" id="allclose"><span class="row-ic">'+I('blinds')+'</span><span class="row-txt"><b>Tout fermer</b><small>'+(nCov>1?nCov+' volets et fenêtres':'1 volet')+'</small></span></button>';
   if(!soir) side+=nightBtn();
@@ -1443,6 +1443,29 @@ async function roomAmbiance(name,a){
   const o=PLAN.find(p=>p.n===name), n=ok.filter(Boolean).length;
   if(n) toast(AMB[a].t+' : '+((o&&(o.ts||o.t))||name)+(n>1?' ('+n+' lampes)':''));
 }
+// Éteindre toutes les lumières d'une pièce
+const roomLights=name=>roomDevs(name).filter(d=>d.available!==false&&isLightDev(d));
+async function roomOff(name){
+  const ls=roomLights(name).filter(d=>d.capabilitiesObj.onoff.value===true), o=PLAN.find(p=>p.n===name), t=(o&&(o.ts||o.t))||name;
+  if(!ls.length){ toast('Tout est déjà éteint : '+t); return; }
+  if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
+  await Promise.all(ls.map(d=>setCap(d.id,'onoff',false))); toast('Éteint : '+t);
+}
+// Soirée pour la grande pièce de vie : salon, cuisine et entrée
+const LIVING=['Salon','Cuisine','Entrée'];
+const livingLamps=()=>[...new Set(LIVING.flatMap(roomLamps))];
+// Le soir (19 h – 6 h), « Soirée » s'affiche juste avant « Avant de dormir »
+const eveBtns=()=>{ const h=new Date().getHours(); return (h>=19||h<6?soireeBtn():'')+nightBtn(); };
+function soireeBtn(){
+  if(!livingLamps().length) return '';
+  return '<button class="allclose" type="button" id="soiree"><span class="row-ic">'+I('bulb')+'</span><span class="row-txt"><b>Soirée</b><small>Salon, cuisine et entrée en lumière douce</small></span></button>';
+}
+async function soireeAll(){
+  const ls=livingLamps(); if(!ls.length) return;
+  if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
+  const n=(await Promise.all(ls.map(d=>ambiance(d,'soiree',true)))).filter(Boolean).length;
+  if(n) toast('Soirée : '+n+(n>1?' lampes':' lampe'));
+}
 function devCard(d){
   const c=d.capabilitiesObj||{}, id=esc(d.id), k=ctrlKind(d), off=d.available===false, done=new Set(['light_mode']), nm=esc(devName(d));
   const can=x=>!off&&capOk(c,x);
@@ -1464,7 +1487,7 @@ function devCard(d){
   // Lumière : ambiances toutes prêtes, puis intensité, blanc, couleur
   if(can('dim')){ done.add('dim'); const mine=ambMine()[d.id]||{};
     ctl+='<div><div class="dv-h"><span>Ambiance</span></div><div class="dv-opts">'+Object.keys(AMB).map(a=>'<button class="chip amb'+(mine[a]?' mine':'')+'" type="button" data-dev="'+id+'" data-amb="'+a+'">'+AMB[a].t+'</button>').join('')+'</div>'
-      +'<p class="amb-tip">Appui long sur une ambiance : elle garde les réglages actuels de cette lampe.</p></div>'+rngHtml(d,'dim',c.dim,'t-dim'); }
+      +'<p class="amb-tip">Appui long : garder les réglages actuels.</p></div>'+rngHtml(d,'dim',c.dim,'t-dim'); }
   if(can('light_temperature')){ done.add('light_temperature'); ctl+=rngHtml(d,'light_temperature',c.light_temperature,'t-temp'); }
   if(can('light_hue')){ done.add('light_hue'); ctl+=rngHtml(d,'light_hue',c.light_hue,'t-hue'); }
   if(can('light_saturation')){ done.add('light_saturation'); ctl+=rngHtml(d,'light_saturation',c.light_saturation,'',satTrk(c.light_hue&&c.light_hue.value)); }
@@ -2005,7 +2028,7 @@ function planSheetHtml(id){
   if(pd) return '<div class="pool-panel">'+poolBits(pd,false,true)+'</div>'+(vis?'':poolSpeedHtml(pd)+poolHydHtml(pd))+(devs.length>1?'<div class="list">'+devs.filter(d=>d!==pd).map(devRow).join('')+'</div>':'');
   if(!devs.length) return '<p class="muted">'+(vis?'Rien à commander dans cette pièce.':'Rien de relié à Homey dans cette pièce. Ce qui s’y trouve se pilote dans l’appli Maison.')+'</p>';
   // Ambiances de la pièce : toutes ses lampes réglées d'un coup
-  const amb=roomLamps(id).length?'<div class="room-amb"><div class="dv-h"><span>Ambiance de la pièce</span></div><div class="dv-opts">'+Object.keys(AMB).map(a=>'<button class="chip" type="button" data-ramb="'+a+'" data-room="'+esc(id)+'">'+AMB[a].t+'</button>').join('')+'</div></div>':'';
+  const amb=roomLights(id).length?'<div class="room-amb dv-opts">'+(roomLamps(id).length?Object.keys(AMB).map(a=>'<button class="chip" type="button" data-ramb="'+a+'" data-room="'+esc(id)+'">'+AMB[a].t+'</button>').join(''):'')+'<button class="chip" type="button" data-roff="'+esc(id)+'">Éteindre</button></div>':'';
   return amb+'<div class="list">'+devs.map(devRow).join('')+'</div>';
 }
 function openRoom(name){ const o=PLAN.find(p=>p.n===name); planRoom=name; openSheet((o&&o.t)||name,planSheetHtml(name),{},true); }
@@ -2102,7 +2125,7 @@ function renderHomeBig(wall){
     +(pinEdit?(alignUndo?'<button class="btn small" type="button" id="pin-undo">Annuler l’alignement</button>':'<button class="btn small" type="button" id="pin-align">Aligner</button>')+'<button class="btn small" type="button" id="pin-guest">'+I('eye')+'Aperçu invité</button><button class="btn small" type="button" id="pin-reset">Remettre en place</button>':'<button class="btn small" type="button" id="plan-small">Réduire le plan</button>')+'</div>';
   h+='<nav class="hb-nav" aria-label="Rubriques"><button type="button" data-go="rooms">'+I('rooms')+'Pièces</button><button type="button" data-go="share">'+I('share')+'Partager</button><button type="button" data-go="apps">'+I('apps')+'Applis</button></nav>';
   let fl=homeFlows(); const now=nowScene(fl); if(now) fl=[now].concat(fl.filter(f=>f!==now));
-  h+='<div class="hb-more">'+nightBtn()
+  h+='<div class="hb-more">'+eveBtns()
     +(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3><button class="linkbtn" type="button" id="arrange">Ranger</button></div><div class="scenes">'+fl.map(f=>sceneBtn(f,f===now)).join('')+'</div>':'')
     +camsHtml()+'</div>';
   return h;
@@ -2221,7 +2244,7 @@ function renderVisit(g,isPrev){
   h+=word;
   h+='<div class="hb-plan">'+planHtml()+'</div>';
   if(!isPrev&&isWide()){ const wall=document.body.classList.contains('wall'); h+='<div class="hb-tools"><button class="btn small" type="button" id="'+(wall?'wall-exit':'wall-go')+'">'+(wall?'Quitter le plein écran':'Plein écran')+'</button></div>'; }
-  h+='<div class="hb-more">'+nightBtn()+(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3></div><div class="scenes">'+fl.map(f=>sceneBtn(f,false)).join('')+'</div>':'')+'</div>';
+  h+='<div class="hb-more">'+eveBtns()+(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3></div><div class="scenes">'+fl.map(f=>sceneBtn(f,false)).join('')+'</div>':'')+'</div>';
   return h+foot;
 }
 function render(){ renderView(); fitLabels(); fitDots(); nightCheck(); }
@@ -2485,7 +2508,7 @@ function openSettings(){
   ['local','remote'].forEach(k=>{ const i=$('#cf-'+k); i.addEventListener('input',()=>{ $('#cf-'+k+'-h').textContent=normAddr(i.value); }); });
 }
 // Lien de branchement pour un autre appareil : adresses + clé, lus au démarrage (#setup=…)
-function setupLink(){ return location.href.split('#')[0]+'#setup='+b64e(JSON.stringify({l:cfg.localRaw||'',r:cfg.remoteRaw||'',k:cfg.key,p:store.get('pins',null)})); }
+function setupLink(){ return location.href.split('#')[0]+'#setup='+b64e(JSON.stringify({l:cfg.localRaw||'',r:cfg.remoteRaw||'',k:cfg.key,p:store.get('pins',null),a:store.get('amb',null)})); }
 let setupGot=false;
 function readSetup(){
   const m=location.hash.match(/^#setup=([A-Za-z0-9_-]+)$/); if(!m) return;
@@ -2493,6 +2516,7 @@ function readSetup(){
     const p=JSON.parse(b64d(m[1]));
     if(typeof p.k!=='string'||!p.k||p.k.length>300||typeof p.l!=='string'||typeof p.r!=='string') throw new Error('bad');
     if(p.p&&typeof p.p==='object'&&!store.get('pins',null)) store.set('pins',cleanPins(p.p));
+    if(p.a&&typeof p.a==='object'&&!Array.isArray(p.a)) store.set('amb',p.a);
     if(cfg&&cfg.key===p.k) return;
     cfg={localRaw:p.l,remoteRaw:p.r,local:normAddr(p.l),remote:normAddr(p.r),key:p.k}; store.set('cfg',cfg);
     if(mode!=='guest'){ mode='live'; conn='loading'; base=''; }
@@ -2500,7 +2524,7 @@ function readSetup(){
   }catch(e){ setTimeout(()=>toast('Ce lien de branchement est illisible. Renvoie-le depuis l’iPhone.','bad'),300); }
 }
 function exportCode(){
-  return 'MAMAISON1.'+b64e(JSON.stringify({l:cfg.localRaw||'',r:cfg.remoteRaw||'',k:cfg.key,h:store.get('home',null),s:store.get('shares',[]),y:store.get('layout',null),q:store.get('pins',null)}));
+  return 'MAMAISON1.'+b64e(JSON.stringify({l:cfg.localRaw||'',r:cfg.remoteRaw||'',k:cfg.key,h:store.get('home',null),s:store.get('shares',[]),y:store.get('layout',null),q:store.get('pins',null),a:store.get('amb',null)}));
 }
 async function importSettings(){
   const raw=($('#cf-import').value||'').replace(/\s+/g,'');
@@ -2516,6 +2540,7 @@ async function importSettings(){
   if(Array.isArray(p.s)) store.set('shares',p.s.filter(s=>s&&typeof s.id==='string'&&typeof s.n==='string'&&typeof s.k==='string'&&Array.isArray(s.b)&&s.b.every(x=>x&&typeof x.i==='string'&&typeof x.n==='string'&&(x.t==='flow'||x.t==='advancedflow'))));
   if(p.y&&Array.isArray(p.y.rooms)) store.set('layout',p.y);
   if(p.q&&typeof p.q==='object') store.set('pins',cleanPins(p.q));
+  if(p.a&&typeof p.a==='object'&&!Array.isArray(p.a)) store.set('amb',p.a);
   render(); toast('Réglages importés');
 }
 async function saveSettings(b){
@@ -2689,6 +2714,7 @@ $('#view').addEventListener('click',e=>{
   switch(b.id){
     case 'allclose': closeAll(b); return;
     case 'night': openNight(); return;
+    case 'soiree': soireeAll(); return;
     case 'go-plan': if([...b.querySelectorAll('.pin.bad')].some(p=>{ const q=p.getBoundingClientRect(); return Math.hypot(q.left+q.width/2-e.clientX,q.top+q.height/2-e.clientY)<=16; })){ openWatch(); return; }
       store.set('homePlan','big'); render(); window.scrollTo(0,0); return;
     case 'plan-small': store.set('homePlan','small'); pinEdit=false; render(); window.scrollTo(0,0); return;
@@ -2829,6 +2855,7 @@ $('#sheet').addEventListener('click',e=>{
   const ph=e.target.closest('button[data-phyd]'); if(ph){ poolHyd(ph.dataset.phyd); return; }
   const op=e.target.closest('button[data-open]'); if(op){ const d=data.devices[op.dataset.open]; if(d) openDev(d); return; }
   const ra=e.target.closest('button[data-ramb]'); if(ra){ roomAmbiance(ra.dataset.room,ra.dataset.ramb); return; }
+  const rf=e.target.closest('button[data-roff]'); if(rf){ roomOff(rf.dataset.roff); return; }
   const db=e.target.closest('button[data-dev]'); if(db&&devClick(db)) return;
   const b=e.target.closest('button[id]'); if(b&&sheetActions[b.id]) sheetActions[b.id](b);
 });
