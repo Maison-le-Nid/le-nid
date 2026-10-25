@@ -481,6 +481,7 @@ h1{letter-spacing:.02em}
 .hb-watch b{font-weight:600;font-size:15px}
 .hb-watch small{font-size:12.5px;color:var(--ink-2)}
 .hb-tools{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:12px 0 0}
+.hb-tools:empty{display:none}
 .hb-plan{margin:0 auto;width:min(100%,calc((100vh - 215px) * 35 / 22.5))}
 body.wall .hb-plan{width:min(100%,calc((100vh - 150px) * 35 / 22.5))}
 .hb-plan .plan-legend{justify-content:center}
@@ -1363,7 +1364,6 @@ function renderHome(){
   if(soir) side+=soireeBtn()+nightBtn();
   side+=miniPlan();
   if(nCov) side+='<button class="allclose" type="button" id="allclose"><span class="row-ic">'+I('blinds')+'</span><span class="row-txt"><b>Tout fermer</b><small>'+(nCov>1?nCov+' volets et fenêtres':'1 volet')+'</small></span></button>';
-  if(!soir) side+=nightBtn();
   side+=camsHtml();
   let main='<div class="sec-row"><h3 class="sec">Scènes</h3>'+(data.flows.some(f=>f.trig)?'<button class="linkbtn" type="button" id="arrange">Ranger</button>':'')+'</div>';
   main+=fl.length?'<div class="scenes">'+fl.map(f=>sceneBtn(f,f===now)).join('')+'</div>'
@@ -1454,8 +1454,8 @@ async function roomOff(name){
 // Soirée pour la grande pièce de vie : salon, cuisine et entrée
 const LIVING=['Salon','Cuisine','Entrée'];
 const livingLamps=()=>[...new Set(LIVING.flatMap(roomLamps))];
-// Le soir (19 h – 6 h), « Soirée » s'affiche juste avant « Avant de dormir »
-const eveBtns=()=>{ const h=new Date().getHours(); return (h>=19||h<6?soireeBtn():'')+nightBtn(); };
+// Le soir seulement (19 h – 6 h) : « Soirée » puis « Avant de dormir »
+const eveBtns=()=>{ const h=new Date().getHours(); return h>=19||h<6?soireeBtn()+nightBtn():''; };
 function soireeBtn(){
   if(!livingLamps().length) return '';
   return '<button class="allclose" type="button" id="soiree"><span class="row-ic">'+I('bulb')+'</span><span class="row-txt"><b>Soirée</b><small>Salon, cuisine et entrée en lumière douce</small></span></button>';
@@ -2011,7 +2011,7 @@ function planHtml(mini){
     return '<i class="pin'+(on?' on':'')+(off?' bad':'')+'" aria-hidden="true" style="'+ptPos(p.o.x+p.fx*p.o.w,p.o.y+p.fy*p.o.h,false)+'"></i>'; }).join('');
   h+='</div>'+(zoom?'<button class="zoom-out" type="button" id="zoom-out">‹ Tout le plan</button>'+(pinEdit?'':'<button class="zoom-out zoom-list" type="button" id="zoom-list">Liste ›</button>'):'')+'</div>';
   const wallIc=document.body.classList.contains('wall');
-  if(!mini) h+='<p class="plan-legend">'+(zoom||wallIc?'':'<span><i class="pt"></i>Un bouton</span>')+'<span><i></i>Lumière allumée</span>'+(isVisit()?'':'<span><i class="dot"></i>Ne répond pas</span>')+'<span><i class="glass"></i>Baie vitrée</span><span>'+(zoom?'Touche un bouton pour allumer, ouvrir ou régler':wallIc?'Touche une icône pour allumer ou éteindre. Appui long : toutes les commandes':'Touche une pièce pour l’agrandir, encore pour revenir. Appui long sur un point : allumer ou éteindre')+'</span></p>';
+  if(!mini) h+='<p class="plan-legend">'+(zoom||wallIc?'':'<span><i class="pt"></i>Un bouton</span>')+'<span><i></i>Lumière allumée</span>'+(isVisit()?'':'<span><i class="dot"></i>Ne répond pas</span>')+'<span><i class="glass"></i>Baie vitrée</span><span>'+(zoom?'Toucher : allumer ou ouvrir':wallIc?'Toucher : allumer · Appui long : régler':'Toucher une pièce : l’agrandir · Appui long : allumer')+'</span></p>';
   return h;
 }
 function miniPlan(){
@@ -2121,8 +2121,7 @@ function renderHomeBig(wall){
     +'<button class="hb-watch'+(n?' warn':'')+'" type="button" id="watch"><span class="status-dot" aria-hidden="true">'+(n?'!':I('check'))+'</span><span class="hb-w-txt"><b>'+(n?n+(n>1?' points à regarder':' point à regarder'):'Tout va bien à la maison')+'</b><small>'+esc(n?it.slice(0,2).map(i=>i.txt).join(' · ')+(n>2?'…':''):summary())+'</small></span></button></div>';
   h+='<div class="hb-plan">'+planHtml()+'</div>';
   h+='<div class="hb-tools">'+(isWide()?'<button class="btn small" type="button" id="'+(wall?'wall-exit':'wall-go')+'">'+(wall?'Quitter le plein écran':'Plein écran')+'</button>':'')
-    +'<button class="btn small'+(pinEdit?' primary':'')+'" type="button" id="pin-edit">'+(pinEdit?I('check')+'Terminé':'Déplacer les boutons')+'</button>'
-    +(pinEdit?(alignUndo?'<button class="btn small" type="button" id="pin-undo">Annuler l’alignement</button>':'<button class="btn small" type="button" id="pin-align">Aligner</button>')+'<button class="btn small" type="button" id="pin-guest">'+I('eye')+'Aperçu invité</button><button class="btn small" type="button" id="pin-reset">Remettre en place</button>':'<button class="btn small" type="button" id="plan-small">Réduire le plan</button>')+'</div>';
+    +(pinEdit?'<button class="btn small primary" type="button" id="pin-edit">'+I('check')+'Terminé</button>'+(alignUndo?'<button class="btn small" type="button" id="pin-undo">Annuler l’alignement</button>':'<button class="btn small" type="button" id="pin-align">Aligner</button>')+'<button class="btn small" type="button" id="pin-guest">'+I('eye')+'Aperçu invité</button><button class="btn small" type="button" id="pin-reset">Remettre en place</button>':'')+'</div>';
   h+='<nav class="hb-nav" aria-label="Rubriques"><button type="button" data-go="rooms">'+I('rooms')+'Pièces</button><button type="button" data-go="share">'+I('share')+'Partager</button><button type="button" data-go="apps">'+I('apps')+'Applis</button></nav>';
   let fl=homeFlows(); const now=nowScene(fl); if(now) fl=[now].concat(fl.filter(f=>f!==now));
   h+='<div class="hb-more">'+eveBtns()
@@ -2479,8 +2478,10 @@ function openSettings(){
     +'<p class="form-msg mt" id="cf-msg" role="status"></p>'
     +'<button class="btn primary block" type="button" id="cf-save">Tester et enregistrer</button>'
     +(mode==='live'?'<button class="btn block danger" type="button" id="cf-forget">Oublier la connexion</button>':'');
-  if(trig.length||nDev){
+  if(trig.length||nDev||!isVisit()){
     h+='<h3 class="sec">Affichage</h3>';
+    // Plan : déplacer ses boutons, ou le réduire sur l'accueil
+    if(!isVisit()) h+='<button class="btn block" type="button" id="cf-pins">Déplacer les boutons du plan</button>'+(store.get('homePlan','big')!=='small'?'<button class="btn block" type="button" id="cf-small">Réduire le plan</button>':'');
     if(trig.length) h+='<button class="btn block" type="button" id="cf-arrange">Ranger les boutons de l’accueil</button>';
     if(nDev) h+='<button class="btn block" type="button" id="cf-arrange-rooms">Ranger les pièces et les appareils</button>';
   }
@@ -2492,6 +2493,8 @@ function openSettings(){
     +'<p class="form-msg" id="imp-msg" role="status"></p>'
     +'<button class="btn block" type="button" id="cf-import-btn">Importer</button>';
   openSheet('Réglages',h,{
+    'cf-pins':()=>{ closeSheet(); tab='home'; store.set('tab','home'); store.set('homePlan','big'); startPinEdit(); window.scrollTo(0,0); },
+    'cf-small':()=>{ closeSheet(); tab='home'; store.set('tab','home'); store.set('homePlan','small'); pinEdit=false; render(); window.scrollTo(0,0); },
     'cf-save':saveSettings,
     'cf-forget':b=>{
       if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='Confirmer : oublier la connexion'; return; }
@@ -2719,7 +2722,7 @@ $('#view').addEventListener('click',e=>{
       store.set('homePlan','big'); render(); window.scrollTo(0,0); return;
     case 'plan-small': store.set('homePlan','small'); pinEdit=false; render(); window.scrollTo(0,0); return;
     case 'watch': openWatch(); return;
-    case 'pin-edit': if(pinEdit){ pinDone(); return; } pinEdit=true; alignUndo=null; alignAsked=false; pinTouched=new Set(); render(); toast(pinEdit?(planZoom?'Fais glisser les boutons où tu veux dans la pièce, puis touche « Terminé ».':'Touche une pièce, puis fais glisser ses boutons. Touche « Terminé » à la fin.'):'Boutons rangés'); return;
+    case 'pin-edit': if(pinEdit){ pinDone(); return; } startPinEdit(); return;
     case 'zoom-out': setZoom(null); return;
     case 'pin-align': alignPins(planZoom); return;
     case 'pin-guest': preview=getShares().find(x=>x.m==='nid')||{id:'apercu',m:'nid',n:'Invités',q:1,b:[]}; render(); window.scrollTo(0,0); return;
@@ -2783,6 +2786,8 @@ $('#view').addEventListener('pointermove',e=>{ if(lp&&Math.hypot(e.clientX-lp.x,
 ['pointerup','pointercancel'].forEach(t=>$('#view').addEventListener(t,()=>{ if(lp){ clearTimeout(lp.t); lp=null; } }));
 $('#view').addEventListener('click',e=>{ if(lpFired){ lpFired=false; e.preventDefault(); e.stopPropagation(); } },true);
 $('#view').addEventListener('contextmenu',e=>{ if(e.target.closest('.plan')) e.preventDefault(); });
+// Entrer dans le mode « Déplacer les boutons » (depuis les Réglages)
+function startPinEdit(){ pinEdit=true; alignUndo=null; alignAsked=false; pinTouched=new Set(); render(); toast(pinEdit?(planZoom?'Fais glisser les boutons où tu veux dans la pièce, puis touche « Terminé ».':'Touche une pièce, puis fais glisser ses boutons. Touche « Terminé » à la fin.'):'Boutons rangés'); }
 // Déplacer les boutons sur le plan (mode « Déplacer les boutons »)
 $('#view').addEventListener('pointerdown',e=>{
   if(!pinEdit) return; const b=e.target.closest('.pin'); if(!b) return;
