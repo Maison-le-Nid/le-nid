@@ -490,6 +490,7 @@ h1{letter-spacing:.02em}
 .hb-plan{margin:0 auto;width:min(100%,calc((100vh - 215px) * 35 / 22.5))}
 body.wall .hb-plan{width:min(100%,calc((100vh - 150px) * 35 / 22.5))}
 .hb-plan .plan-legend{justify-content:center}
+.hb-watch-row{margin:14px 0 0}.hb-watch-row .hb-watch{width:100%;max-width:none;margin:0}
 .hb-nav{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:640px;margin:16px auto 0}
 .hb-nav button{min-height:58px;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;background:var(--face);box-shadow:var(--float-lo);color:var(--title);font:inherit;font-weight:500;cursor:pointer}
 .hb-more{max-width:720px;margin:12px auto 0}
@@ -1373,13 +1374,12 @@ function renderHome(){
   if(now) fl=[now].concat(fl.filter(f=>f!==now));
   let top='';
   if(mode==='demo') top='<div class="note"><span>Démo avec des appareils d’exemple.</span><button class="btn small" type="button" id="open-settings">Connecter mon Homey</button></div>';
-  let side='<section class="status '+(ok?'ok':'warn')+'"><div class="status-dot" aria-hidden="true">'+(ok?I('check'):'!')+'</div><div class="status-txt">'
+  let side=miniPlan()+'<section class="status '+(ok?'ok':'warn')+'"><div class="status-dot" aria-hidden="true">'+(ok?I('check'):'!')+'</div><div class="status-txt">'
     +'<h2>'+(ok?'Tout va bien à la maison':w.length+(w.length>1?' points à regarder':' point à regarder'))+'</h2>'
-    +(ok?'':'<ul>'+w.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><button class="linkbtn" type="button" id="watch">Voir et agir</button>')
+    +(ok?'':'<ul>'+w.slice(0,2).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><button class="linkbtn" type="button" id="watch">'+(w.length>2?'Voir tout ('+w.length+')':'Voir et agir')+'</button>')
     +'<p class="sum">'+esc(summary())+'</p></div></section>';
   const hr=new Date().getHours(), soir=hr>=19||hr<6;
   if(soir) side+=soireeBtn()+nightBtn(); else if(hr<11) side+=morningBtn();
-  side+=miniPlan();
   if(nCov) side+='<button class="allclose" type="button" id="allclose"><span class="row-ic">'+I('blinds')+'</span><span class="row-txt"><b>Tout fermer</b><small>'+(nCov>1?nCov+' volets et fenêtres':'1 volet')+'</small></span></button>';
   side+=camsHtml();
   let main='<div class="sec-row"><h3 class="sec">Scènes</h3>'+(data.flows.some(f=>f.trig)?'<button class="linkbtn" type="button" id="arrange">Ranger</button>':'')+'</div>';
@@ -2139,14 +2139,17 @@ function wxHtml(){
 }
 function renderHomeBig(wall){
   const tm=wallTime(), it=watchItems(), n=it.length;
+  // Sur l'iPhone : le plan juste sous l'heure, « À regarder » en dessous
+  const narrow=!wall&&!isWide(), watchBtn='<button class="hb-watch'+(n?' warn':'')+'" type="button" id="watch"><span class="status-dot" aria-hidden="true">'+(n?'!':I('check'))+'</span><span class="hb-w-txt"><b>'+(n?n+(n>1?' points à regarder':' point à regarder'):'Tout va bien à la maison')+'</b><small>'+esc(n?it.slice(0,2).map(i=>i.txt).join(' · ')+(n>2?'…':''):summary())+'</small></span></button>';
   let h='';
   if(mode==='demo') h+='<div class="note"><span>Démo avec des appareils d’exemple.</span><button class="btn small" type="button" id="open-settings">Connecter mon Homey</button></div>';
   h+='<div class="hb-top"><div class="hb-clock"><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div></div>'
     +'<div class="hb-wx">'+wxHtml()+'</div>'
-    +'<button class="hb-watch'+(n?' warn':'')+'" type="button" id="watch"><span class="status-dot" aria-hidden="true">'+(n?'!':I('check'))+'</span><span class="hb-w-txt"><b>'+(n?n+(n>1?' points à regarder':' point à regarder'):'Tout va bien à la maison')+'</b><small>'+esc(n?it.slice(0,2).map(i=>i.txt).join(' · ')+(n>2?'…':''):summary())+'</small></span></button></div>';
+    +(narrow?'':watchBtn)+'</div>';
   h+='<div class="hb-plan">'+planHtml()+'</div>';
   h+='<div class="hb-tools">'+(isWide()?'<button class="btn small" type="button" id="'+(wall?'wall-exit':'wall-go')+'">'+(wall?'Quitter le plein écran':'Plein écran')+'</button>':'')
     +(pinEdit?'<button class="btn small primary" type="button" id="pin-edit">'+I('check')+'Terminé</button>'+(alignUndo?'<button class="btn small" type="button" id="pin-undo">Annuler l’alignement</button>':'<button class="btn small" type="button" id="pin-align">Aligner</button>')+'<button class="btn small" type="button" id="pin-guest">'+I('eye')+'Aperçu invité</button><button class="btn small" type="button" id="pin-reset">Remettre en place</button>':'')+'</div>';
+  if(narrow) h+='<div class="hb-watch-row">'+watchBtn+'</div>';
   h+='<nav class="hb-nav" aria-label="Rubriques"><button type="button" data-go="rooms">'+I('rooms')+'Pièces</button><button type="button" data-go="share">'+I('share')+'Partager</button></nav>';
   let fl=homeFlows(); const now=nowScene(fl); if(now) fl=[now].concat(fl.filter(f=>f!==now));
   h+='<div class="hb-more">'+eveBtns()
