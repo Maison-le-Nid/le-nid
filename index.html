@@ -82,6 +82,7 @@ h1{font-family:var(--serif);font-size:24px;line-height:1.1;margin:0;color:var(--
 a.allclose{color:inherit;text-decoration:none}
 a.btn{text-decoration:none}
 .cams{margin-top:22px}
+.scenes-more{display:block;margin:12px auto 0}
 .cams-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
 .cam-tile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 6px 12px;border-radius:var(--r-lg);background:var(--face);box-shadow:var(--float-lo);color:var(--title);text-decoration:none;text-align:center;transition:transform .2s}
 .cam-tile:active{transform:scale(.96)}
@@ -162,6 +163,9 @@ a.btn{text-decoration:none}
 .plan-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin:10px 0 0;font-size:13px;color:var(--ink-2)}
 .plan-legend span{display:inline-flex;align-items:center;gap:6px}
 .plan-legend i{width:14px;height:14px;border:1.5px solid var(--ink);background:var(--lit);display:inline-block}
+/* « ? » qui montre ou cache la légende des couleurs */
+.legend-q{flex:none;width:26px;height:26px;padding:0;border:1px solid var(--line-2);border-radius:50%;background:var(--face);color:var(--ink-2);font:inherit;font-size:14px;font-weight:600;line-height:1;cursor:pointer}
+.plan-legend .legend-keys{flex-basis:100%;justify-content:center;flex-wrap:wrap;gap:6px 16px}
 .plan-legend i.dot{width:9px;height:9px;border:0;border-radius:50%;background:var(--bad)}
 .plan-legend i.glass{width:18px;height:8px;background:var(--glass)}
 .bay{position:absolute;z-index:3;padding:0;margin:0;border:1.5px solid var(--ink);border-radius:1px;background:var(--glass);cursor:pointer;overflow:visible}
@@ -1247,6 +1251,7 @@ async function runScene(btn){
   try{
     await trigger(f,g);
     flash={id:f.id,until:Date.now()+1800};
+    const use=store.get('sceneUse'+sfx(),{})||{}; use[f.id]=(use[f.id]||0)+1; store.set('sceneUse'+sfx(),use);
     toast('« '+f.name+' » lancé');
     render(); setTimeout(render,1900);
     if(mode==='live'||isVisitLive()) setTimeout(refresh,2500);
@@ -1337,18 +1342,29 @@ function sceneBtn(f,isNow){
     +(isNow?'<span class="scene-now">Maintenant</span>':'')
     +'<span class="scene-ok">'+I('check')+'Lancé</span></button>';
 }
+// Les 4 scènes les plus lancées (dans l'ordre choisi) ; la scène du moment reste en tête
+function topScenes(fl,now){
+  if(scenesAll||fl.length<=4) return fl;
+  const use=store.get('sceneUse'+sfx(),{})||{};
+  const rank=fl.map((f,i)=>({f,i,n:use[f.id]||0})).sort((a,b)=>(b.f===now)-(a.f===now)||b.n-a.n||a.i-b.i).slice(0,4).map(x=>x.f);
+  return fl.filter(f=>rank.includes(f));
+}
+function scenesMore(fl){ return fl.length>4?'<button class="linkbtn scenes-more" type="button" id="scenes-all">'+(scenesAll?'Moins de scènes':'Toutes les scènes ('+fl.length+')')+'</button>':''; }
 function homeFlows(){
   const trig=data.flows.filter(f=>f.trig), sel=store.get('home'+sfx(),null);
   if(Array.isArray(sel)) return sel.map(id=>trig.find(f=>f.id===id)).filter(Boolean);
   return trig.slice(0,8);
 }
+// Caméras : un seul bouton sur l'accueil ; il ouvre les trois choix (raccourcis iPhone)
 function camsHtml(){
-  // une rangée compacte : chaque tuile ouvre l'appli des caméras (raccourcis iPhone)
+  return '<button class="allclose" type="button" id="open-cams"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Caméras</b><small>Toutes, Sherlock ou Aqara</small></span></button>';
+}
+function openCams(){
   const t=(name,b,sm,lab)=>'<a class="cam-tile" href="shortcuts://run-shortcut?name='+name+'" aria-label="'+lab+'"><span class="cam-ic">'+I('camera')+'</span><b>'+b+'</b><small>'+sm+'</small></a>';
-  return '<div class="cams"><h3 class="sec">Caméras</h3><div class="cams-row">'
+  openSheet('Caméras','<div class="cams-row">'
     +t('Cameras%20Alexa','Toutes','par Alexa','Toutes les caméras, eufy et Aqara, dans Alexa')
     +t('Cameras%20eufy','Sherlock','eufy','Caméras eufy, ouvre l’appli Sherlock')
-    +t('Cameras%20Aqara','Aqara','appli Aqara','Caméras Aqara, ouvre l’appli')+'</div></div>';
+    +t('Cameras%20Aqara','Aqara','appli Aqara','Caméras Aqara, ouvre l’appli')+'</div>',{});
 }
 function renderHome(){
   const w=watchList(), ok=!w.length, nCov=coverDevices().length;
@@ -1366,7 +1382,7 @@ function renderHome(){
   if(nCov) side+='<button class="allclose" type="button" id="allclose"><span class="row-ic">'+I('blinds')+'</span><span class="row-txt"><b>Tout fermer</b><small>'+(nCov>1?nCov+' volets et fenêtres':'1 volet')+'</small></span></button>';
   side+=camsHtml();
   let main='<div class="sec-row"><h3 class="sec">Scènes</h3>'+(data.flows.some(f=>f.trig)?'<button class="linkbtn" type="button" id="arrange">Ranger</button>':'')+'</div>';
-  main+=fl.length?'<div class="scenes">'+fl.map(f=>sceneBtn(f,f===now)).join('')+'</div>'
+  main+=fl.length?'<div class="scenes">'+topScenes(fl,now).map(f=>sceneBtn(f,f===now)).join('')+'</div>'+scenesMore(fl)
     :'<p class="muted">Aucune scène à lancer. Crée dans Homey un Flow qui se lance à la main, il apparaîtra ici.</p>';
   main+='<button class="ask" type="button" id="ask">'+I('chat')+'Demander un nouveau scénario</button>';
   return top+'<div class="home"><div class="home-side">'+side+'</div><div class="home-main">'+main+'</div></div>';
@@ -1555,7 +1571,7 @@ const PLAN_DECO=[];
 // Cuisine, entrée et salon : une seule grande pièce ouverte (murs extérieurs seulement)
 const PLAN_WALLS=[{x:7.1,y:8.1,w:18.6,h:8}];
 const tallPlan=()=>window.matchMedia('(max-width: 699px)').matches;
-let planRoom=null, devBack=null, sliding=0;
+let planRoom=null, devBack=null, sliding=0, legendOpen=false, scenesAll=false;
 function visitKeep(d){
   if(d.available===false||/camera|doorbell|homealarm/.test(d.class||'')||/cam[ée]ra|sonnette|eufy|alarme/i.test(d.name||'')) return false;
   const k=ctrlKind(d);
@@ -2011,7 +2027,10 @@ function planHtml(mini){
     return '<i class="pin'+(on?' on':'')+(off?' bad':'')+'" aria-hidden="true" style="'+ptPos(p.o.x+p.fx*p.o.w,p.o.y+p.fy*p.o.h,false)+'"></i>'; }).join('');
   h+='</div>'+(zoom?'<button class="zoom-out" type="button" id="zoom-out">‹ Tout le plan</button>'+(pinEdit?'':'<button class="zoom-out zoom-list" type="button" id="zoom-list">Liste ›</button>'):'')+'</div>';
   const wallIc=document.body.classList.contains('wall');
-  if(!mini) h+='<p class="plan-legend">'+(zoom||wallIc?'':'<span><i class="pt"></i>Un bouton</span>')+'<span><i></i>Lumière allumée</span>'+(isVisit()?'':'<span><i class="dot"></i>Ne répond pas</span>')+'<span><i class="glass"></i>Baie vitrée</span><span>'+(zoom?'Toucher : allumer ou ouvrir':wallIc?'Toucher : allumer · Appui long : régler':'Toucher une pièce : l’agrandir · Appui long : allumer')+'</span></p>';
+  // Une ligne d'aide ; les couleurs ne s'affichent qu'en touchant « ? »
+  if(!mini) h+='<p class="plan-legend"><span>'+(zoom?'Toucher : allumer ou ouvrir':wallIc?'Toucher : allumer · Appui long : régler':'Toucher une pièce : l’agrandir · Appui long : allumer')+'</span>'
+    +'<button class="legend-q" type="button" id="legend-q" aria-expanded="'+legendOpen+'" aria-label="'+(legendOpen?'Cacher les couleurs':'Que veulent dire les couleurs ?')+'">'+(legendOpen?'×':'?')+'</button>'
+    +(legendOpen?'<span class="legend-keys">'+(zoom||wallIc?'':'<span><i class="pt"></i>Un bouton</span>')+'<span><i></i>Lumière allumée</span>'+(isVisit()?'':'<span><i class="dot"></i>Ne répond pas</span>')+'<span><i class="glass"></i>Baie vitrée</span></span>':'')+'</p>';
   return h;
 }
 function miniPlan(){
@@ -2125,7 +2144,7 @@ function renderHomeBig(wall){
   h+='<nav class="hb-nav" aria-label="Rubriques"><button type="button" data-go="rooms">'+I('rooms')+'Pièces</button><button type="button" data-go="share">'+I('share')+'Partager</button><button type="button" data-go="apps">'+I('apps')+'Applis</button></nav>';
   let fl=homeFlows(); const now=nowScene(fl); if(now) fl=[now].concat(fl.filter(f=>f!==now));
   h+='<div class="hb-more">'+eveBtns()
-    +(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3><button class="linkbtn" type="button" id="arrange">Ranger</button></div><div class="scenes">'+fl.map(f=>sceneBtn(f,f===now)).join('')+'</div>':'')
+    +(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3><button class="linkbtn" type="button" id="arrange">Ranger</button></div><div class="scenes">'+topScenes(fl,now).map(f=>sceneBtn(f,f===now)).join('')+'</div>'+scenesMore(fl):'')
     +camsHtml()+'</div>';
   return h;
 }
@@ -2718,6 +2737,9 @@ $('#view').addEventListener('click',e=>{
     case 'allclose': closeAll(b); return;
     case 'night': openNight(); return;
     case 'soiree': soireeAll(); return;
+    case 'legend-q': legendOpen=!legendOpen; render(); return;
+    case 'scenes-all': scenesAll=!scenesAll; render(); return;
+    case 'open-cams': openCams(); return;
     case 'go-plan': if([...b.querySelectorAll('.pin.bad')].some(p=>{ const q=p.getBoundingClientRect(); return Math.hypot(q.left+q.width/2-e.clientX,q.top+q.height/2-e.clientY)<=16; })){ openWatch(); return; }
       store.set('homePlan','big'); render(); window.scrollTo(0,0); return;
     case 'plan-small': store.set('homePlan','small'); pinEdit=false; render(); window.scrollTo(0,0); return;
