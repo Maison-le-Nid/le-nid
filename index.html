@@ -491,6 +491,32 @@ h1{letter-spacing:.02em}
 body.wall .hb-plan{width:min(100%,calc((100vh - 150px) * 35 / 22.5))}
 .hb-plan .plan-legend{justify-content:center}
 .hb-watch-row{margin:14px 0 0}.hb-watch-row .hb-watch{width:100%;max-width:none;margin:0}
+/* iPhone : heure et météo sur une ligne fine, pour laisser la place au plan */
+.hb-top.slim{flex-wrap:nowrap;align-items:center;gap:10px;margin:0 0 10px}
+.hb-top.slim .hb-clock{display:flex;align-items:baseline;gap:8px;flex:none}
+.hb-top.slim .hb-clock .wall-clock{font-size:28px}
+.hb-top.slim .hb-clock .wall-date{margin:0;font-size:13px}
+.hb-top.slim .hb-wx{flex-direction:row;align-items:baseline;gap:6px;margin-left:auto;min-width:0}
+.hb-top.slim .hb-wx b{font-size:20px}
+.hb-top.slim .hb-wx small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
+.hb-top.slim .hb-wx .linkbtn{min-height:0;font-size:13px;white-space:nowrap}
+/* iPhone : Pièces et Partager en deux liens simples sous le plan */
+.hb-nav.links{display:flex;justify-content:center;gap:32px;margin:10px auto 0}
+.hb-nav.links button{min-height:40px;padding:0 4px;background:none;box-shadow:none;border-radius:0;color:var(--brand);font-size:15px;font-weight:600}
+.hb-nav.links button .i{width:18px;height:18px;color:var(--brand)}
+/* iPhone : les scènes en petites pastilles sur une ligne (glisser pour voir la suite) */
+@media (max-width:699px){
+  body:not(.wall) .hb-more .scenes,.home-main .scenes{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 8px;margin:0 -2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  body:not(.wall) .hb-more .scenes::-webkit-scrollbar,.home-main .scenes::-webkit-scrollbar{display:none}
+  body:not(.wall) .hb-more .scene,.home-main .scene{flex:none;flex-direction:row;align-items:center;justify-content:flex-start;gap:8px;min-height:0;padding:6px 16px 6px 6px;border-radius:999px;scroll-snap-align:start}
+  body:not(.wall) .hb-more .scene.now,.home-main .scene.now{padding:5px 15px 5px 5px}
+  body:not(.wall) .hb-more .scene-ic,.home-main .scene-ic{width:34px;height:34px;flex:none}
+  body:not(.wall) .hb-more .scene-ic .i,.home-main .scene-ic .i{width:18px;height:18px}
+  body:not(.wall) .hb-more .scene-name,.home-main .scene-name{font-family:inherit;font-size:15px;font-weight:600;white-space:nowrap}
+  body:not(.wall) .hb-more .scene-now,.home-main .scene-now{display:none}
+  body:not(.wall) .hb-more .scene-ok,.home-main .scene-ok{position:static;font-size:12px}
+  body:not(.wall) .hb-more .scene.done .scene-name,.home-main .scene.done .scene-name{display:none}
+}
 .hb-nav{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:640px;margin:16px auto 0}
 .hb-nav button{min-height:58px;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;background:var(--face);box-shadow:var(--float-lo);color:var(--title);font:inherit;font-weight:500;cursor:pointer}
 .hb-more{max-width:720px;margin:12px auto 0}
@@ -2117,7 +2143,7 @@ function outTemp(){
   const d=Object.values(data.devices||{}).find(x=>x.available!==false&&/terrasse nord|ext[ée]rieur|dehors/i.test(x.name)&&x.capabilitiesObj&&x.capabilitiesObj.measure_temperature&&typeof x.capabilitiesObj.measure_temperature.value==='number');
   return d?d.capabilitiesObj.measure_temperature.value:null;
 }
-function wxHtml(){
+function wxHtml(slim){
   const g=store.get('geo',null), j=wx&&wx.j, t0=outTemp();
   const cur=t0!==null?t0:(j&&j.current&&typeof j.current.temperature_2m==='number'?j.current.temperature_2m:null);
   let line='';
@@ -2134,6 +2160,8 @@ function wxHtml(){
       line=WMO(j.daily.weather_code[0])+(trend?' · '+trend:'')+(rain!==undefined?' · pluie vers '+(+j.hourly.time[rain].slice(11,13))+' h':'');
     }
   } }catch(e){ line=''; }
+  // iPhone : une ligne fine (température + prévision courte, ou le lien « Prévisions »)
+  if(slim) return '<b>'+(cur!==null?nf0.format(cur)+'°':'–')+'</b>'+(g?'<small>'+esc(line||'Dehors')+'</small>':'<button class="linkbtn" type="button" id="wx-on">Prévisions</button>');
   return '<b>'+(cur!==null?nf0.format(cur)+'°':'–')+'</b><small>'+esc(line||(g?'Dehors · prévisions en cours…':'Dehors'))+'</small>'
     +(!g?'<button class="linkbtn" type="button" id="wx-on">Afficher la tendance du jour</button>':'');
 }
@@ -2143,14 +2171,14 @@ function renderHomeBig(wall){
   const narrow=!wall&&!isWide(), watchBtn='<button class="hb-watch'+(n?' warn':'')+'" type="button" id="watch"><span class="status-dot" aria-hidden="true">'+(n?'!':I('check'))+'</span><span class="hb-w-txt"><b>'+(n?n+(n>1?' points à regarder':' point à regarder'):'Tout va bien à la maison')+'</b><small>'+esc(n?it.slice(0,2).map(i=>i.txt).join(' · ')+(n>2?'…':''):summary())+'</small></span></button>';
   let h='';
   if(mode==='demo') h+='<div class="note"><span>Démo avec des appareils d’exemple.</span><button class="btn small" type="button" id="open-settings">Connecter mon Homey</button></div>';
-  h+='<div class="hb-top"><div class="hb-clock"><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div></div>'
-    +'<div class="hb-wx">'+wxHtml()+'</div>'
+  h+='<div class="hb-top'+(narrow?' slim':'')+'"><div class="hb-clock"><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div></div>'
+    +'<div class="hb-wx">'+wxHtml(narrow)+'</div>'
     +(narrow?'':watchBtn)+'</div>';
   h+='<div class="hb-plan">'+planHtml()+'</div>';
   h+='<div class="hb-tools">'+(isWide()?'<button class="btn small" type="button" id="'+(wall?'wall-exit':'wall-go')+'">'+(wall?'Quitter le plein écran':'Plein écran')+'</button>':'')
     +(pinEdit?'<button class="btn small primary" type="button" id="pin-edit">'+I('check')+'Terminé</button>'+(alignUndo?'<button class="btn small" type="button" id="pin-undo">Annuler l’alignement</button>':'<button class="btn small" type="button" id="pin-align">Aligner</button>')+'<button class="btn small" type="button" id="pin-guest">'+I('eye')+'Aperçu invité</button><button class="btn small" type="button" id="pin-reset">Remettre en place</button>':'')+'</div>';
+  h+='<nav class="hb-nav'+(narrow?' links':'')+'" aria-label="Rubriques"><button type="button" data-go="rooms">'+I('rooms')+'Pièces</button><button type="button" data-go="share">'+I('share')+'Partager</button></nav>';
   if(narrow) h+='<div class="hb-watch-row">'+watchBtn+'</div>';
-  h+='<nav class="hb-nav" aria-label="Rubriques"><button type="button" data-go="rooms">'+I('rooms')+'Pièces</button><button type="button" data-go="share">'+I('share')+'Partager</button></nav>';
   let fl=homeFlows(); const now=nowScene(fl); if(now) fl=[now].concat(fl.filter(f=>f!==now));
   h+='<div class="hb-more">'+eveBtns()
     +(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3><button class="linkbtn" type="button" id="arrange">Ranger</button></div><div class="scenes">'+topScenes(fl,now).map(f=>sceneBtn(f,f===now)).join('')+'</div>'+scenesMore(fl):'')
