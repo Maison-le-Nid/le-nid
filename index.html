@@ -287,7 +287,8 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;back
 
 /* Onglets */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.tabs-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.tabs-in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+.tab[hidden]{display:none}
 .tab{background:none;border:0;padding:8px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--ink-3);cursor:pointer;min-height:58px}
 .tab[aria-current="page"]{color:var(--brand);font-weight:600}
 .tab[aria-current="page"] .i{stroke-width:2.2}
@@ -489,7 +490,7 @@ h1{letter-spacing:.02em}
 .hb-plan{margin:0 auto;width:min(100%,calc((100vh - 215px) * 35 / 22.5))}
 body.wall .hb-plan{width:min(100%,calc((100vh - 150px) * 35 / 22.5))}
 .hb-plan .plan-legend{justify-content:center}
-.hb-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:640px;margin:16px auto 0}
+.hb-nav{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:640px;margin:16px auto 0}
 .hb-nav button{min-height:58px;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:999px;background:var(--face);box-shadow:var(--float-lo);color:var(--title);font:inherit;font-weight:500;cursor:pointer}
 .hb-more{max-width:720px;margin:12px auto 0}
 body.homebig .tabs{display:none}
@@ -762,7 +763,6 @@ body.wall.side-open .wrap{padding-right:calc(min(420px,38vw) + 16px);transition:
   <div class="top-in">
     <span class="logo" aria-hidden="true"><svg viewBox="28 28 124 124" width="24" height="24"><g fill="none" stroke="currentColor" stroke-width="11" stroke-linejoin="round" stroke-linecap="round"><path d="M38 86L90 44l52 42"/><path d="M52 76v58h76V76"/><path d="M78 134v-28h24v28"/></g></svg></span>
     <div class="brand-txt"><h1 id="hello">Le Nid</h1><span id="conn" class="pill">Démo</span></div>
-    <button id="theme-btn" class="icon-btn" type="button" aria-label="Ambiance"></button>
     <button id="gear" class="icon-btn" type="button" aria-label="Réglages"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   </div>
 </header>
@@ -774,7 +774,7 @@ body.wall.side-open .wrap{padding-right:calc(min(420px,38vw) + 16px);transition:
     <button class="tab" type="button" data-tab="home"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>Accueil</button>
     <button class="tab" type="button" data-tab="rooms"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M12 4v16M3 12h9"/></svg>Pièces</button>
     <button class="tab" type="button" data-tab="share"><svg class="i" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></svg>Partager</button>
-    <button class="tab" type="button" data-tab="apps"><svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M17 14v6M14 17h6"/></svg>Applis</button>
+    <button class="tab" type="button" data-tab="apps" hidden><svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M17 14v6M14 17h6"/></svg>Applis</button>
   </div>
 </nav>
 
@@ -844,7 +844,8 @@ const store={
 };
 const THEMES=['auto','light','dark'], TH_LABEL={auto:'Auto, comme l’iPhone',light:'Jour',dark:'Soir'};
 const TH_IC={auto:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="currentColor"/>',light:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M2.5 12h2M19.5 12h2M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',dark:'<path d="M19.5 14.5A7.5 7.5 0 0 1 9.5 4.5a7.5 7.5 0 1 0 10 10z"/>'};
-function applyTheme(){ const t=store.get('theme','auto'); if(t==='auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme=t; const b=document.getElementById('theme-btn'); if(b){ b.innerHTML='<svg class="i" viewBox="0 0 24 24">'+TH_IC[t]+'</svg>'; b.setAttribute('aria-label','Ambiance : '+TH_LABEL[t]); b.title='Ambiance : '+TH_LABEL[t]; } }
+// Le Nid suit le réglage jour / nuit de l'iPhone (plus de bouton dans l'en-tête)
+function applyTheme(){ if(store.get('theme','auto')!=='auto') store.del('theme'); const t='auto'; if(t==='auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme=t; const b=document.getElementById('theme-btn'); if(b){ b.innerHTML='<svg class="i" viewBox="0 0 24 24">'+TH_IC[t]+'</svg>'; b.setAttribute('aria-label','Ambiance : '+TH_LABEL[t]); b.title='Ambiance : '+TH_LABEL[t]; } }
 applyTheme();
 const inClaude=()=>!!window.claude||/claude/i.test(location.hostname);
 function b64e(s){return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
@@ -1377,7 +1378,7 @@ function renderHome(){
     +(ok?'':'<ul>'+w.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><button class="linkbtn" type="button" id="watch">Voir et agir</button>')
     +'<p class="sum">'+esc(summary())+'</p></div></section>';
   const hr=new Date().getHours(), soir=hr>=19||hr<6;
-  if(soir) side+=soireeBtn()+nightBtn();
+  if(soir) side+=soireeBtn()+nightBtn(); else if(hr<11) side+=morningBtn();
   side+=miniPlan();
   if(nCov) side+='<button class="allclose" type="button" id="allclose"><span class="row-ic">'+I('blinds')+'</span><span class="row-txt"><b>Tout fermer</b><small>'+(nCov>1?nCov+' volets et fenêtres':'1 volet')+'</small></span></button>';
   side+=camsHtml();
@@ -1471,7 +1472,12 @@ async function roomOff(name){
 const LIVING=['Salon','Cuisine','Entrée'];
 const livingLamps=()=>[...new Set(LIVING.flatMap(roomLamps))];
 // Le soir seulement (19 h – 6 h) : « Soirée » puis « Avant de dormir »
-const eveBtns=()=>{ const h=new Date().getHours(); return h>=19||h<6?soireeBtn()+nightBtn():''; };
+const eveBtns=()=>{ const h=new Date().getHours(); return h>=19||h<6?soireeBtn()+nightBtn():h<11?morningBtn():''; };
+// Le matin (6 h – 11 h) : la scène « Bonjour » en grand, un toucher la lance
+function morningBtn(){
+  const f=(data.flows||[]).find(x=>x.trig&&/bonjour|r[ée]veil|matin/i.test(x.name)); if(!f) return '';
+  return '<button class="allclose" type="button" data-flow="'+esc(f.id)+'" data-type="'+esc(f.type)+'" data-name="'+esc(f.name)+'"><span class="row-ic">'+I('sun')+'</span><span class="row-txt"><b>'+esc(f.name)+'</b><small>Lancer la scène du matin</small></span></button>';
+}
 function soireeBtn(){
   if(!livingLamps().length) return '';
   return '<button class="allclose" type="button" id="soiree"><span class="row-ic">'+I('bulb')+'</span><span class="row-txt"><b>Soirée</b><small>Salon, cuisine et entrée en lumière douce</small></span></button>';
@@ -2141,7 +2147,7 @@ function renderHomeBig(wall){
   h+='<div class="hb-plan">'+planHtml()+'</div>';
   h+='<div class="hb-tools">'+(isWide()?'<button class="btn small" type="button" id="'+(wall?'wall-exit':'wall-go')+'">'+(wall?'Quitter le plein écran':'Plein écran')+'</button>':'')
     +(pinEdit?'<button class="btn small primary" type="button" id="pin-edit">'+I('check')+'Terminé</button>'+(alignUndo?'<button class="btn small" type="button" id="pin-undo">Annuler l’alignement</button>':'<button class="btn small" type="button" id="pin-align">Aligner</button>')+'<button class="btn small" type="button" id="pin-guest">'+I('eye')+'Aperçu invité</button><button class="btn small" type="button" id="pin-reset">Remettre en place</button>':'')+'</div>';
-  h+='<nav class="hb-nav" aria-label="Rubriques"><button type="button" data-go="rooms">'+I('rooms')+'Pièces</button><button type="button" data-go="share">'+I('share')+'Partager</button><button type="button" data-go="apps">'+I('apps')+'Applis</button></nav>';
+  h+='<nav class="hb-nav" aria-label="Rubriques"><button type="button" data-go="rooms">'+I('rooms')+'Pièces</button><button type="button" data-go="share">'+I('share')+'Partager</button></nav>';
   let fl=homeFlows(); const now=nowScene(fl); if(now) fl=[now].concat(fl.filter(f=>f!==now));
   h+='<div class="hb-more">'+eveBtns()
     +(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3><button class="linkbtn" type="button" id="arrange">Ranger</button></div><div class="scenes">'+topScenes(fl,now).map(f=>sceneBtn(f,f===now)).join('')+'</div>'+scenesMore(fl):'')
@@ -2503,6 +2509,7 @@ function openSettings(){
     if(!isVisit()) h+='<button class="btn block" type="button" id="cf-pins">Déplacer les boutons du plan</button>'+(store.get('homePlan','big')!=='small'?'<button class="btn block" type="button" id="cf-small">Réduire le plan</button>':'');
     if(trig.length) h+='<button class="btn block" type="button" id="cf-arrange">Ranger les boutons de l’accueil</button>';
     if(nDev) h+='<button class="btn block" type="button" id="cf-arrange-rooms">Ranger les pièces et les appareils</button>';
+    if(!isVisit()) h+='<button class="btn block" type="button" id="cf-apps">'+I('apps')+'Applis</button>';
   }
   h+='<h3 class="sec">iPhone et iPad</h3>';
   if(mode==='live') h+='<button class="btn block" type="button" id="cf-export">'+I('copy')+'Copier mes réglages</button>'
@@ -2521,6 +2528,7 @@ function openSettings(){
     },
     'cf-arrange':openArrange,
     'cf-arrange-rooms':openArrangeRooms,
+    'cf-apps':()=>{ closeSheet(); tab='apps'; store.set('tab','apps'); render(); window.scrollTo(0,0); },
     'cf-export':async()=>{ const ok=await copyText(exportCode(),'cf-export-out'); toast(ok?'Réglages copiés. Colle-les sur l’autre appareil.':'Sélectionne le texte affiché et copie-le.'); },
     'cf-import-btn':importSettings,
     'cf-send':async()=>{ const url=setupLink();
@@ -2698,7 +2706,6 @@ function toast(msg,kind){ const el=$('#toast'); el.textContent=msg; el.className
 /* ---------- Événements ---------- */
 $('#tabs').addEventListener('click',e=>{ const b=e.target.closest('[data-tab]'); if(!b) return; tab=b.dataset.tab; store.set('tab',tab); render(); window.scrollTo(0,0); });
 $('#gear').addEventListener('click',openSettings);
-$('#theme-btn').addEventListener('click',()=>{ const t=store.get('theme','auto'), n=THEMES[(THEMES.indexOf(t)+1)%THEMES.length]; store.set('theme',n); applyTheme(); toast('Ambiance : '+TH_LABEL[n]); });
 function devClick(b){
   const d=b.dataset.dev&&data.devices[b.dataset.dev]; if(!d) return false;
   if(b.dataset.gar){ garageAsk(d,b.dataset.gar==='open'); return true; }
