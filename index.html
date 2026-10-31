@@ -79,10 +79,12 @@ h1{font-family:var(--serif);font-size:24px;line-height:1.1;margin:0;color:var(--
 .allclose b{display:block;font-weight:600;font-size:16px}
 .allclose small{display:block;color:var(--ink-2);font-size:13px}
 .allclose.busy{opacity:.55;pointer-events:none}
+a.allclose{box-sizing:border-box;color:inherit;text-decoration:none}
 a.allclose{color:inherit;text-decoration:none}
 a.btn{text-decoration:none}
 .cams{margin-top:22px}
 .scenes-more{display:block;margin:12px auto 0}
+.psw .psw-mode{font-size:10px;font-weight:600;letter-spacing:.04em;opacity:.7;margin-left:4px}
 .cams-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
 .cam-tile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 6px 12px;border-radius:var(--r-lg);background:var(--face);box-shadow:var(--float-lo);color:var(--title);text-decoration:none;text-align:center;transition:transform .2s}
 .cam-tile:active{transform:scale(.96)}
@@ -835,6 +837,7 @@ const P={
   garage:'<path d="M3 10.5L12 4l9 6.5V20H3z"/><path d="M7 20v-7.5h10V20M7 15h10M7 17.5h10"/>',
   roof:'<path d="M2.5 11.5L12 4l9.5 7.5"/><rect x="7" y="10" width="10" height="10" rx="1"/><path d="M12 10v10M7 15h10"/>',
   camera:'<rect x="3" y="7" width="13" height="10" rx="2"/><path d="M16 11l5-3v8l-5-3"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M9 21h6"/>',
   sensor:'<circle cx="12" cy="12" r="2.5"/><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 7.5a6.4 6.4 0 0 1 0 9"/>',
   lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
   dot:'<circle cx="12" cy="12" r="7"/>',
@@ -1383,6 +1386,10 @@ function homeFlows(){
   if(Array.isArray(sel)) return sel.map(id=>trig.find(f=>f.id===id)).filter(Boolean);
   return trig.slice(0,8);
 }
+// Interphone : lance le raccourci iPhone « Interphone » (on parle, les HomePod diffusent)
+function intercomHtml(){
+  return '<a class="allclose" href="shortcuts://run-shortcut?name=Interphone" aria-label="Interphone : parler dans les HomePod"><span class="row-ic">'+I('mic')+'</span><span class="row-txt"><b>Interphone</b><small>Parler dans toute la maison</small></span></a>';
+}
 // Caméras : un seul bouton sur l'accueil ; il ouvre les trois choix (raccourcis iPhone)
 function camsHtml(){
   return '<button class="allclose" type="button" id="open-cams"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Caméras</b><small>Toutes, Sherlock ou Aqara</small></span></button>';
@@ -1407,7 +1414,7 @@ function renderHome(){
   const hr=new Date().getHours(), soir=hr>=19||hr<6;
   if(soir) side+=soireeBtn()+nightBtn(); else if(hr<11) side+=morningBtn();
   if(nCov) side+='<button class="allclose" type="button" id="allclose"><span class="row-ic">'+I('blinds')+'</span><span class="row-txt"><b>Tout fermer</b><small>'+(nCov>1?nCov+' volets et fenêtres':'1 volet')+'</small></span></button>';
-  side+=camsHtml();
+  side+=intercomHtml()+camsHtml();
   let main='<div class="sec-row"><h3 class="sec">Scènes</h3>'+(data.flows.some(f=>f.trig)?'<button class="linkbtn" type="button" id="arrange">Ranger</button>':'')+'</div>';
   main+=fl.length?'<div class="scenes">'+topScenes(fl,now).map(f=>sceneBtn(f,f===now)).join('')+'</div>'+scenesMore(fl)
     :'<p class="muted">Aucune scène à lancer. Crée dans Homey un Flow qui se lance à la main, il apparaîtra ici.</p>';
@@ -1981,7 +1988,13 @@ function poolSw(d){
 function poolBits(d,tall,full){
   if(d.available===false) return '<span class="pc bad"><b>Ne répond pas</b></span>';
   return '<span class="pc-row">'+poolInd(d,full).map(i=>'<span class="pc'+(i.warn?' warn':'')+'"><small>'+esc(i.l)+'</small><b>'+esc(tall&&i.vs||i.v)+'</b>'+(i.x?'<small>'+esc(i.x)+'</small>':'')+'</span>').join('')+'</span>'
-    +poolSw(d).map(s=>'<button class="psw'+(s.on?' on':'')+(full?'':litAnim('pl:'+s.k,s.on))+'" type="button" data-pcap="'+esc(d.id)+'|'+s.k+'" aria-label="'+esc(s.l+' de la piscine, '+(s.on?'allumée. Touche pour éteindre':'éteinte. Touche pour allumer'))+'">'+I(s.i)+'<span>'+esc(s.l)+'</span></button>').join('');
+    +poolSw(d).map(s=>'<button class="psw'+(s.on?' on':'')+(full?'':litAnim('pl:'+s.k,s.on))+'" type="button" data-pcap="'+esc(d.id)+'|'+s.k+'" aria-label="'+esc(s.l+' de la piscine, '+(s.on?'allumée. Touche pour éteindre':'éteinte. Touche pour allumer'))+'">'+I(s.i)+'<span>'+esc(s.l)+'</span>'+(s.k==='lighting_onoff'&&(d.capabilitiesObj.lighting_mode||{}).value==='automatic'?'<small class="psw-mode">Auto</small>':'')+'</button>').join('');
+}
+// Lumière de la piscine : programme automatique du boîtier, ou commande à la main
+function poolLightHtml(d){
+  const m=(d.capabilitiesObj||{}).lighting_mode; if(!m||m.setable===false||d.available===false) return '';
+  return '<div class="pool-speed"><span>Lumière</span><div class="seg" role="group" aria-label="Mode de la lumière">'
+    +[['automatic','Auto'],['manual','Manuel']].map(([v,t])=>'<button type="button" data-dev="'+esc(d.id)+'" data-cap="lighting_mode" data-val="'+v+'" aria-pressed="'+(m.value===v)+'">'+t+'</button>').join('')+'</div></div>';
 }
 function poolHud(o,tall){ const d=poolDev(); return d?'<div class="pool-hud'+(tall?' tall':'')+'" style="'+planBox(o,tall)+'">'+poolBits(d,tall,false)+'</div>':''; }
 async function poolTap(v){
@@ -1989,6 +2002,9 @@ async function poolTap(v){
   if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
   if(d.available===false){ toast('La piscine ne répond pas.','bad'); return; }
   const on=!c.value, s=poolSw(d).find(x=>x.k===k), nm=s&&s.k==='lighting_onoff'?'la lumière de la piscine':'« '+(s?s.l:'piscine')+' »';
+  // La lumière ne garde pas un ordre en mode « Automatique » (programme du boîtier) : on passe en « Manuel » d'abord
+  const lm=d.capabilitiesObj.lighting_mode;
+  if(k==='lighting_onoff'&&lm&&lm.setable!==false&&lm.value!=='manual'){ if(await setCap(id,'lighting_mode','manual')===false) return; }
   toast((on?'J’allume ':'J’éteins ')+nm); await setCap(id,k,on);
 }
 
@@ -2076,7 +2092,7 @@ function planSheetHtml(id){
   if(String(id).indexOf('dev:')===0){ const d=data.devices[id.slice(4)]; return d?devCard(d):'<p class="muted">Cet appareil n’est plus dans Homey.</p>'; }
   if(String(id).indexOf('bay:')===0){ const d=bayDev(id.slice(4)); return d?'<div class="list">'+devRow(d)+'</div>':'<p class="muted">Ce store ne répond plus.</p>'; }
   const vis=isVisit(), devs=roomDevs(id).filter(d=>!vis||visitKeep(d)), pd=id==='Piscine'&&poolDev();
-  if(pd) return '<div class="pool-panel">'+poolBits(pd,false,true)+'</div>'+(vis?'':poolSpeedHtml(pd)+poolHydHtml(pd))+(devs.length>1?'<div class="list">'+devs.filter(d=>d!==pd).map(devRow).join('')+'</div>':'');
+  if(pd) return '<div class="pool-panel">'+poolBits(pd,false,true)+'</div>'+(vis?'':poolSpeedHtml(pd)+poolLightHtml(pd)+poolHydHtml(pd))+(devs.length>1?'<div class="list">'+devs.filter(d=>d!==pd).map(devRow).join('')+'</div>':'');
   if(!devs.length) return '<p class="muted">'+(vis?'Rien à commander dans cette pièce.':'Rien de relié à Homey dans cette pièce. Ce qui s’y trouve se pilote dans l’appli Maison.')+'</p>';
   // Ambiances de la pièce : toutes ses lampes réglées d'un coup
   const amb=roomLights(id).length?'<div class="room-amb dv-opts">'+(roomLamps(id).length?Object.keys(AMB).map(a=>'<button class="chip" type="button" data-ramb="'+a+'" data-room="'+esc(id)+'">'+AMB[a].t+'</button>').join(''):'')+'<button class="chip" type="button" data-roff="'+esc(id)+'">Éteindre</button></div>':'';
@@ -2182,7 +2198,7 @@ function renderHomeBig(wall){
   let fl=homeFlows(); const now=nowScene(fl); if(now) fl=[now].concat(fl.filter(f=>f!==now));
   h+='<div class="hb-more">'+eveBtns()
     +(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3><button class="linkbtn" type="button" id="arrange">Ranger</button></div><div class="scenes">'+topScenes(fl,now).map(f=>sceneBtn(f,f===now)).join('')+'</div>'+scenesMore(fl):'')
-    +camsHtml()+'</div>';
+    +intercomHtml()+camsHtml()+'</div>';
   return h;
 }
 function getShares(){
