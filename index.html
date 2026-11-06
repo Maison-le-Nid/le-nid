@@ -977,18 +977,23 @@ function normFlows(m,type){
   return Object.values(m).filter(f=>f&&f.id&&f.enabled!==false)
     .map(f=>({id:f.id,name:f.name||'Sans nom',type,trig:f.triggerable!==false})).sort(byName);
 }
+// Appareils : on retire ceux à cacher, et on prend le type choisi dans Homey (« Branché : Lampe ») plutôt que celui du module
+function normDevs(d){
+  const dd=d||{}; for(const k of Object.keys(dd)){ const x=dd[k]; if(isHidden(x)){ delete dd[k]; continue; } if(x&&x.virtualClass) x.class=x.virtualClass; }
+  return dd;
+}
 async function loadLive(){
   const [z,d,f,af,ap]=await Promise.all([
     req('/api/manager/zones/zone/'), req('/api/manager/devices/device/'),
     req('/api/manager/flow/flow/').catch(()=>null), req('/api/manager/flow/advancedflow/').catch(()=>null),
     req('/api/manager/apps/app/').catch(()=>null)
   ]);
-  const dd=d||{}; for(const k of Object.keys(dd)) if(isHidden(dd[k])) delete dd[k];
+  const dd=normDevs(d);
   data={zones:z||{},devices:dd,flows:normFlows(f,'flow').concat(normFlows(af,'advancedflow')),apps:ap};
 }
 async function loadVisit(){
   const [z,d]=await Promise.all([req('/api/manager/zones/zone/'),req('/api/manager/devices/device/')]);
-  const dd=d||{}; for(const k of Object.keys(dd)) if(isHidden(dd[k])) delete dd[k];
+  const dd=normDevs(d);
   data={zones:z||{},devices:dd,flows:(guest.b||[]).map(f=>({id:f.i,type:f.t,name:f.n,trig:true})),apps:null};
 }
 async function refresh(){
