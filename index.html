@@ -1016,14 +1016,15 @@ function errMsg(e){
 /* ---------- Le Nid : les noms et les pièces de l’appli Maison ---------- */
 // Homey garde ses noms complets (plus clairs pour les alertes) ; l’appli affiche ceux de Le Nid.
 const nk=s=>String(s||'').trim().replace(/\s+/g,' ').toLowerCase();
-const NID_ROOM={'ma salle de bain':'Salle De Bain Ma Chambre','chambre de paul':'Chambre De Paul','chambre piscine':'Chambre Piscine','chambre artiste':'Chambre Artiste','arrière cuisine':'Arrière Cuisine','terrasse':'Extérieur','carport':'Extérieur'};
+const NID_ROOM={'ma salle de bain':'Salle De Bain Ma Chambre','chambre de paul':'Chambre De Paul','chambre paul':'Chambre De Paul','chambre amis':'Chambre AMIS','chambre piscine':'Chambre AMIS','chambre artiste':'Chambre Artiste','chambre artist':'Chambre Artiste','arrière cuisine':'Arrière Cuisine','terrasse':'Extérieur','carport':'Extérieur'};
 const NID_DEV={
   'base eufy':['Base eufy','Arrière Cuisine'], 'plaque de cuisson':['Plaque de cuisson','Buanderie'],
   'clim bureau':['Clim','Bureau'], 'clim salon':['Clim','Salon'],
-  'clim ma chambre':['Clim','Ma Chambre'], 'clim chambre piscine':['Clim','Chambre Piscine'],
+  'clim ma chambre':['Clim','Ma Chambre'], 'clim master':['Clim','Ma Chambre'], 'clim artist':['Clim','Chambre Artiste'],
+  'clim amis':['Clim','Chambre AMIS'], 'clim chambre amis':['Clim','Chambre AMIS'], 'clim chambre piscine':['Clim','Chambre AMIS'],
   'lumière cuisine':['Lumière','Cuisine'], 'sonnette entrée':['Sonnette','Entrée'], 'rideau ma chambre':['Rideau','Ma Chambre'], 'rideaux ma chambre':['Rideau','Ma Chambre'],
   'lumière baie gauche':['Lumière Baie Gauche','Salon'], 'lumière baie droite':['Lumière Baie Droite','Salon'], 'lumière table':['Lumière Table','Salon'],
-  'store paul':['Store de Paul','Extérieur'], 'store chambre piscine':['Store de la chambre piscine','Extérieur'],
+  'store paul':['Store de Paul','Extérieur'], 'store chambre amis':['Store de la chambre AMIS','Extérieur'], 'store chambre piscine':['Store de la chambre AMIS','Extérieur'],
   'store chambre de maître':['Store de ma chambre','Extérieur'], 'store ma chambre':['Store de ma chambre','Extérieur'],
   'store baie droite 1':['Store droit 1','Extérieur'], 'store baie droite 2':['Store droit 2','Extérieur'],
   'store baie gauche 3':['Store gauche 3','Extérieur'], 'store baie droite 4':['Store gauche 4','Extérieur'],
@@ -1032,7 +1033,7 @@ const NID_DEV={
   'kajplats trompette 1':['Lampe trompette de ma chambre','Ma Chambre'], 'kajplats trompette 2':['Lampe trompette du bureau','Bureau']
 };
 // Les stores restent dans « Extérieur », mais on les retrouve aussi dans leur pièce
-const NID_ALSO={'store ma chambre':['Ma Chambre'],'store chambre de maître':['Ma Chambre'],'store baie gauche 3':['Salon'],'store baie droite 4':['Salon'],'store paul':['Chambre De Paul'],'store chambre piscine':['Chambre Piscine'],
+const NID_ALSO={'store ma chambre':['Ma Chambre'],'store chambre de maître':['Ma Chambre'],'store baie gauche 3':['Salon'],'store baie droite 4':['Salon'],'store paul':['Chambre De Paul'],'store chambre amis':['Chambre AMIS'],'store chambre piscine':['Chambre AMIS'],
   'store baie droite 1':['Salon'],'store baie droite 2':['Salon'],'store baie gauche 1':['Salon'],'store baie gauche 2':['Salon']};
 // Doublons : les ampoules réunies dans un groupe Homey (Lampadaire salon, Lampe petite table) et les déclencheurs de Siri
 const NID_HIDE=new Set(['lumière piscine','kajplats lampadaire salon1','kajplats lampadaire salon 1','kajplats lampadaire salon 2','kajplats petite table1','kajplats petite table 1','kajplats table 2']);
@@ -1606,11 +1607,11 @@ const PLAN=[
   {n:'Salon',x:7.1,y:8.1,w:18.6,h:8,k:'zone',notch:[11.4/18.6,4/8]},
   {n:'Cuisine',x:7.1,y:8.1,w:6.95,h:4,k:'zone'},
   {n:'Entrée',x:14.05,y:8.1,w:4.45,h:4,k:'zone'},
-  // Les chambres de Paul, piscine, artiste et le bureau, côté descente
+  // Les chambres de Paul, AMIS, artiste et le bureau, côté descente
   {n:'Bureau',x:25.7,y:8.1,w:3.55,h:3.4},
   {n:'Salle De Bain Artiste',s:'Bain artiste',x:29.25,y:8.1,w:2.2,h:3.4},
   {n:'Chambre Artiste',s:'Ch. artiste',x:31.45,y:8.1,w:3.55,h:3.4},
-  {n:'Chambre Piscine',s:'Ch. piscine',x:25.7,y:12.7,w:3.55,h:3.4},
+  {n:'Chambre AMIS',s:'Ch. AMIS',x:25.7,y:12.7,w:3.55,h:3.4},
   {n:'Salle De Bain Paul',s:'Bain Paul',x:29.25,y:12.7,w:2.2,h:3.4},
   {n:'Chambre De Paul',s:'Ch. Paul',x:31.45,y:12.7,w:3.55,h:3.4},
   {n:'Piscine',x:2.6,y:16.8,w:22.9,h:3.5,k:'pool'},
@@ -1657,7 +1658,7 @@ const PLAN_BAYS=[
   {x:1.5,w:3.5,dev:'store ma chambre|store chambre de maître|rideaux ma chambre'},
   {x:8.9,w:3,dev:'store baie droite 4'},{x:13.9,w:3,dev:'store baie gauche 3'},
   {x:18.55,w:3,dev:'store baie droite 2'},{x:22.4,w:3,dev:'store baie droite 1'},
-  {x:26.5,w:2,dev:'store chambre piscine'},
+  {x:26.5,w:2,dev:'store chambre amis|store chambre piscine'},
   {x:32.2,w:2,dev:'store paul'}
 ].map(b=>Object.assign({y:15.65,h:0.9},b));
 const bayDev=k=>{ for(const n of String(k).split('|')){ const d=Object.values(data.devices||{}).find(x=>nk(x.name)===n); if(d) return d; } return null; };
