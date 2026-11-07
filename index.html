@@ -1035,7 +1035,7 @@ const NID_DEV={
 const NID_ALSO={'store ma chambre':['Ma Chambre'],'store chambre de maître':['Ma Chambre'],'store baie gauche 3':['Salon'],'store baie droite 4':['Salon'],'store paul':['Chambre De Paul'],'store chambre piscine':['Chambre Piscine'],
   'store baie droite 1':['Salon'],'store baie droite 2':['Salon'],'store baie gauche 1':['Salon'],'store baie gauche 2':['Salon']};
 // Doublons : les ampoules réunies dans un groupe Homey (Lampadaire salon, Lampe petite table) et les déclencheurs de Siri
-const NID_HIDE=new Set(['kajplats lampadaire salon1','kajplats lampadaire salon 1','kajplats lampadaire salon 2','kajplats petite table1','kajplats petite table 1','kajplats table 2']);
+const NID_HIDE=new Set(['lumière piscine','kajplats lampadaire salon1','kajplats lampadaire salon 1','kajplats lampadaire salon 2','kajplats petite table1','kajplats petite table 1','kajplats table 2']);
 const isHidden=d=>NID_HIDE.has(nk(d.name))||/^d[ée]clencheur\b/.test(nk(d.name));
 const nidRoom=n=>NID_ROOM[nk(n)]||String(n||'').trim();
 const nidDev=n=>NID_DEV[nk(n)]||(nk(n).indexOf('echo dot')===0?['Echo Dot','Bureau']:null);
@@ -1966,7 +1966,8 @@ function poolInd(d,full){
   if(full&&el!==null&&!(c.target_hydrolysis_level&&c.target_hydrolysis_level.setable!==false)) out.push({l:'Électrolyse',v:nf0.format(el)+' %'});
   return out;
 }
-const POOL_SW=[['lighting_onoff','Lumière','bulb'],['onoff','Marche','wave']];
+// Lumière de la piscine retirée le 7 nov. : Homey ne sait pas la commander sur ce boîtier (à remettre avec un module connecté)
+const POOL_SW=[['onoff','Marche','wave']];
 const POOL_SPEED={slow:'lente',medium:'moyenne',high:'rapide'};
 function poolSpeedHtml(d){
   const c=d.capabilitiesObj||{}, f=c.filtration_speed; if(!f||f.setable===false||d.available===false) return '';
