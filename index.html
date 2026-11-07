@@ -83,8 +83,8 @@ a.allclose{color:inherit;text-decoration:none}
 a.btn{text-decoration:none}
 .cams{margin-top:22px}
 .scenes-more{display:block;margin:12px auto 0}
-.psw .psw-mode{font-size:10px;font-weight:600;letter-spacing:.04em;opacity:.7;margin-left:4px}
 .cams-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.cams-row.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 .cam-tile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 6px 12px;border-radius:var(--r-lg);background:var(--face);box-shadow:var(--float-lo);color:var(--title);text-decoration:none;text-align:center;transition:transform .2s}
 .cam-tile:active{transform:scale(.96)}
 .cam-tile b{font-size:15px;font-weight:600;line-height:1.2}
@@ -1393,6 +1393,17 @@ function homeFlows(){
 function camsHtml(){
   return '<button class="allclose" type="button" id="open-cams"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Caméras</b><small>Toutes, Sherlock ou Aqara</small></span></button>';
 }
+// Alarme : deux raccourcis de l'iPhone qui envoient le SMS depuis ton numéro (jamais chez les invités)
+const ALARM_ON='Armer', ALARM_OFF='Désarmer';
+function alarmHtml(){
+  return '<button class="allclose" type="button" id="open-alarm"><span class="row-ic">'+I('shield')+'</span><span class="row-txt"><b>Alarme</b><small>Armer ou désarmer</small></span></button>';
+}
+function openAlarm(){
+  const t=(name,ic,b,sm,lab)=>'<a class="cam-tile" href="shortcuts://run-shortcut?name='+encodeURIComponent(name)+'" aria-label="'+lab+'"><span class="cam-ic">'+I(ic)+'</span><b>'+b+'</b><small>'+sm+'</small></a>';
+  openSheet('Alarme','<div class="cams-row two">'
+    +t(ALARM_ON,'shield','Armer','envoie le SMS','Armer l’alarme : envoie le SMS depuis ton iPhone')
+    +t(ALARM_OFF,'house','Désarmer','envoie le SMS','Désarmer l’alarme : envoie le SMS depuis ton iPhone')+'</div>',{});
+}
 function openCams(){
   const t=(name,b,sm,lab)=>'<a class="cam-tile" href="shortcuts://run-shortcut?name='+name+'" aria-label="'+lab+'"><span class="cam-ic">'+I('camera')+'</span><b>'+b+'</b><small>'+sm+'</small></a>';
   openSheet('Caméras','<div class="cams-row">'
@@ -1413,7 +1424,7 @@ function renderHome(){
   const hr=new Date().getHours(), soir=hr>=19||hr<6;
   if(soir) side+=soireeBtn()+nightBtn(); else if(hr<11) side+=morningBtn();
   if(nCov) side+='<button class="allclose" type="button" id="allclose"><span class="row-ic">'+I('blinds')+'</span><span class="row-txt"><b>Tout fermer</b><small>'+(nCov>1?nCov+' volets et fenêtres':'1 volet')+'</small></span></button>';
-  side+=camsHtml();
+  side+=alarmHtml()+camsHtml();
   let main='<div class="sec-row"><h3 class="sec">Scènes</h3>'+(data.flows.some(f=>f.trig)?'<button class="linkbtn" type="button" id="arrange">Ranger</button>':'')+'</div>';
   main+=fl.length?'<div class="scenes">'+topScenes(fl,now).map(f=>sceneBtn(f,f===now)).join('')+'</div>'+scenesMore(fl)
     :'<p class="muted">Aucune scène à lancer. Crée dans Homey un Flow qui se lance à la main, il apparaîtra ici.</p>';
@@ -1987,13 +1998,7 @@ function poolSw(d){
 function poolBits(d,tall,full){
   if(d.available===false) return '<span class="pc bad"><b>Ne répond pas</b></span>';
   return '<span class="pc-row">'+poolInd(d,full).map(i=>'<span class="pc'+(i.warn?' warn':'')+'"><small>'+esc(i.l)+'</small><b>'+esc(tall&&i.vs||i.v)+'</b>'+(i.x?'<small>'+esc(i.x)+'</small>':'')+'</span>').join('')+'</span>'
-    +poolSw(d).map(s=>'<button class="psw'+(s.on?' on':'')+(full?'':litAnim('pl:'+s.k,s.on))+'" type="button" data-pcap="'+esc(d.id)+'|'+s.k+'" aria-label="'+esc(s.l+' de la piscine, '+(s.on?'allumée. Touche pour éteindre':'éteinte. Touche pour allumer'))+'">'+I(s.i)+'<span>'+esc(s.l)+'</span>'+(s.k==='lighting_onoff'&&(d.capabilitiesObj.lighting_mode||{}).value==='automatic'?'<small class="psw-mode">Auto</small>':'')+'</button>').join('');
-}
-// Lumière de la piscine : programme automatique du boîtier, ou commande à la main
-function poolLightHtml(d){
-  const m=(d.capabilitiesObj||{}).lighting_mode; if(!m||m.setable===false||d.available===false) return '';
-  return '<div class="pool-speed"><span>Lumière</span><div class="seg" role="group" aria-label="Mode de la lumière">'
-    +[['automatic','Auto'],['manual','Manuel']].map(([v,t])=>'<button type="button" data-dev="'+esc(d.id)+'" data-cap="lighting_mode" data-val="'+v+'" aria-pressed="'+(m.value===v)+'">'+t+'</button>').join('')+'</div></div>';
+    +poolSw(d).map(s=>'<button class="psw'+(s.on?' on':'')+(full?'':litAnim('pl:'+s.k,s.on))+'" type="button" data-pcap="'+esc(d.id)+'|'+s.k+'" aria-label="'+esc(s.l+' de la piscine, '+(s.on?'allumée. Touche pour éteindre':'éteinte. Touche pour allumer'))+'">'+I(s.i)+'<span>'+esc(s.l)+'</span>'+'</button>').join('');
 }
 function poolHud(o,tall){ const d=poolDev(); return d?'<div class="pool-hud'+(tall?' tall':'')+'" style="'+planBox(o,tall)+'">'+poolBits(d,tall,false)+'</div>':''; }
 async function poolTap(v){
@@ -2001,9 +2006,7 @@ async function poolTap(v){
   if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
   if(d.available===false){ toast('La piscine ne répond pas.','bad'); return; }
   const on=!c.value, s=poolSw(d).find(x=>x.k===k), nm=s&&s.k==='lighting_onoff'?'la lumière de la piscine':'« '+(s?s.l:'piscine')+' »';
-  // La lumière ne garde pas un ordre en mode « Automatique » (programme du boîtier) : on passe en « Manuel » d'abord
-  const lm=d.capabilitiesObj.lighting_mode;
-  if(k==='lighting_onoff'&&lm&&lm.setable!==false&&lm.value!=='manual'){ if(await setCap(id,'lighting_mode','manual')===false) return; }
+  // Lumière : on ne touche plus au mode (laissé en Manuel dans l'appli Vistapool) ; Homey ne connaît pas le vrai mode du boîtier
   toast((on?'J’allume ':'J’éteins ')+nm); await setCap(id,k,on);
 }
 
@@ -2091,7 +2094,7 @@ function planSheetHtml(id){
   if(String(id).indexOf('dev:')===0){ const d=data.devices[id.slice(4)]; return d?devCard(d):'<p class="muted">Cet appareil n’est plus dans Homey.</p>'; }
   if(String(id).indexOf('bay:')===0){ const d=bayDev(id.slice(4)); return d?'<div class="list">'+devRow(d)+'</div>':'<p class="muted">Ce store ne répond plus.</p>'; }
   const vis=isVisit(), devs=roomDevs(id).filter(d=>!vis||visitKeep(d)), pd=id==='Piscine'&&poolDev();
-  if(pd) return '<div class="pool-panel">'+poolBits(pd,false,true)+'</div>'+(vis?'':poolSpeedHtml(pd)+poolLightHtml(pd)+poolHydHtml(pd))+(devs.length>1?'<div class="list">'+devs.filter(d=>d!==pd).map(devRow).join('')+'</div>':'');
+  if(pd) return '<div class="pool-panel">'+poolBits(pd,false,true)+'</div>'+(vis?'':poolSpeedHtml(pd)+poolHydHtml(pd))+(devs.length>1?'<div class="list">'+devs.filter(d=>d!==pd).map(devRow).join('')+'</div>':'');
   if(!devs.length) return '<p class="muted">'+(vis?'Rien à commander dans cette pièce.':'Rien de relié à Homey dans cette pièce. Ce qui s’y trouve se pilote dans l’appli Maison.')+'</p>';
   // Ambiances de la pièce : toutes ses lampes réglées d'un coup
   const amb=roomLights(id).length?'<div class="room-amb dv-opts">'+(roomLamps(id).length?Object.keys(AMB).map(a=>'<button class="chip" type="button" data-ramb="'+a+'" data-room="'+esc(id)+'">'+AMB[a].t+'</button>').join(''):'')+'<button class="chip" type="button" data-roff="'+esc(id)+'">Éteindre</button></div>':'';
@@ -2197,7 +2200,7 @@ function renderHomeBig(wall){
   let fl=homeFlows(); const now=nowScene(fl); if(now) fl=[now].concat(fl.filter(f=>f!==now));
   h+='<div class="hb-more">'+eveBtns()
     +(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3><button class="linkbtn" type="button" id="arrange">Ranger</button></div><div class="scenes">'+topScenes(fl,now).map(f=>sceneBtn(f,f===now)).join('')+'</div>'+scenesMore(fl):'')
-    +camsHtml()+'</div>';
+    +alarmHtml()+camsHtml()+'</div>';
   return h;
 }
 function getShares(){
@@ -2793,6 +2796,7 @@ $('#view').addEventListener('click',e=>{
     case 'legend-q': legendOpen=!legendOpen; render(); return;
     case 'scenes-all': scenesAll=!scenesAll; render(); return;
     case 'open-cams': openCams(); return;
+    case 'open-alarm': openAlarm(); return;
     case 'go-plan': if([...b.querySelectorAll('.pin.bad')].some(p=>{ const q=p.getBoundingClientRect(); return Math.hypot(q.left+q.width/2-e.clientX,q.top+q.height/2-e.clientY)<=16; })){ openWatch(); return; }
       store.set('homePlan','big'); render(); window.scrollTo(0,0); return;
     case 'plan-small': store.set('homePlan','small'); pinEdit=false; render(); window.scrollTo(0,0); return;
