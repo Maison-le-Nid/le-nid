@@ -1393,16 +1393,17 @@ function homeFlows(){
 function camsHtml(){
   return '<button class="allclose" type="button" id="open-cams"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Caméras</b><small>Toutes, Sherlock ou Aqara</small></span></button>';
 }
-// Alarme : deux raccourcis de l'iPhone qui envoient le SMS depuis ton numéro (jamais chez les invités)
+// Alarme : deux raccourcis de l'appareil (« Armer », « Désarmer ») qui envoient le SMS ; visible par tous, chacun a ses raccourcis
 const ALARM_ON='Armer', ALARM_OFF='Désarmer';
 function alarmHtml(){
   return '<button class="allclose" type="button" id="open-alarm"><span class="row-ic">'+I('shield')+'</span><span class="row-txt"><b>Alarme</b><small>Armer ou désarmer</small></span></button>';
 }
 function openAlarm(){
+  if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
   const t=(name,ic,b,sm,lab)=>'<a class="cam-tile" href="shortcuts://run-shortcut?name='+encodeURIComponent(name)+'" aria-label="'+lab+'"><span class="cam-ic">'+I(ic)+'</span><b>'+b+'</b><small>'+sm+'</small></a>';
   openSheet('Alarme','<div class="cams-row two">'
-    +t(ALARM_ON,'shield','Armer','envoie le SMS','Armer l’alarme : envoie le SMS depuis ton iPhone')
-    +t(ALARM_OFF,'house','Désarmer','envoie le SMS','Désarmer l’alarme : envoie le SMS depuis ton iPhone')+'</div>',{});
+    +t(ALARM_ON,'shield','Armer','envoie le SMS','Armer l’alarme : envoie le SMS depuis ce téléphone')
+    +t(ALARM_OFF,'house','Désarmer','envoie le SMS','Désarmer l’alarme : envoie le SMS depuis ce téléphone')+'</div>',{});
 }
 function openCams(){
   const t=(name,b,sm,lab)=>'<a class="cam-tile" href="shortcuts://run-shortcut?name='+name+'" aria-label="'+lab+'"><span class="cam-ic">'+I('camera')+'</span><b>'+b+'</b><small>'+sm+'</small></a>';
@@ -2317,7 +2318,7 @@ function renderVisit(g,isPrev){
   h+=word;
   h+='<div class="hb-plan">'+planHtml()+'</div>';
   if(!isPrev&&isWide()){ const wall=document.body.classList.contains('wall'); h+='<div class="hb-tools"><button class="btn small" type="button" id="'+(wall?'wall-exit':'wall-go')+'">'+(wall?'Quitter le plein écran':'Plein écran')+'</button></div>'; }
-  h+='<div class="hb-more">'+eveBtns()+(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3></div><div class="scenes">'+fl.map(f=>sceneBtn(f,false)).join('')+'</div>':'')+'</div>';
+  h+='<div class="hb-more">'+eveBtns()+(fl.length?'<div class="sec-row"><h3 class="sec">Scènes</h3></div><div class="scenes">'+fl.map(f=>sceneBtn(f,false)).join('')+'</div>':'')+alarmHtml()+'</div>';
   return h+foot;
 }
 function render(){ renderView(); fitLabels(); fitDots(); nightCheck(); }
