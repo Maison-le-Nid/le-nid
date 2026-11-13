@@ -86,6 +86,10 @@ a.btn{text-decoration:none}
 .cams-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
 .cams-row.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 .allclose.armed small{color:var(--bad);font-weight:600}
+.arm-pill{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:5px 12px;border-radius:999px;border:1px solid var(--bad);background:var(--bad-bg);color:var(--bad);font-weight:600;font-size:13px;line-height:1.2;cursor:pointer}
+.arm-pill svg{width:14px;height:14px;flex:none}
+.arm-row{margin:-4px 0 10px}
+.arm-row .arm-pill{margin-top:0}
 .arm-alert{display:flex;align-items:center;gap:14px;padding:12px 14px;margin:0 0 14px;border-radius:var(--r-lg);background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad)}
 .arm-alert .row-ic{flex:none;display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:var(--bad);color:#fff}
 .arm-alert .row-txt{flex:1;min-width:0}
@@ -1455,6 +1459,8 @@ function armBanner(){
     +(a.call?'<a class="arm-call" href="tel:17" aria-label="Appeler le 17, police secours">Appeler le 17</a>':'')+'</span></div>';
 }
 setInterval(()=>{ const s=$('#arm-left'); if(s) s.textContent=Math.max(0,Math.ceil((+s.dataset.until-Date.now())/1000)); },1000);
+// Pastille « Alarme armée » à côté de l'heure : un toucher ouvre l'écran Alarme
+function armPill(){ const b=eufyBase(); return b&&b.capabilitiesObj.CMD_SET_ARMING.value==='away'?'<button class="arm-pill" type="button" id="arm-pill" aria-label="Alarme armée, ouvrir l’écran Alarme">'+I('shield')+'<span>Alarme armée</span></button>':''; }
 function openAlarm(){
   if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
   const t=(name,arm,ic,b,sm,lab)=>'<a class="cam-tile" href="shortcuts://run-shortcut?name='+encodeURIComponent(name)+'" data-arm="'+arm+'" aria-label="'+lab+'"><span class="cam-ic">'+I(ic)+'</span><b>'+b+'</b><small>'+sm+'</small></a>';
@@ -2257,9 +2263,10 @@ function renderHomeBig(wall){
   let h='';
   if(mode==='demo') h+='<div class="note"><span>Démo avec des appareils d’exemple.</span><button class="btn small" type="button" id="open-settings">Connecter mon Homey</button></div>';
   h+=armBanner();
-  h+='<div class="hb-top'+(narrow?' slim':'')+'"><div class="hb-clock"><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div></div>'
+  h+='<div class="hb-top'+(narrow?' slim':'')+'"><div class="hb-clock"><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div>'+(narrow?'':armPill())+'</div>'
     +'<div class="hb-wx">'+wxHtml(narrow)+'</div>'
     +(narrow?'':watchBtn)+'</div>';
+  if(narrow&&armPill()) h+='<div class="arm-row">'+armPill()+'</div>';
   h+='<div class="hb-plan">'+planHtml()+'</div>';
   h+='<div class="hb-tools">'+(isWide()?'<button class="btn small" type="button" id="'+(wall?'wall-exit':'wall-go')+'">'+(wall?'Quitter le plein écran':'Plein écran')+'</button>':'')
     +(pinEdit?'<button class="btn small primary" type="button" id="pin-edit">'+I('check')+'Terminé</button>'+(alignUndo?'<button class="btn small" type="button" id="pin-undo">Annuler l’alignement</button>':'<button class="btn small" type="button" id="pin-align">Aligner</button>')+'<button class="btn small" type="button" id="pin-guest">'+I('eye')+'Aperçu invité</button><button class="btn small" type="button" id="pin-reset">Remettre en place</button>':'')+'</div>';
@@ -2382,7 +2389,7 @@ function renderVisit(g,isPrev){
   if(!isPrev&&conn==='off') return h+'<section class="status bad"><div class="status-dot" aria-hidden="true">!</div><div class="status-txt"><h2>Le Nid ne répond pas</h2><p>'+esc(lastErr)+'</p><div class="row-btns"><button class="btn small" type="button" id="retry">Réessayer</button></div></div></section>'+foot;
   const tm=wallTime(), fl=(g.b||[]).map(f=>({id:f.i,type:f.t,name:f.n}));
   if(!isPrev) h+=armBanner();
-  h+='<div class="hb-top"><div class="hb-clock"><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div></div><div class="hb-wx">'+wxHtml()+'</div></div>';
+  h+='<div class="hb-top"><div class="hb-clock"><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div>'+(isPrev?'':armPill())+'</div><div class="hb-wx">'+wxHtml()+'</div></div>';
   h+=word;
   h+='<div class="hb-plan">'+planHtml()+'</div>';
   if(!isPrev&&isWide()){ const wall=document.body.classList.contains('wall'); h+='<div class="hb-tools"><button class="btn small" type="button" id="'+(wall?'wall-exit':'wall-go')+'">'+(wall?'Quitter le plein écran':'Plein écran')+'</button></div>'; }
@@ -2865,7 +2872,7 @@ $('#view').addEventListener('click',e=>{
     case 'legend-q': legendOpen=!legendOpen; render(); return;
     case 'scenes-all': scenesAll=!scenesAll; render(); return;
     case 'open-cams': openCams(); return;
-    case 'open-alarm': openAlarm(); return;
+    case 'open-alarm': case 'arm-pill': openAlarm(); return;
     case 'go-plan': if([...b.querySelectorAll('.pin.bad')].some(p=>{ const q=p.getBoundingClientRect(); return Math.hypot(q.left+q.width/2-e.clientX,q.top+q.height/2-e.clientY)<=16; })){ openWatch(); return; }
       store.set('homePlan','big'); render(); window.scrollTo(0,0); return;
     case 'plan-small': store.set('homePlan','small'); pinEdit=false; render(); window.scrollTo(0,0); return;
