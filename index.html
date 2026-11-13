@@ -986,7 +986,8 @@ async function tryConnect(c){
 }
 function normFlows(m,type){
   if(!m) return [];
-  return Object.values(m).filter(f=>f&&f.id&&f.enabled!==false)
+  // Les flows « Alarme : … » servent au bouton Alarme : pas dans les scènes
+  return Object.values(m).filter(f=>f&&f.id&&f.enabled!==false&&!/^alarme\s*:/i.test(f.name||''))
     .map(f=>({id:f.id,name:f.name||'Sans nom',type,trig:f.triggerable!==false})).sort(byName);
 }
 // Appareils : on retire ceux à cacher, et on prend le type choisi dans Homey (« Branché : Lampe ») plutôt que celui du module
@@ -1410,14 +1411,21 @@ function camsHtml(){
 // La Base eufy suit le même bouton : Armer = « À l'extérieur » (sirènes et lumières si un capteur s'ouvre), Désarmer = Géo
 const ALARM_ON='Armer', ALARM_OFF='Désarmer';
 const eufyBase=()=>Object.values(data.devices||{}).find(d=>d.class==='homealarm'&&/^base eufy$/i.test(String(d.name||'').trim())&&d.capabilitiesObj&&d.capabilitiesObj.CMD_SET_ARMING);
+// Flows Homey « Alarme : armer » et « Alarme : désarmer » : ils règlent eufy et préviennent le script de l'alarme
+const ARM_FLOW={away:'374551b6-01b6-402c-bccc-29b93d9802e4',geo:'9e53babb-2e06-45cf-8e60-91310add2295'};
 document.addEventListener('click',async e=>{
   const a=e.target.closest&&e.target.closest('a[data-arm]'); if(!a) return;
   const b=eufyBase(); if(!b||preview||isDemoData()) return; // sans Base eufy : seul le SMS part
   e.preventDefault();
-  const href=a.getAttribute('href'), on=a.dataset.arm==='away';
-  const ok=await Promise.race([setCap(b.id,'CMD_SET_ARMING',on?'away':'geo'),new Promise(r=>setTimeout(()=>r(null),2500))]);
-  toast(ok===false?'eufy ne répond pas : seul le SMS part.':(on?'eufy armé : 90 s pour sortir.':'eufy désarmé.'),ok===false?'bad':'');
-  setTimeout(()=>{ location.href=href; },700);
+  const href=a.getAttribute('href'), v=a.dataset.arm==='away'?'away':'geo', c=b.capabilitiesObj.CMD_SET_ARMING;
+  store.set('armAt'+sfx(),v==='away'?Date.now():0);
+  c.value=v; c.lastUpdated=new Date().toISOString(); render();
+  const put=()=>req('/api/manager/devices/device/'+encodeURIComponent(b.id)+'/capability/CMD_SET_ARMING',{method:'PUT',body:{value:v}}).then(()=>true,()=>false);
+  const go=()=>req('/api/manager/flow/flow/'+ARM_FLOW[v]+'/trigger',{method:'POST',body:{}}).then(()=>true,put);
+  const ok=await Promise.race([go(),new Promise(r=>setTimeout(()=>r(null),3000))]);
+  toast(ok===false?'eufy ne répond pas : seul le SMS part.':(v==='away'?'Alarme armée : 90 s pour sortir.':'Alarme désarmée.'),ok===false?'bad':'');
+  setTimeout(()=>{ location.href=href; },900);
+  setTimeout(refresh,4000);
 });
 function alarmHtml(){
   const b=eufyBase(), on=!!b&&b.capabilitiesObj.CMD_SET_ARMING.value==='away';
@@ -1427,18 +1435,21 @@ function alarmHtml(){
 const tsOf=c=>c&&c.lastUpdated?new Date(c.lastUpdated).getTime():0;
 function armEntry(){
   const b=eufyBase(); if(!b||b.capabilitiesObj.CMD_SET_ARMING.value!=='away') return null;
-  const ds=Object.values(data.devices||{}), now=Date.now(), armed=tsOf(b.capabilitiesObj.CMD_SET_ARMING), ag=b.capabilitiesObj.alarm_generic;
+  const ds=Object.values(data.devices||{}), now=Date.now(), armAt=Number(store.get('armAt'+sfx(),0))||0, ag=b.capabilitiesObj.alarm_generic;
+  if(now-armAt<90000) return null; // 90 s pour sortir après « Armer »
+  const open=ds.filter(d=>isContact(d)&&d.capabilitiesObj.alarm_contact.value===true);
+  const door=open.find(d=>/^porte d.entr[ée]e$/i.test(String(d.name||'').trim())), dt=door&&tsOf(door.capabilitiesObj.alarm_contact);
+  if(door&&now-dt<30000) return {t:'Porte d’entrée ouverte',until:dt+30000};
+  if(open.length) return {t:'Alarme déclenchée',w:devName(open[0])+(open.length>1?' et '+(open.length-1)+' autre'+(open.length>2?'s':''):''),call:true};
   if(ag&&ag.value===true) return {t:'L’alarme sonne',call:true};
-  const door=ds.find(d=>/^porte d.entr[ée]e$/i.test(String(d.name||'').trim())&&isContact(d)), dc=door&&door.capabilitiesObj.alarm_contact;
-  if(dc&&dc.value===true&&now-tsOf(dc)<30000&&tsOf(dc)-armed>90000) return {t:'Porte d’entrée ouverte',until:tsOf(dc)+30000};
   const g=ds.find(d=>ctrlKind(d)==='garage'), gc=g&&g.capabilitiesObj.garagedoor_closed;
-  if(gc&&gc.value===false&&now-tsOf(gc)<120000&&tsOf(gc)-armed>300000) return {t:'Garage ouvert, l’alarme est armée'};
+  if(gc&&gc.value===false&&now-tsOf(gc)<120000&&now-armAt>300000) return {t:'Garage ouvert, l’alarme est armée'};
   return null;
 }
 function armBanner(){
   const a=armEntry(); if(!a) return '';
   const left=a.until?Math.max(0,Math.ceil((a.until-Date.now())/1000)):null;
-  return '<div class="arm-alert" role="alert"><span class="row-ic">'+I('shield')+'</span><span class="row-txt"><b>'+esc(a.t)+'</b><small>'+(left!==null?'Désarme dans <span id="arm-left" data-until="'+a.until+'">'+left+'</span> s':'Désarme maintenant')+'</small></span>'
+  return '<div class="arm-alert" role="alert"><span class="row-ic">'+I('shield')+'</span><span class="row-txt"><b>'+esc(a.t)+'</b><small>'+(left!==null?'Désarme dans <span id="arm-left" data-until="'+a.until+'">'+left+'</span> s':(a.w?esc(a.w)+' · désarme maintenant':'Désarme maintenant'))+'</small></span>'
     +'<span class="arm-btns"><a class="arm-go" data-arm="geo" href="shortcuts://run-shortcut?name='+encodeURIComponent(ALARM_OFF)+'">Désarmer</a>'
     // Appeler la police : après avoir regardé les caméras (c'est la personne qui vérifie, pas Le Nid)
     +(a.call?'<a class="arm-call" href="tel:17" aria-label="Appeler le 17, police secours">Appeler le 17</a>':'')+'</span></div>';
