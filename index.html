@@ -89,9 +89,11 @@ a.btn{text-decoration:none}
 .arm-alert{display:flex;align-items:center;gap:14px;padding:12px 14px;margin:0 0 14px;border-radius:var(--r-lg);background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad)}
 .arm-alert .row-ic{flex:none;display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:var(--bad);color:#fff}
 .arm-alert .row-txt{flex:1;min-width:0}
-.arm-alert b{display:block;font-weight:600;font-size:16px}
+.arm-alert b{display:block;font-weight:600;font-size:16px;color:var(--bad)}
 .arm-alert small{display:block;font-size:14px}
-.arm-alert .arm-go{flex:none;padding:11px 18px;border-radius:999px;background:var(--bad);color:#fff;font-weight:600;text-decoration:none}
+.arm-alert .arm-btns{flex:none;display:flex;flex-direction:column;gap:8px}
+.arm-alert .arm-go,.arm-alert .arm-call{padding:11px 18px;border-radius:999px;background:var(--bad);color:#fff;font-weight:600;text-decoration:none;text-align:center;white-space:nowrap}
+.arm-alert .arm-call{background:transparent;color:var(--bad);border:1.5px solid var(--bad);padding:9px 16px}
 .cam-tile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 6px 12px;border-radius:var(--r-lg);background:var(--face);box-shadow:var(--float-lo);color:var(--title);text-decoration:none;text-align:center;transition:transform .2s}
 .cam-tile:active{transform:scale(.96)}
 .cam-tile b{font-size:15px;font-weight:600;line-height:1.2}
@@ -1426,7 +1428,7 @@ const tsOf=c=>c&&c.lastUpdated?new Date(c.lastUpdated).getTime():0;
 function armEntry(){
   const b=eufyBase(); if(!b||b.capabilitiesObj.CMD_SET_ARMING.value!=='away') return null;
   const ds=Object.values(data.devices||{}), now=Date.now(), armed=tsOf(b.capabilitiesObj.CMD_SET_ARMING), ag=b.capabilitiesObj.alarm_generic;
-  if(ag&&ag.value===true) return {t:'L’alarme sonne'};
+  if(ag&&ag.value===true) return {t:'L’alarme sonne',call:true};
   const door=ds.find(d=>/^porte d.entr[ée]e$/i.test(String(d.name||'').trim())&&isContact(d)), dc=door&&door.capabilitiesObj.alarm_contact;
   if(dc&&dc.value===true&&now-tsOf(dc)<30000&&tsOf(dc)-armed>90000) return {t:'Porte d’entrée ouverte',until:tsOf(dc)+30000};
   const g=ds.find(d=>ctrlKind(d)==='garage'), gc=g&&g.capabilitiesObj.garagedoor_closed;
@@ -1437,7 +1439,9 @@ function armBanner(){
   const a=armEntry(); if(!a) return '';
   const left=a.until?Math.max(0,Math.ceil((a.until-Date.now())/1000)):null;
   return '<div class="arm-alert" role="alert"><span class="row-ic">'+I('shield')+'</span><span class="row-txt"><b>'+esc(a.t)+'</b><small>'+(left!==null?'Désarme dans <span id="arm-left" data-until="'+a.until+'">'+left+'</span> s':'Désarme maintenant')+'</small></span>'
-    +'<a class="arm-go" data-arm="geo" href="shortcuts://run-shortcut?name='+encodeURIComponent(ALARM_OFF)+'">Désarmer</a></div>';
+    +'<span class="arm-btns"><a class="arm-go" data-arm="geo" href="shortcuts://run-shortcut?name='+encodeURIComponent(ALARM_OFF)+'">Désarmer</a>'
+    // Appeler la police : après avoir regardé les caméras (c'est la personne qui vérifie, pas Le Nid)
+    +(a.call?'<a class="arm-call" href="tel:17" aria-label="Appeler le 17, police secours">Appeler le 17</a>':'')+'</span></div>';
 }
 setInterval(()=>{ const s=$('#arm-left'); if(s) s.textContent=Math.max(0,Math.ceil((+s.dataset.until-Date.now())/1000)); },1000);
 function openAlarm(){
