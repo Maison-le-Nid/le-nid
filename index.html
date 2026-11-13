@@ -85,6 +85,13 @@ a.btn{text-decoration:none}
 .scenes-more{display:block;margin:12px auto 0}
 .cams-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
 .cams-row.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.allclose.armed small{color:var(--bad);font-weight:600}
+.arm-alert{display:flex;align-items:center;gap:14px;padding:12px 14px;margin:0 0 14px;border-radius:var(--r-lg);background:var(--bad-bg);border:1px solid var(--bad);color:var(--bad)}
+.arm-alert .row-ic{flex:none;display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;background:var(--bad);color:#fff}
+.arm-alert .row-txt{flex:1;min-width:0}
+.arm-alert b{display:block;font-weight:600;font-size:16px}
+.arm-alert small{display:block;font-size:14px}
+.arm-alert .arm-go{flex:none;padding:11px 18px;border-radius:999px;background:var(--bad);color:#fff;font-weight:600;text-decoration:none}
 .cam-tile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 6px 12px;border-radius:var(--r-lg);background:var(--face);box-shadow:var(--float-lo);color:var(--title);text-decoration:none;text-align:center;transition:transform .2s}
 .cam-tile:active{transform:scale(.96)}
 .cam-tile b{font-size:15px;font-weight:600;line-height:1.2}
@@ -1411,8 +1418,28 @@ document.addEventListener('click',async e=>{
   setTimeout(()=>{ location.href=href; },700);
 });
 function alarmHtml(){
-  return '<button class="allclose" type="button" id="open-alarm"><span class="row-ic">'+I('shield')+'</span><span class="row-txt"><b>Alarme</b><small>Armer ou désarmer</small></span></button>';
+  const b=eufyBase(), on=!!b&&b.capabilitiesObj.CMD_SET_ARMING.value==='away';
+  return '<button class="allclose'+(on?' armed':'')+'" type="button" id="open-alarm"><span class="row-ic">'+I('shield')+'</span><span class="row-txt"><b>Alarme</b><small>'+(on?'Armée':'Armer ou désarmer')+'</small></span></button>';
 }
+// Alarme armée et quelqu'un rentre (porte d'entrée, garage) ou l'alarme sonne : bandeau rouge « Désarmer » en haut
+const tsOf=c=>c&&c.lastUpdated?new Date(c.lastUpdated).getTime():0;
+function armEntry(){
+  const b=eufyBase(); if(!b||b.capabilitiesObj.CMD_SET_ARMING.value!=='away') return null;
+  const ds=Object.values(data.devices||{}), now=Date.now(), armed=tsOf(b.capabilitiesObj.CMD_SET_ARMING), ag=b.capabilitiesObj.alarm_generic;
+  if(ag&&ag.value===true) return {t:'L’alarme sonne'};
+  const door=ds.find(d=>/^porte d.entr[ée]e$/i.test(String(d.name||'').trim())&&isContact(d)), dc=door&&door.capabilitiesObj.alarm_contact;
+  if(dc&&dc.value===true&&now-tsOf(dc)<30000&&tsOf(dc)-armed>90000) return {t:'Porte d’entrée ouverte',until:tsOf(dc)+30000};
+  const g=ds.find(d=>ctrlKind(d)==='garage'), gc=g&&g.capabilitiesObj.garagedoor_closed;
+  if(gc&&gc.value===false&&now-tsOf(gc)<120000&&tsOf(gc)-armed>300000) return {t:'Garage ouvert, l’alarme est armée'};
+  return null;
+}
+function armBanner(){
+  const a=armEntry(); if(!a) return '';
+  const left=a.until?Math.max(0,Math.ceil((a.until-Date.now())/1000)):null;
+  return '<div class="arm-alert" role="alert"><span class="row-ic">'+I('shield')+'</span><span class="row-txt"><b>'+esc(a.t)+'</b><small>'+(left!==null?'Désarme dans <span id="arm-left" data-until="'+a.until+'">'+left+'</span> s':'Désarme maintenant')+'</small></span>'
+    +'<a class="arm-go" data-arm="geo" href="shortcuts://run-shortcut?name='+encodeURIComponent(ALARM_OFF)+'">Désarmer</a></div>';
+}
+setInterval(()=>{ const s=$('#arm-left'); if(s) s.textContent=Math.max(0,Math.ceil((+s.dataset.until-Date.now())/1000)); },1000);
 function openAlarm(){
   if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
   const t=(name,arm,ic,b,sm,lab)=>'<a class="cam-tile" href="shortcuts://run-shortcut?name='+encodeURIComponent(name)+'" data-arm="'+arm+'" aria-label="'+lab+'"><span class="cam-ic">'+I(ic)+'</span><b>'+b+'</b><small>'+sm+'</small></a>';
@@ -1434,6 +1461,7 @@ function renderHome(){
   if(now) fl=[now].concat(fl.filter(f=>f!==now));
   let top='';
   if(mode==='demo') top='<div class="note"><span>Démo avec des appareils d’exemple.</span><button class="btn small" type="button" id="open-settings">Connecter mon Homey</button></div>';
+  top+=armBanner();
   let side=miniPlan()+'<section class="status '+(ok?'ok':'warn')+'"><div class="status-dot" aria-hidden="true">'+(ok?I('check'):'!')+'</div><div class="status-txt">'
     +'<h2>'+(ok?'Tout va bien à la maison':w.length+(w.length>1?' points à regarder':' point à regarder'))+'</h2>'
     +(ok?'':'<ul>'+w.slice(0,2).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><button class="linkbtn" type="button" id="watch">'+(w.length>2?'Voir tout ('+w.length+')':'Voir et agir')+'</button>')
@@ -2213,6 +2241,7 @@ function renderHomeBig(wall){
   const narrow=!wall&&!isWide(), watchBtn='<button class="hb-watch'+(n?' warn':'')+'" type="button" id="watch"><span class="status-dot" aria-hidden="true">'+(n?'!':I('check'))+'</span><span class="hb-w-txt"><b>'+(n?n+(n>1?' points à regarder':' point à regarder'):'Tout va bien à la maison')+'</b><small>'+esc(n?it.slice(0,2).map(i=>i.txt).join(' · ')+(n>2?'…':''):summary())+'</small></span></button>';
   let h='';
   if(mode==='demo') h+='<div class="note"><span>Démo avec des appareils d’exemple.</span><button class="btn small" type="button" id="open-settings">Connecter mon Homey</button></div>';
+  h+=armBanner();
   h+='<div class="hb-top'+(narrow?' slim':'')+'"><div class="hb-clock"><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div></div>'
     +'<div class="hb-wx">'+wxHtml(narrow)+'</div>'
     +(narrow?'':watchBtn)+'</div>';
@@ -2337,6 +2366,7 @@ function renderVisit(g,isPrev){
   if(!isPrev&&conn==='loading') return h+'<p class="loading">Connexion au Nid…</p>';
   if(!isPrev&&conn==='off') return h+'<section class="status bad"><div class="status-dot" aria-hidden="true">!</div><div class="status-txt"><h2>Le Nid ne répond pas</h2><p>'+esc(lastErr)+'</p><div class="row-btns"><button class="btn small" type="button" id="retry">Réessayer</button></div></div></section>'+foot;
   const tm=wallTime(), fl=(g.b||[]).map(f=>({id:f.i,type:f.t,name:f.n}));
+  if(!isPrev) h+=armBanner();
   h+='<div class="hb-top"><div class="hb-clock"><div class="wall-clock" id="wall-clock">'+esc(tm.t)+'</div><div class="wall-date" id="wall-date">'+esc(tm.d)+'</div></div><div class="hb-wx">'+wxHtml()+'</div></div>';
   h+=word;
   h+='<div class="hb-plan">'+planHtml()+'</div>';
