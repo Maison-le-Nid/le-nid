@@ -1398,16 +1398,28 @@ function camsHtml(){
   return '<button class="allclose" type="button" id="open-cams"><span class="row-ic">'+I('camera')+'</span><span class="row-txt"><b>Caméras</b><small>Toutes, Sherlock ou Aqara</small></span></button>';
 }
 // Alarme : deux raccourcis de l'appareil (« Armer », « Désarmer ») qui envoient le SMS ; visible par tous, chacun a ses raccourcis
+// La Base eufy suit le même bouton : Armer = « À l'extérieur » (sirènes et lumières si un capteur s'ouvre), Désarmer = Géo
 const ALARM_ON='Armer', ALARM_OFF='Désarmer';
+const eufyBase=()=>Object.values(data.devices||{}).find(d=>d.class==='homealarm'&&/^base eufy$/i.test(String(d.name||'').trim())&&d.capabilitiesObj&&d.capabilitiesObj.CMD_SET_ARMING);
+document.addEventListener('click',async e=>{
+  const a=e.target.closest&&e.target.closest('a[data-arm]'); if(!a) return;
+  const b=eufyBase(); if(!b||preview||isDemoData()) return; // sans Base eufy : seul le SMS part
+  e.preventDefault();
+  const href=a.getAttribute('href'), on=a.dataset.arm==='away';
+  const ok=await Promise.race([setCap(b.id,'CMD_SET_ARMING',on?'away':'geo'),new Promise(r=>setTimeout(()=>r(null),2500))]);
+  toast(ok===false?'eufy ne répond pas : seul le SMS part.':(on?'eufy armé : 90 s pour sortir.':'eufy désarmé.'),ok===false?'bad':'');
+  setTimeout(()=>{ location.href=href; },700);
+});
 function alarmHtml(){
   return '<button class="allclose" type="button" id="open-alarm"><span class="row-ic">'+I('shield')+'</span><span class="row-txt"><b>Alarme</b><small>Armer ou désarmer</small></span></button>';
 }
 function openAlarm(){
   if(preview){ toast('Aperçu : rien n’est lancé.'); return; }
-  const t=(name,ic,b,sm,lab)=>'<a class="cam-tile" href="shortcuts://run-shortcut?name='+encodeURIComponent(name)+'" aria-label="'+lab+'"><span class="cam-ic">'+I(ic)+'</span><b>'+b+'</b><small>'+sm+'</small></a>';
+  const t=(name,arm,ic,b,sm,lab)=>'<a class="cam-tile" href="shortcuts://run-shortcut?name='+encodeURIComponent(name)+'" data-arm="'+arm+'" aria-label="'+lab+'"><span class="cam-ic">'+I(ic)+'</span><b>'+b+'</b><small>'+sm+'</small></a>';
+  const eu=!!eufyBase();
   openSheet('Alarme','<div class="cams-row two">'
-    +t(ALARM_ON,'shield','Armer','envoie le SMS','Armer l’alarme : envoie le SMS depuis ce téléphone')
-    +t(ALARM_OFF,'house','Désarmer','envoie le SMS','Désarmer l’alarme : envoie le SMS depuis ce téléphone')+'</div>',{});
+    +t(ALARM_ON,'away','shield','Armer',eu?'alarme et eufy':'envoie le SMS','Armer l’alarme'+(eu?' et les sirènes eufy':'')+' : envoie le SMS depuis ce téléphone')
+    +t(ALARM_OFF,'geo','house','Désarmer',eu?'tout s’arrête':'envoie le SMS','Désarmer l’alarme'+(eu?', coupe les sirènes eufy':'')+' : envoie le SMS depuis ce téléphone')+'</div>',{});
 }
 function openCams(){
   const t=(name,b,sm,lab)=>'<a class="cam-tile" href="shortcuts://run-shortcut?name='+name+'" aria-label="'+lab+'"><span class="cam-ic">'+I('camera')+'</span><b>'+b+'</b><small>'+sm+'</small></a>';
