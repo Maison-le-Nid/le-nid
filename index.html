@@ -452,6 +452,7 @@ h1{font-size:28px;letter-spacing:.005em}
 .btn.primary{box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 10px 18px -8px rgba(46,74,54,.55)}
 /* Le plan : relief et lumière qui rayonne */
 .pr.lit{box-shadow:var(--glow);z-index:1}
+.pr.inset{z-index:2}
 .pr.pool{box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 10px 22px -10px rgba(78,141,228,.7)}
 .plan{border-radius:28px}
 /* Barre d'onglets en apesanteur */
@@ -742,6 +743,8 @@ body.wall.night .plan:not(.zoomed) .pin:not(.as-dot).on{box-shadow:0 0 0 1.5px #
 .dv-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
 .dv-chip{padding:6px 12px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);font-size:14px}
 .dv-chip.warn{color:var(--bad)}
+.pr.open{box-shadow:inset 0 0 0 2px var(--bad)}
+.plan .pr.open small.p-open{color:var(--bad);font-weight:600;letter-spacing:.04em;opacity:1}
 .dv-ctl{display:flex;flex-direction:column;gap:20px;padding-top:4px}
 .dv-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:15px;color:var(--ink-2)}
 .dv-h b{color:var(--title);font-weight:600;font-variant-numeric:tabular-nums}
@@ -1016,7 +1019,7 @@ function errMsg(e){
 /* ---------- Le Nid : les noms et les pièces de l’appli Maison ---------- */
 // Homey garde ses noms complets (plus clairs pour les alertes) ; l’appli affiche ceux de Le Nid.
 const nk=s=>String(s||'').trim().replace(/\s+/g,' ').toLowerCase();
-const NID_ROOM={'ma salle de bain':'Salle De Bain Ma Chambre','chambre de paul':'Chambre De Paul','chambre paul':'Chambre De Paul','chambre amis':'Chambre AMIS','chambre piscine':'Chambre AMIS','chambre artiste':'Chambre Artiste','chambre artist':'Chambre Artiste','arrière cuisine':'Arrière Cuisine','terrasse':'Extérieur','carport':'Extérieur'};
+const NID_ROOM={'toilette':'Toilette','toilettes':'Toilette','wc':'Toilette','ma salle de bain':'Salle De Bain Ma Chambre','chambre de paul':'Chambre De Paul','chambre paul':'Chambre De Paul','chambre amis':'Chambre AMIS','chambre piscine':'Chambre AMIS','chambre artiste':'Chambre Artiste','chambre artist':'Chambre Artiste','arrière cuisine':'Arrière Cuisine','terrasse':'Extérieur','carport':'Extérieur'};
 const NID_DEV={
   'base eufy':['Base eufy','Arrière Cuisine'], 'plaque de cuisson':['Plaque de cuisson','Buanderie'],
   'clim bureau':['Clim','Bureau'], 'clim salon':['Clim','Salon'],
@@ -1033,7 +1036,7 @@ const NID_DEV={
   'kajplats trompette 1':['Lampe trompette de ma chambre','Ma Chambre'], 'kajplats trompette 2':['Lampe trompette du bureau','Bureau']
 };
 // Les stores restent dans « Extérieur », mais on les retrouve aussi dans leur pièce
-const NID_ALSO={'store ma chambre':['Ma Chambre'],'store chambre de maître':['Ma Chambre'],'store baie gauche 3':['Salon'],'store baie droite 4':['Salon'],'store paul':['Chambre De Paul'],'store chambre amis':['Chambre AMIS'],'store chambre piscine':['Chambre AMIS'],
+const NID_ALSO={'toilette d':['Toilette'],'ch paul':['Chambre De Paul'],'ch artiste':['Chambre Artiste'],'ch amis':['Chambre AMIS'],'baie droite d':['Salon'],'store ma chambre':['Ma Chambre'],'store chambre de maître':['Ma Chambre'],'store baie gauche 3':['Salon'],'store baie droite 4':['Salon'],'store paul':['Chambre De Paul'],'store chambre amis':['Chambre AMIS'],'store chambre piscine':['Chambre AMIS'],
   'store baie droite 1':['Salon'],'store baie droite 2':['Salon'],'store baie gauche 1':['Salon'],'store baie gauche 2':['Salon']};
 // Doublons : les ampoules réunies dans un groupe Homey (Lampadaire salon, Lampe petite table) et les déclencheurs de Siri
 const NID_HIDE=new Set(['lumière piscine','kajplats lampadaire salon1','kajplats lampadaire salon 1','kajplats lampadaire salon 2','kajplats petite table1','kajplats petite table 1','kajplats table 2']);
@@ -1607,6 +1610,8 @@ const PLAN=[
   {n:'Salon',x:7.1,y:8.1,w:18.6,h:8,k:'zone',notch:[11.4/18.6,4/8]},
   {n:'Cuisine',x:7.1,y:8.1,w:6.95,h:4,k:'zone'},
   {n:'Entrée',x:14.05,y:8.1,w:4.45,h:4,k:'zone'},
+  // La toilette, au fond du salon, collée au bureau : 5 m de long (profondeur à confirmer)
+  {n:'Toilette',s:'WC',x:20.7,y:8.1,w:5,h:1.5,k:'inset',v:1},
   // Les chambres de Paul, AMIS, artiste et le bureau, côté descente
   {n:'Bureau',x:25.7,y:8.1,w:3.55,h:3.4},
   {n:'Salle De Bain Artiste',s:'Bain artiste',x:29.25,y:8.1,w:2.2,h:3.4},
@@ -1676,7 +1681,9 @@ const isOn=d=>!!(d&&d.capabilitiesObj&&d.capabilitiesObj.onoff&&d.capabilitiesOb
 // Les stores des baies vitrées sont déjà dessinés sur les baies ; tous les autres stores (Velux…) ont leur bouton dans la pièce
 let bayCache={src:null,ids:null};
 function bayIds(){ if(bayCache.src!==data.devices){ bayCache={src:data.devices,ids:new Set(PLAN_BAYS.map(b=>bayDev(b.dev)).filter(Boolean).map(d=>d.id))}; } return bayCache.ids; }
-const pinSkip=d=>TREE_RE.test(nk(d.name))||bayIds().has(d.id);
+// Capteurs d'ouverture (portes, fenêtres) : pas de point sur le plan, la pièce affiche « Ouvert » à la place
+const isContact=d=>d.class==='sensor'&&!!(d.capabilitiesObj||{}).alarm_contact;
+const pinSkip=d=>TREE_RE.test(nk(d.name))||bayIds().has(d.id)||isContact(d);
 function cleanPins(o){ const out={}; if(!o||typeof o!=='object') return out;
   for(const [id,v] of Object.entries(o)) if(v&&typeof v.r==='string'&&PLAN.some(p=>p.n===v.r)&&isFinite(v.fx)&&isFinite(v.fy)) out[id]={r:v.r,fx:Math.max(0,Math.min(1,+v.fx)),fy:Math.max(0,Math.min(1,+v.fy))};
   return out; }
@@ -2057,10 +2064,12 @@ function planHtml(mini){
   for(const o of PLAN){
     const st=roomState(o);
     const hud=!mini&&o.k==='pool'&&poolDev();
-    const cls='pr'+(o.k?' '+o.k:'')+(hud?' hud':'')+(st.lit?' lit':'')+(mini?'':litAnim('r:'+o.n,!!st.lit))+(st.bad?' bad'+(st.devs.every(d=>d.available!==false||dots.some(p=>p.d===d&&p.o===o))?' pbad':''):'')+(!st.devs.length&&!o.k?' none':'')+(tall&&o.v?' vt':'')+(pinned.has(o.n)&&((tall&&o.v)||smallRoom(o,tall)||stripRoom(o,tall))?' pinned'+(stripRoom(o,tall)?' strip':'')+(!tall&&smallRoom(o,tall)&&bayTop(o)?' baytop':''):'');
+    // Porte ou fenêtre ouverte (capteur d'ouverture) : petit repère sur la pièce
+    const open=st.devs.some(d=>isContact(d)&&d.capabilitiesObj.alarm_contact.value===true);
+    const cls='pr'+(o.k?' '+o.k:'')+(hud?' hud':'')+(st.lit?' lit':'')+(mini?'':litAnim('r:'+o.n,!!st.lit))+(st.bad?' bad'+(st.devs.every(d=>d.available!==false||dots.some(p=>p.d===d&&p.o===o))?' pbad':''):'')+(open?' open':'')+(!st.devs.length&&!o.k?' none':'')+(tall&&o.v?' vt':'')+(pinned.has(o.n)&&((tall&&o.v)||smallRoom(o,tall)||stripRoom(o,tall))?' pinned'+(stripRoom(o,tall)?' strip':'')+(!tall&&smallRoom(o,tall)&&bayTop(o)?' baytop':''):'');
     if(mini){ h+='<span class="'+cls+'" style="'+planBox(o,false)+'"></span>'; continue; }
-    const say=o.n+(st.sub?', '+st.sub:'')+(st.bad?', un appareil ne répond pas':'')+(st.devs.length?'':', rien de relié à Homey');
-    h+='<button class="'+cls+'" type="button" data-plan="'+esc(o.n)+'" style="'+planBox(o,tall)+'" aria-label="'+esc(say)+'"><b>'+esc(tall&&o.ts||o.s||o.n)+'</b>'+(st.temp&&!hud?'<small>'+esc(st.temp)+'</small>':'')+'</button>';
+    const say=o.n+(st.sub?', '+st.sub:'')+(open?', porte ou fenêtre ouverte':'')+(st.bad?', un appareil ne répond pas':'')+(st.devs.length?'':', rien de relié à Homey');
+    h+='<button class="'+cls+'" type="button" data-plan="'+esc(o.n)+'" style="'+planBox(o,tall)+'" aria-label="'+esc(say)+'"><b>'+esc(tall&&o.ts||o.s||o.n)+'</b>'+(st.temp&&!hud&&!(open&&smallRoom(o,tall))?'<small>'+esc(st.temp)+'</small>':'')+(open&&Math.min(o.w,o.h)>=2?'<small class="p-open" aria-hidden="true">Ouvert</small>':'')+'</button>';
   }
   for(const w of PLAN_WALLS) h+='<span class="pwall" aria-hidden="true" style="'+planBox(w,tall)+'"></span>';
   for(const b of PLAN_BAYS){
