@@ -1049,7 +1049,7 @@ const NID_DEV={
 const NID_ALSO={'toilette d':['Toilette'],'ch paul':['Chambre De Paul'],'ch artiste':['Chambre Artiste'],'ch amis':['Chambre AMIS'],'baie droite d':['Salon'],'store ma chambre':['Ma Chambre'],'store chambre de maître':['Ma Chambre'],'store baie gauche 3':['Salon'],'store baie droite 4':['Salon'],'store paul':['Chambre De Paul'],'store chambre amis':['Chambre AMIS'],'store chambre piscine':['Chambre AMIS'],
   'store baie droite 1':['Salon'],'store baie droite 2':['Salon'],'store baie gauche 1':['Salon'],'store baie gauche 2':['Salon']};
 // Doublons : les ampoules réunies dans un groupe Homey (Lampadaire salon, Lampe petite table) et les déclencheurs de Siri
-const NID_HIDE=new Set(['lumière piscine','kajplats lampadaire salon1','kajplats lampadaire salon 1','kajplats lampadaire salon 2','kajplats petite table1','kajplats petite table 1','kajplats table 2']);
+const NID_HIDE=new Set(['lumière piscine','alerte caméras','kajplats lampadaire salon1','kajplats lampadaire salon 1','kajplats lampadaire salon 2','kajplats petite table1','kajplats petite table 1','kajplats table 2']);
 const isHidden=d=>NID_HIDE.has(nk(d.name))||/^d[ée]clencheur\b/.test(nk(d.name));
 const nidRoom=n=>NID_ROOM[nk(n)]||String(n||'').trim();
 const nidDev=n=>NID_DEV[nk(n)]||(nk(n).indexOf('echo dot')===0?['Echo Dot','Bureau']:null);
